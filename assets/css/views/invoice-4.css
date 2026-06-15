@@ -1,0 +1,299 @@
+pre.xdebug-var-dump {
+  direction: ltr;
+  text-align: left;
+  font-family: monospace; }
+
+@page {
+  size: auto;
+  margin: 0; }
+@media print {
+  body {
+    -webkit-print-color-adjust: exact;
+    color-adjust: exact; } }
+@media print {
+  html, body {
+    height: 99%;
+    page-break-after: avoid;
+    page-break-before: avoid; } }
+* {
+  box-sizing: border-box; }
+
+html, body, div, span, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+abbr, address, cite, code, del, dfn, em,
+img, ins, kbd, q, samp, small, strong, sub,
+sup, var, b, i, dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend, table, caption,
+tbody, tfoot, thead, tr, th, td, article,
+aside, canvas, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section,
+summary, time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  font-size: 100%;
+  vertical-align: baseline;
+  background: transparent; }
+
+body {
+  line-height: 34px;
+  color: #000;
+  font-size: 16px;
+  font-family: Tahoma, Arial, sans-serif; }
+
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+  display: block; }
+
+a {
+  color: #000;
+  margin: 0;
+  padding: 0;
+  font-size: 100%;
+  vertical-align: baseline;
+  background: transparent;
+  text-decoration: none; }
+
+ul {
+  list-style: none; }
+
+ins {
+  text-decoration: none;
+  display: block; }
+
+del {
+  text-decoration: line-through;
+  display: block; }
+
+img {
+  max-width: 100%;
+  height: auto; }
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  width: 100%;
+  max-width: 100%; }
+  table th, table td {
+    vertical-align: middle;
+    padding: 10px; }
+  table.fci-fix-table {
+    table-layout: fixed; }
+
+.button {
+  background: #ed3819;
+  color: #FFF;
+  text-align: center;
+  cursor: pointer;
+  display: inline-block;
+  margin: 0 3px;
+  padding: 4px 16px !important;
+  border-radius: 5px;
+}
+
+
+@media (max-width: 576px) {
+  .fci-res-table thead {
+    display: none; }
+  .fci-res-table td {
+    width: 100%;
+    display: block; } }
+.fci-border-table {
+  border: 1px solid #000; }
+  @media (min-width: 576px) {
+    .fci-border-table th, .fci-border-table td {
+      border: 1px solid #000; } }
+  @media (max-width: 576px) {
+    .fci-border-table tbody tr:not(:last-child) td:last-child {
+      border-bottom: 1px solid #000; } }
+
+@media (max-width: 576px) {
+  .total-table tbody tr:not(:last-child) td:last-child {
+    display: table-cell;
+    width: auto; }
+  .total-table tbody tr:not(:last-child) th {
+    border-bottom: 1px solid #000; } }
+.clearfix:after {
+  content: '';
+  display: block;
+  clear: both; }
+
+.container {
+  position: relative;
+  border: 1px solid transparent;
+  padding: 10px; }
+
+.section {
+  margin: 0 5px; }
+  .section .title {
+    font-weight: bold;
+    display: inline-block;
+    margin: 0 5px; }
+  .section .body {
+    display: inline-block; }
+
+.barcode > * {
+  margin: auto; }
+.barcode desc {
+  display: none !important; }
+
+@media (min-width: 576px) {
+  .products-table td .title-item {
+    display: none; } }
+.products-table img.wp-post-image {
+  max-width: 60px; }
+.products-table .product-attributes li {
+  display: inline-block; }
+
+@media (max-width: 576px) {
+  .products-table .row {
+    display: none; }
+  .products-table td {
+    min-height: 54px;
+    text-align: right; }
+  .products-table td .title-item {
+    font-weight: bold;
+    float: left;
+    margin-right: 5px; }
+  .products-table tbody tr.even td {
+    background: rgba(146, 146, 146, 0.25); }
+  .products-table tfoot {
+    display: none; }
+
+  .rtl .products-table td {
+    text-align: left; }
+    .rtl .products-table td .title-item {
+      float: right;
+      margin-right: 0;
+      margin-left: 5px; } }
+.profit-wrapper {
+  text-align: right;
+  margin: 10px 0; }
+  .profit-wrapper > div {
+    display: inline-block;
+    padding: 0 10px;
+    line-height: 20px; }
+  .profit-wrapper .profit {
+    border-right: 1px solid #000; }
+
+.fci-sign-table td {
+  vertical-align: top; }
+.fci-sign-table .shop-sign .title,
+.fci-sign-table .signature-customer .title {
+  display: block;
+  margin-bottom: 10px; }
+
+img.watermark {
+  position: absolute;
+  top: 50%;
+  right: 50%;
+  transform: translate(50%, -50%);
+  z-index: 999; }
+
+.print {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+ 
+}
+@media print {
+  .print {
+    display: none;
+  }
+}
+
+.condensed {
+  line-height: 20px; }
+  .condensed table th, .condensed table td {
+    padding: 1px; }
+  .condensed .profit-wrapper {
+    margin-top: 0;
+    margin-bottom: 0; }
+
+@media (max-width: 576px) {
+  td.to-word {
+    display: table-cell; } }
+.rtl {
+  text-align: right;
+  direction: rtl; }
+  .rtl .container {
+    text-align: right;
+    direction: rtl; }
+  .rtl .profit-wrapper .profit {
+    border-left: 1px solid #000;
+    border-right: none; }
+
+.invoice .view-4 .fci-border-table {
+  border-left: 0;
+  border-right: 0; }
+  @media (min-width: 576px) {
+    .invoice .view-4 .fci-border-table tr th:first-child, .invoice .view-4 .fci-border-table tr td:first-child {
+      border-left: none; }
+    .invoice .view-4 .fci-border-table tr th:last-child, .invoice .view-4 .fci-border-table tr td:last-child {
+      border-right: none; } }
+.invoice .view-4 .shop-detail {
+  text-align: center; }
+  .invoice .view-4 .shop-detail .fci-title-invoice {
+    font-weight: bold;
+    font-size: 150%; }
+.invoice .view-4 .wrapper {
+  border: 1px solid #000; }
+.invoice .view-4 .sender-info .section, .invoice .view-4 .customer-detail .section {
+  display: inline-block; }
+.invoice .view-4 .sender-info > .title, .invoice .view-4 .customer-detail > .title {
+  font-weight: bold;
+  border-bottom: 1px solid #000;
+  background: rgba(146, 146, 146, 0.25);
+  text-align: center;
+  padding: 10px 0; }
+.invoice .view-4 .sender-info > .content, .invoice .view-4 .customer-detail > .content {
+  border-bottom: 1px solid #000;
+  padding: 10px 0;
+  }
+.invoice .view-4 .product-table-title {
+  font-weight: bold;
+  text-align: center;
+  padding: 10px 0; }
+.invoice .view-4 .products-table th {
+  background: rgba(146, 146, 146, 0.25); }
+.invoice .view-4 .fci-sign-table {
+  border-bottom: none; }
+  .invoice .view-4 .fci-sign-table td {
+    border-bottom: none; }
+@media (min-width: 576px) {
+  .invoice.rtl .view-4 .fci-border-table tr th:first-child,
+  .invoice.rtl .view-4 .fci-border-table tr td:first-child {
+    border-right: none; }
+  .invoice.rtl .view-4 .fci-border-table tr th:last-child,
+  .invoice.rtl .view-4 .fci-border-table tr td:last-child {
+    border-left: none; } }
+.invoice.condensed .view-4 .sender-info > .title, .invoice.condensed .view-4 .customer-detail > .title {
+  padding-top: 3px;
+  padding-bottom: 3px; }
+.invoice.condensed .view-4 .sender-info > .content, .invoice.condensed .view-4 .customer-detail > .content {
+  padding-top: 3px;
+  padding-bottom: 3px; }
+.invoice.condensed .view-4 .product-table-title {
+  padding-top: 3px;
+  padding-bottom: 3px; }
+
+.invoice .view-4 .fci-title-invoice{
+  text-align: right;
+}
+
+.section.print-date , .section.order-id , .section.order-status , .barcode{
+  text-align: left;
+}
+
+@media (max-width: 576px) {
+  .invoice .view-4 .fci-title-invoice , .section.print-date , .section.order-id , .section.order-status , .barcode{
+    text-align: center;
+  }
+
+}
+
+.woocommerce-Price-currencySymbol{
+  font-size: 12px;
+}
+

@@ -1,0 +1,211 @@
+/* Factorchi compact document styles */
+
+.fc-compact {
+  font-size: var(--fc-font-size);
+  line-height: var(--fc-line-height);
+  color: #1e293b;
+}
+
+.fc-compact p,
+.fc-compact td,
+.fc-compact th,
+.fc-compact div {
+  margin: 0;
+}
+
+.fc-compact-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--fc-brand);
+  margin-bottom: 10px;
+}
+
+.fc-compact-shop {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  flex: 1;
+}
+
+.fc-compact-shop img {
+  max-width: 52px;
+  max-height: 52px;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
+.fc-compact-shop-info strong,
+.fc-compact-shop-info b,
+.fc-compact-shop-info .shop-title {
+  font-size: var(--fc-font-size-lg);
+  color: var(--fc-brand);
+}
+
+.fc-compact-meta {
+  text-align: left;
+  font-size: var(--fc-font-size-sm);
+  min-width: 120px;
+  color: var(--fc-muted);
+}
+
+.fc-compact-meta p {
+  margin-bottom: 2px;
+}
+
+.fc-compact-section {
+  margin-bottom: 8px;
+}
+
+.fc-compact-section-title {
+  font-weight: 700;
+  font-size: var(--fc-font-size-sm);
+  color: var(--fc-brand);
+  margin-bottom: 4px;
+}
+
+.fc-compact-customer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 14px;
+  padding: 10px 12px;
+  background: var(--fc-soft);
+  border: 1px solid var(--fc-border);
+  border-radius: var(--fc-radius);
+  margin-bottom: 10px;
+}
+
+.fc-compact-customer .fc-compact-block p {
+  margin-bottom: 2px;
+}
+
+.fc-compact-customer .fc-compact-block p strong {
+  color: var(--fc-brand);
+}
+
+.fc-compact-invoice .factorchi-products-table,
+.fc-compact-invoice table.fci-fix-table {
+  width: 100% !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  margin: 8px 0 !important;
+  font-size: var(--fc-font-size-sm) !important;
+  border: 1px solid var(--fc-border) !important;
+  border-radius: var(--fc-radius) !important;
+  overflow: hidden;
+}
+
+.fc-compact-invoice .factorchi-products-table th,
+.fc-compact-invoice table.fci-fix-table th {
+  background: var(--fc-brand) !important;
+  color: #fff !important;
+  border: none !important;
+  padding: 6px 8px !important;
+}
+
+.fc-compact-invoice .factorchi-products-table td,
+.fc-compact-invoice table.fci-fix-table td {
+  border: none !important;
+  border-bottom: 1px solid var(--fc-border) !important;
+  padding: 5px 8px !important;
+}
+
+.fc-compact-totals {
+  margin-top: 8px;
+}
+
+.fc-compact-totals table {
+  width: 100%;
+  max-width: 280px;
+  margin-right: 0;
+  margin-left: auto;
+  font-size: var(--fc-font-size-sm);
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid var(--fc-border);
+  border-radius: var(--fc-radius);
+  overflow: hidden;
+}
+
+.fc-compact-totals td {
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--fc-border);
+}
+
+.fc-compact-totals tr.final td,
+.fc-compact-totals tr:last-child td {
+  background: var(--fc-brand);
+  color: #fff;
+  font-weight: 700;
+  border-bottom: none;
+}
+
+.fc-compact-note {
+  margin-top: 8px;
+  padding: 8px 10px;
+  border-right: 3px solid var(--fc-brand-light);
+  font-size: var(--fc-font-size-sm);
+  background: var(--fc-soft);
+  border-radius: 0 var(--fc-radius) var(--fc-radius) 0;
+}
+
+/* Post label compact */
+.fc-compact-post-label .fc-compact-label-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.fc-compact-post-label .fc-compact-address-box {
+  border: 1px solid var(--fc-border-strong);
+  border-radius: var(--fc-radius);
+  padding: 10px 12px;
+  min-height: 100px;
+  background: var(--fc-soft);
+}
+
+.fc-compact-post-label .fc-compact-address-box h3 {
+  margin: 0 0 6px;
+  font-size: var(--fc-font-size);
+  font-weight: 700;
+  color: var(--fc-brand);
+  border-bottom: 1px solid var(--fc-border);
+  padding-bottom: 4px;
+}
+
+.fc-compact-post-label .fc-compact-address-box p {
+  margin-bottom: 3px;
+  font-size: var(--fc-font-size);
+}
+
+.fc-compact-post-label .fc-compact-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--fc-border);
+  font-size: var(--fc-font-size-sm);
+  color: var(--fc-muted);
+}
+
+.fc-compact-post-label .barcode {
+  margin: 6px 0;
+}
+
+.fc-compact-post-label .barcode img {
+  max-height: calc(var(--fc-font-size) * 4);
+}
+
+@media print {
+  .fc-compact-customer,
+  .fc-compact-post-label .fc-compact-address-box {
+    background: var(--fc-soft);
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

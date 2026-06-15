@@ -1,0 +1,215 @@
+
+html, body, div, span, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+abbr, address, cite, code, del, dfn, em,
+img, ins, kbd, q, samp, small, strong, sub,
+sup, var, b, i, dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend, table, caption,
+tbody, tfoot, thead, tr, th, td, article,
+aside, canvas, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section,
+summary, time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  font-size: 100%;
+  vertical-align: baseline;
+  background: transparent; }
+
+body {
+  line-height: 34px;
+  color: #000;
+  font-size: 16px;
+  font-family: Tahoma, Arial, sans-serif; }
+
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+  display: block; }
+
+a {
+  color: #000;
+  margin: 0;
+  padding: 0;
+  font-size: 100%;
+  vertical-align: baseline;
+  background: transparent;
+  text-decoration: none; }
+
+ul {
+  list-style: none; }
+
+ins {
+  text-decoration: none;
+  display: block; }
+
+del {
+  text-decoration: line-through;
+  display: block; }
+
+img {
+  max-width: 100%;
+  height: auto; }
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  width: 100%;
+  max-width: 100%; }
+  table th, table td {
+    vertical-align: middle;
+    padding: 10px; }
+  table.fci-fix-table {
+    table-layout: fixed; }
+
+.button {
+  background: #b0b0b0;
+  color: #242424;
+  text-align: center;
+  border-radius: 5px;
+  cursor: pointer;
+  display: inline-block;
+padding: 3px 14px;
+}
+
+
+.fci-border-table {
+  border: 1px solid #000; }
+  @media (min-width: 576px) {
+    .fci-border-table th, .fci-border-table td {
+      border: 1px solid #000; } }
+  @media (max-width: 576px) {
+    .fci-border-table tbody tr:not(:last-child) td:last-child {
+      border-bottom: 1px solid #000; } }
+
+@media (max-width: 576px) {
+  .total-table tbody tr:not(:last-child) td:last-child {
+    display: table-cell;
+    width: auto; }
+  .total-table tbody tr:not(:last-child) th {
+    border-bottom: 1px solid #000; } }
+.clearfix:after {
+  content: '';
+  display: block;
+  clear: both; }
+
+input[type=submit] {
+  background: #2980B9;
+  color: #FFF;
+  text-align: center;
+  cursor: pointer;
+  display: inline-block;
+  border: none;
+  height: 30px;
+  border-radius: 3px; }
+
+input[type=text], select {
+  max-width: 100px;
+  height: 30px;
+  border-radius: 3px;
+  border: 1px solid #5f5f5f; }
+
+.filter-nav-sticky {
+  padding: 15px;
+  text-align: center;
+  background: #2f2f2f;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.filter-nav-sticky select, .filter-nav-sticky input{
+  min-width: 140px;
+}
+  @media print {
+    .filter-nav-sticky {
+      display: none; } }
+
+.header {
+  padding: 15px;
+  margin-bottom: 10px; }
+  .header > span:not(.date) {
+    margin-right: 15px;
+    float: left; }
+  .header .title {
+    font-size: 150%;
+    font-weight: bold; }
+  .header .date {
+    float: right; }
+
+.orders-table {
+  text-align: center; }
+  .orders-table th {
+    background-color: rgba(72, 72, 72, 0.25); }
+  .orders-table td.note div:first-child {
+    border-bottom: 1px dashed #b3b3b3; }
+  .orders-table th.products, .orders-table td.products {
+    width: 25%; }
+  .orders-table td.products .total, .orders-table td.price .total {
+    border-top: 1px solid #d2d2d2; }
+
+.totals{
+  display: flex;
+  justify-content: center;
+}
+.totals > div {
+  display: inline-block;
+}
+  .totals > div > span {
+    margin: 0 5px;
+  }
+
+.no-orders {
+  text-align: center;
+  margin: 30px 0; }
+
+  @media print {
+    .print {
+      display: none; } }
+
+.orders.rtl .header > span:not(.date) {
+  float: right;
+  margin-right: 0;
+  margin-left: 15px; }
+.orders.rtl .header .date {
+  float: left; }
+
+body.condensed {
+  line-height: 24px; }
+  body.condensed table th, body.condensed table td {
+    padding: 4px; }
+
+@media (max-width: 576px) {
+  .fci-res-table thead {
+    display: none; }
+  .fci-res-table td {
+    width: 100%;
+    display: block; }
+  .filter-nav-sticky{
+    flex-direction: column;
+  }
+  .filter-nav-sticky .print{
+    margin-top: 10px;
+  }
+}
+
+
+pre.xdebug-var-dump {
+  direction: ltr;
+  text-align: left;
+  font-family: monospace; }
+
+@page {
+  size: auto;
+  margin: 0; }
+@media print {
+  body {
+    -webkit-print-color-adjust: exact;
+    color-adjust: exact; } }
+@media print {
+  html, body {
+    height: 99%;
+    page-break-after: avoid;
+    page-break-before: avoid; } }
+* {
+  box-sizing: border-box; }
+

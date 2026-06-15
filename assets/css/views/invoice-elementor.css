@@ -1,0 +1,551 @@
+pre.xdebug-var-dump {
+    direction: ltr;
+    text-align: left;
+    font-family: monospace;
+}
+
+@page {
+    size: auto;
+    margin: 0;
+}
+
+@media print {
+    body {
+        -webkit-print-color-adjust: exact;
+        color-adjust: exact;
+    }
+}
+
+@media print {
+    html, body {
+        height: 99%;
+        page-break-after: avoid;
+        page-break-before: avoid;
+    }
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html, body, div, span, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+abbr, address, cite, code, del, dfn, em,
+img, ins, kbd, q, samp, small, strong, sub,
+sup, var, b, i, dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend, table, caption,
+tbody, tfoot, thead, tr, th, td, article,
+aside, canvas, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section,
+summary, time, mark, audio, video {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    font-size: 100%;
+    vertical-align: baseline;
+    background: transparent;
+}
+
+body {
+    line-height: 34px;
+    color: #000;
+    font-size: 16px;
+    font-family: Tahoma, Arial, sans-serif;
+}
+
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+    display: block;
+}
+
+a {
+    color: #000;
+    margin: 0;
+    padding: 0;
+    font-size: 100%;
+    vertical-align: baseline;
+    background: transparent;
+    text-decoration: none;
+}
+
+ul {
+    list-style: none;
+}
+
+ins {
+    text-decoration: none;
+    display: block;
+}
+
+del {
+    text-decoration: line-through;
+    display: block;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    width: 100% !important;
+    max-width: 100%;
+    display: table !important;
+    overflow: hidden !important;
+}
+
+table th, table td {
+    vertical-align: middle;
+    padding: 10px;
+}
+
+table.fci-fix-table {
+    table-layout: fixed;
+}
+
+.print {
+    position: fixed;
+    left: 4px;
+    top: 4px;
+    display: flex;
+    flex-direction: column;
+}
+
+@media print {
+    .print {
+        display: none;
+    }
+}
+
+.button {
+    background: #FF6348;
+    color: #FFF;
+    text-align: center;
+    border-radius: 2px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    font-size: 12px;
+    margin: 3px 0;
+    line-height: 14px;
+}
+
+.section {
+    margin: 0 5px;
+}
+
+.section .title {
+    font-weight: bold;
+    display: inline-block;
+    margin: 0 5px;
+}
+
+.section .body {
+    display: inline-block;
+}
+
+.barcode > * {
+    margin: auto;
+}
+
+.barcode desc {
+    display: none !important;
+}
+
+.clearfix:after {
+    content: '';
+    display: block;
+    clear: both;
+}
+
+@media (max-width: 576px) {
+    .fci-res-table thead {
+        display: none;
+    }
+
+    .fci-res-table td {
+        width: 100%;
+        display: block;
+    }
+}
+
+@media (min-width: 576px) {
+    .fci-border-table th, .fci-border-table td {
+        border: 1px solid #dee2e6;
+    }
+}
+
+
+@media (min-width: 576px) {
+    .products-table td .title-item {
+        display: none;
+    }
+}
+
+.products-table img.wp-post-image {
+    max-width: 60px;
+}
+
+.products-table .product-attributes li {
+    display: inline-block;
+}
+
+@media (max-width: 576px) {
+    .products-table .row {
+        display: none;
+    }
+
+    .products-table td {
+        min-height: 54px;
+        text-align: right;
+    }
+
+    .products-table td .title-item {
+        font-weight: bold;
+        float: left;
+        margin-right: 5px;
+    }
+
+    .products-table tbody tr.even td {
+        background: rgba(146, 146, 146, 0.25);
+    }
+
+    .products-table tfoot {
+        display: none;
+    }
+
+    .rtl .products-table td {
+        text-align: left;
+    }
+
+    .rtl .products-table td .title-item {
+        float: right;
+        margin-right: 0;
+        margin-left: 5px;
+    }
+}
+
+.profit-wrapper {
+    text-align: left;
+    margin: 10px 0;
+}
+
+.profit-wrapper > div {
+    display: inline-block;
+    padding: 0 10px;
+    line-height: 20px;
+}
+
+.profit-wrapper .profit {
+    border-right: 1px solid #000;
+}
+
+.fci-sign-table td {
+    vertical-align: top;
+}
+
+.fci-sign-table .shop-sign .title,
+.fci-sign-table .signature-customer .title {
+    display: block;
+    margin-bottom: 10px;
+}
+
+img.watermark {
+    position: absolute;
+    top: 50%;
+    right: 50%;
+    transform: translate(50%, -50%);
+    z-index: 999;
+}
+
+
+.condensed {
+    line-height: 20px;
+}
+
+.condensed table th, .condensed table td {
+    padding: 1px;
+}
+
+.condensed .profit-wrapper {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+@media (max-width: 576px) {
+    td.to-word {
+        display: table-cell;
+    }
+}
+
+.rtl {
+    text-align: right;
+    direction: rtl;
+}
+
+.rtl .container {
+    text-align: right;
+    direction: rtl;
+}
+
+.rtl .profit-wrapper .profit {
+    border-left: 1px solid #000;
+    border-right: none;
+}
+
+.invoice .view-elementor .shop-detail {
+    border: 1px solid #000;
+    text-align: right;
+}
+
+.invoice .view-elementor .shop-detail tfoot td {
+    background: rgba(146, 146, 146, 0.25);
+}
+
+.invoice .view-elementor .shop-detail tfoot .section {
+    display: inline-block;
+}
+
+@media (max-width: 576px) {
+    .invoice .view-elementor .shop-detail tfoot, .invoice .view-elementor .shop-detail tfoot tr {
+        display: block;
+    }
+}
+
+.invoice .view-elementor .customer-detail {
+    border: 1px solid #000;
+    padding: 15px;
+    margin: 20px 0;
+}
+
+.invoice .view-elementor .customer-detail .section {
+    display: inline-block;
+}
+
+.invoice .view-elementor .products-table {
+    text-align: center;
+}
+
+.invoice .view-elementor .products-table .variation dt, .invoice .view-elementor .products-table .variation dd {
+    display: inline-block;
+}
+
+.invoice .view-elementor .total-table {
+    text-align: center;
+}
+
+.invoice .view-elementor .total-table {
+    text-align: center;
+}
+
+.total-table tbody , .total-table tbody tr{
+    display: block;
+}
+.total-table tbody th , .total-table tbody td{
+    width: 50%;
+    display: inline-block;
+}
+
+.invoice .view-elementor .cart-total-table {
+    text-align: center;
+}
+
+.invoice .view-elementor .cart-total-table {
+    text-align: center;
+}
+
+.cart-total-table tbody , .cart-total-table tbody tr{
+    display: block;
+}
+.cart-total-table tbody th , .cart-total-table tbody td{
+    width: 49%;
+    display: inline-block;
+}
+
+
+.invoice .view-elementor .customer-note, .invoice .view-elementor .order-note {
+    padding-left: 20px;
+    margin: 20px 0;
+    position: relative;
+}
+
+.invoice .view-elementor .customer-note, .invoice .view-elementor .order-note:before {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    left: 0;
+    content: '';
+    background: #000;
+    top: 12px;
+}
+
+.invoice.rtl .view-elementor .customer-note, .invoice.rtl .view-elementor .order-note {
+    border-left: none;
+    padding-left: 0;
+    padding-right: 15px;
+    position: relative;
+}
+
+.invoice.rtl .view-elementor .customer-note, .invoice.rtl .view-elementor .order-note:before {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    right: 0;
+    content: '';
+    background: #000;
+    top: 12px;
+}
+
+.invoice.condensed .view-elementor .customer-detail {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.invoice.condensed .view-elementor .customer-note, .invoice.condensed .view-elementor .order-note {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+
+.invoice .view-elementor .customer-detail {
+    text-align: center;
+}
+
+.order-status{
+    background: unset !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    color: #000 !important;
+}
+
+.woocommerce-Price-currencySymbol {
+    font-size: 12px;
+}
+
+.quantity{
+    float:  unset !important;
+}
+
+.row{
+    display: revert !important;
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+}
+
+.fci-border-table{
+    border: 0 !important;
+}
+
+.woocommerce-Price-amount{
+    color: #000 !important;
+}
+
+.fci-table-rounded-corner table{
+    border-radius: 16px;
+}
+
+.fci-table.fci-table-color-green-1 th{
+    background: #27ae60 !important;
+    border-color: #27ae60 !important;
+}
+
+.fci-table.fci-table-color-white th{
+    background: #fff !important;
+}
+
+.fci-table.fci-table-color-default th{
+    background: #F0F2F7 !important;
+}
+
+.fci-table.fci-table-color-green-2  th{
+    background: #16a085 !important;
+    border-color: #16a085 !important;
+    color: #fff !important;
+}
+
+.fci-table.fci-table-color-blue  th{
+    background: #2980b9 !important;
+    border-color: #2980b9 !important;
+    color: #fff !important;
+}
+
+.fci-table.fci-table-color-orange  th{
+    background: #ffa502 !important;
+    border-color: #ffa502 !important;
+}
+
+.fci-table.fci-table-color-red  th{
+    background: #EF4056 !important;
+    border-color: #EF4056 !important;
+    color: #fff !important;
+}
+
+.fci-table.fci-table-color-yellow  th{
+    background: #fff200 !important;
+    border-color: #fff200 !important;
+}
+
+.fci-dir-right .section,.fci-dir-right .shop-logo{
+    text-align: right !important;
+}
+.fci-dir-left .section,.fci-dir-left .shop-logo{
+    text-align: left !important;
+}
+.fci-dir-center .section ,.fci-dir-center .shop-logo{
+    text-align: center !important;
+}
+
+.fci-dir-left .barcode svg{
+    float: left;
+}
+.fci-dir-right .barcode svg{
+    float: right;
+}
+
+.fci-text-color-black{
+    color: #000 !important;
+}
+.fci-text-color-white{
+    color: #fff !important;
+}
+
+@media (max-width: 576px) {
+    .fci-dir-left .barcode svg, .fci-dir-right .barcode svg{
+        float: unset !important;
+    }
+
+    .section , .fci-dir-right .section , .fci-dir-left .section, .barcode {
+        text-align: center !important;
+    }
+
+    .invoice .view-elementor .shop-detail {
+        text-align: center !important;
+    }
+
+    .total-table tbody th, .total-table tbody td{
+        width: 100%;
+        text-align: center;
+    }
+
+    .cart-total-table tbody th, .cart-total-table tbody td{
+        width: 100%;
+        text-align: center;
+    }
+
+
+    .products-table .row{
+        display: none !important;
+    }
+}
+
+
+
+

@@ -1,0 +1,275 @@
+---
+description: Factorchi WooCommerce invoice plugin development guide
+globs:
+  - wp-content/plugins/factorchi/**
+---
+
+# Factorchi Plugin
+
+WooCommerce invoice generation, printing, and multi-channel delivery plugin for Taghechian.
+
+## Architecture
+
+- Bootstrap: `Factorchi.php` → `Factorchi_Plugin` singleton
+- Settings: `Factorchi_Settings::OPTION_KEY` (`factorchi_settings`), helper `factorchi_get_setting()`
+- Invoice URL: `?action=factorchi-show&type={type}&order-id={id}&view={view}&token={token}`
+- Templates: `views/front/{type}/{view}.php` (ported from Factori)
+- Layout wrappers: `views/header.php`, `views/footer.php`
+- Compatibility aliases: `includes/compatibility.php` maps `FCI_*` classes for ported templates
+
+## Factori view sync
+
+Templates are copied from Factori desktop (`views/front/`, `views/sumo.php`, `assets/css/views/`, `persian-datepicker.*`) into Factorchi. Factori's encrypted `header.php`/`footer.php` are **not** used; readable wrappers live in `views/header.php` and `views/footer.php`.
+
+### Constants (Factori compat)
+
+| Constant | Maps to |
+|----------|---------|
+| `FCI_VIEW_PATH` | `FACTORCHI_VIEW_PATH` |
+| `FCI_CSS_URL` | `FACTORCHI_CSS_URL` |
+| `FCI_JS_URL` | `FACTORCHI_JS_URL` |
+
+### Class aliases (`compatibility.php`)
+
+| Factori | Factorchi |
+|---------|-----------|
+| `FCI_Shop` | `Factorchi_Shop` |
+| `FCI_Customer_Detail` | `Factorchi_Customer_Data` |
+| `FCI_Products_Table` | `Factorchi_Products_Table` |
+| `FCI_Total_Table` | `Factorchi_Total_Table` |
+| `FCI_Labels` | `Factorchi_Labels` |
+| `FCI_View_Render` | `Factorchi_View_Render` |
+| `FCI_Date_Convert` | `Factorchi_Date_Convert` |
+| `FCI_Helper` | `Factorchi_Helper` |
+| `FCI_Orders_Table` | `Factorchi_Orders_Table` |
+| `FCI_Order_Detail` | `Factorchi_Order_Detail` |
+
+### Settings bridge
+
+`get_fci_settings('orders-view')` maps hyphen keys to underscore (`orders_view`). Boolean keys (`tapin-status`, `use-persian-number`, `page-break`) return PHP bool from `yes`/`no`.
+
+### Re-sync from Factori
+
+```powershell
+$src = "c:\Users\sel20\Desktop\factori"
+$dst = "...\wp-content\plugins\factorchi"
+Copy-Item "$src\views\front\*" "$dst\views\front\" -Recurse -Force
+Copy-Item "$src\views\sumo.php" "$dst\views\" -Force
+Copy-Item "$src\assets\css\views\*" "$dst\assets\css\views\" -Force
+Copy-Item "$src\assets\css\theme.css" "$dst\assets\css\theme.css" -Force
+Copy-Item "$src\assets\css\persian-datepicker.css" "$dst\assets\css\persian-datepicker.css" -Force
+Copy-Item "$src\assets\css\fontawesome.min.css" "$dst\assets\css\fontawesome.min.css" -Force
+```
+
+After sync, fix any `$$data['sender']` typos in invoice views if reintroduced.
+
+### View CSS (front documents)
+
+Factori CSS uses body/type selectors like `.invoice .view-1`, `.post-label .view-1`. Factorchi must emit matching body classes via `Factorchi_Invoice_View::append_body_class()`:
+
+- Example: `invoice rtl view-1 factorchi-document`
+
+**Enqueue order** (`append_styles()` / `append_print_styles()`):
+
+1. `assets/css/fontawesome.min.css`
+2. `assets/css/views/{type}-{n}.css` — per-view Factori layout (or `print-layout.css` + `print-compact.css` for compact)
+3. `assets/css/theme.css`
+4. `assets/css/document-base.css` — Factorchi unified typography/tables layer (loads **last**)
+5. `append_document_variables()` — inline CSS vars from settings
+
+### Typography (per document type)
+
+Admin tab **قالب‌ها** → section **سایز فونت (پیکسل)**:
+
+| Setting key | Default | Document type |
+|-------------|---------|---------------|
+| `font_size_invoice` | 14 | invoice |
+| `font_size_pre_invoice` | 14 | pre-invoice |
+| `font_size_post_label` | 12 | post-label |
+| `font_size_order_label` | 12 | order-label |
+| `font_size_orders` | 13 | orders report |
+| `font_size_label` | 12 | shop/customer/product/mini-label |
+
+Global font family: `font_family` in tab **عمومی** (default `peyda`). Bundled fonts live in `assets/fonts/`; `@font-face` in `assets/css/fonts/peyda.css`. `Factorchi_Font_Registry` maps setting keys to CSS family names and injects the font stylesheet in document views.
+
+`Factorchi_Invoice_View::get_font_size()` maps `type` → setting key (clamped 10–24).
+
+Injected CSS variables:
+
+- `--fc-font-family`, `--fc-font-size`, `--fc-font-size-sm`, `--fc-font-size-lg`, `--fc-line-height`
+
+`document-base.css` normalizes tables (`.fci-fix-table`, `.fci-border-table`), `.shop-detail`, `.customer-detail`, labels, orders report, and `.fc-compact` without editing Factori per-view CSS files.
+
+**Visual design** (`document-base.css` + CSS variables): paper card on gray background, brand colors (`--fc-brand` #5f1b29), rounded borders, striped product tables with dark header, highlighted total row, grid customer block, gradient print button. Product/total tables in PHP use classes only (no inline borders).
+
+**Order status in views:** Never show WooCommerce order status on printed/front documents (invoice, pre-invoice, post-label, order-label, shop-label, orders report, compact print). `Factorchi_Shop::order_status_holder()` returns empty; `Factorchi_Orders_Table::is_status('order-status')` is always false; `order-status` is omitted from default `sections`. Admin access/auto-send status settings are unrelated.
+
+**Products list (post-label):** `$data['products_list']` is HTML from `Factorchi_Products_Table::render_list_html()`. Shown in `post-label/view-1.php` under sender/recipient with `.fc-label-products-list` (`--fc-font-size-sm`). Other post-label views omit it unless added explicitly.
+
+**Product image on invoice** (tab قالب‌ها): `show_product_image` (yes/no), `product_image_size` (24–200px square, default 70). Thumbnail renders after product name in the same table cell via `Factorchi_View_Render::format_product_name_cell()` for `invoice` and `pre-invoice` only.
+
+**CSS map** (`resolve_css_file()`):
+
+| Type / view | CSS file |
+|-------------|----------|
+| invoice view-1..6 | `invoice-{n}.css` |
+| invoice view-7 | `invoice-1.css` (no dedicated file in Factori) |
+| invoice view-8 | `invoice-6.css` |
+| invoice view-mini / pre-invoice | `pre-invoice-1.css` |
+| post-label, order-label | `post-label-1/2.css`, `order-label-1/2.css` |
+| shop/customer/product/mini-label | `*-label-1.css` |
+| orders | `orders-1.css` / `orders-2.css` (also loaded in `orders/header.php`) |
+
+Orders report additionally loads `persian-datepicker.css` + JS in `orders/footer.php`.
+
+## Key classes
+
+| Class | Role |
+|-------|------|
+| `Factorchi_Invoice_Router` | Handles `factorchi-show` requests + access control |
+| `Factorchi_Invoice_View` | Selects template, enqueues view CSS |
+| `Factorchi_View_Render` | Builds `$data` array for templates |
+| `Factorchi_Shop` / `Factorchi_Customer_Data` | Shop & customer fields (`*_holder()` + `get_*()` for orders views) |
+| `Factorchi_Order_Detail` | Order notes/ID for orders report templates |
+| `Factorchi_Orders_Table` | Orders report columns (`is_status`, `get_products`, totals) |
+| `Factorchi_Notify_Dispatcher` | Sends via enabled channels |
+| `Factorchi_Survey` | Post-purchase survey queue (`{prefix}factorchi_survey`) |
+
+## Notify channels
+
+Toggle in admin tab **ارسال**: email, SMS, WhatsApp, socials, Telegram, Bale.
+Message templates support: `{order_id}`, `{customer_name}`, `{invoice_url}`, `{payment_url}`, `{shop_name}`.
+
+## Theme integration
+
+**No theme edits required.** The plugin hooks into WooCommerce:
+
+- `woocommerce_get_view_order_url` — replaces view-order links with invoice URL when `replace_view_order_url` is enabled (default: yes). Any theme using `$order->get_view_order_url()` for invoice buttons works automatically.
+- `woocommerce_my_account_my_orders_actions` — adds «مشاهده فاکتور» action on the default orders table.
+- `woocommerce_thankyou` — fallback invoice button when URL replacement is disabled.
+- `woocommerce_view_order` — invoice button on order details page.
+
+Taghechian address fields `_billing_plaque`, `_billing_unit` are supported in `Factorchi_Customer_Data` when present on orders.
+
+## Sabz Afzar
+
+`sabz-afzar-integration` handles accounting invoices; Factorchi handles customer-facing printable invoices. Both can run together.
+
+## Compact print system
+
+Factorchi ships dedicated compact templates for admin/bulk printing, separate from Factori decorative views.
+
+### URL parameters
+
+| Param | Values | Purpose |
+|-------|--------|---------|
+| `mode` | `compact` | Use `views/print/*-compact.php` via `shell.php` |
+| `print-size` | `a4`, `a5` | Page size (default from `print_page_size` setting) |
+| `per-page` | `1`, `2`, `4` | Documents per physical page (default from `print_per_page`) |
+| `order-id` | `123` or `1,2,3` | Single or batch orders |
+
+Example bulk URL:
+
+`?action=factorchi-show&type=invoice&order-id=1,2,3&mode=compact&print-size=a4&per-page=1`
+
+### Compact vs Factori view
+
+| Context | Template path |
+|---------|---------------|
+| `mode=compact` or multi-order + `bulk_use_compact=yes` | `views/print/shell.php` → `batch.php` → `invoice-compact.php` / `post-label-compact.php` |
+| Default single-order preview | `views/front/{type}/{view}.php` (Factori) |
+
+### Print CSS
+
+| File | Role |
+|------|------|
+| `assets/css/print-layout.css` | A4/A5 dimensions, 1/2/4-up grid, toolbar, page breaks |
+| `assets/css/print-compact.css` | Compact document typography and tables |
+| `assets/js/print-toolbar.js` | Screen toolbar: size/per-page selects, `window.print()`, localStorage prefs |
+
+Body classes on compact pages: `factorchi-print fc-print-a4 fc-print-1up` (size and per-page vary).
+
+`@page { size: A4|A5 }` is injected inline in `views/print/shell.php` from `$print_size`.
+
+### Bulk actions (admin orders list)
+
+Registered in `Factorchi_WooCommerce::bulk_actions()`:
+
+- `factorchi_bulk_print_invoice` → «چاپ فاکتور»
+- `factorchi_bulk_print_post_label` → «چاپ برچسب پستی»
+
+JS handler: `assets/js/admin-scripts.js` → `handleBulkPrint()` opens URL with `mode=compact` when `bulk_use_compact` is enabled.
+
+Works on classic list (`edit-shop_order`) and HPOS (`woocommerce_page_wc-orders`). Admin script enqueued via `Factorchi_Assets` on both screens.
+
+### Print settings (tab: general → چاپ و نمایش)
+
+| Key | Default | Description |
+|-----|---------|-------------|
+| `print_page_size` | `a4` | Default page size for compact/bulk |
+| `print_per_page` | `1` | 1, 2, or 4 documents per page |
+| `bulk_use_compact` | `yes` | Bulk actions use compact templates |
+
+### Metabox links
+
+- **چاپ فاکتور** → `factorchi_get_invoice_url($order, 'invoice', '', false, true)` (compact)
+- **پیش‌نمایش قالب** → standard Factori view URL
+- **چاپ برچسب پستی** → compact post-label URL
+
+## Adding a new document type
+
+1. Add default view setting in `Factorchi_Settings::defaults()`
+2. Add template under `views/front/{type}/`
+3. Map CSS in `Factorchi_Invoice_View::resolve_css_file()`
+4. For bulk/compact support: add `views/print/{type}-compact.php` and map in `get_compact_template_path()`
+
+## Admin UI
+
+Modern RTL settings panel with vertical sidebar navigation.
+
+### Layout
+
+- Main view: `admin/views/settings.php` — header banner, sidebar groups, active tab panel, sticky save bar
+- URL-based tabs: `?page=factorchi&tab={slug}` (preserved on save via hidden `factorchi_tab`)
+- Standalone pages (same visual language, no sidebar): `tools.php`, `status.php`, `survey-list.php`
+
+### Assets
+
+| File | Loaded on |
+|------|-----------|
+| `assets/css/admin-settings.css` | All `factorchi*` admin pages |
+| `assets/js/admin-settings.js` | Settings page only (`toplevel_page_factorchi`) |
+| `wp_enqueue_media()` | Settings page — logo picker |
+
+### Form partials (`admin/views/partials/`)
+
+Reusable field components: `field-text`, `field-textarea`, `field-toggle`, `field-select`, `field-checkbox-group`, `field-logo`, `card-section`, `card-section-end`.
+
+Tab views in `admin/views/tabs/` include partials; set `$name`, `$label`, `$value` / `$checked` before each include.
+
+### Template registry
+
+`Factorchi_Template_Registry` scans `views/front/{folder}/view*.php` for dropdown options in the templates tab. Setting keys map to folders via `SETTING_FOLDER_MAP`. Use `get_options_for_setting()` and `preview_url()` for admin selects and preview links.
+
+### Sidebar groups
+
+| Group | Tabs |
+|-------|------|
+| فروشگاه | general |
+| نمایش | templates, access |
+| ارسال | notify, sms, bots, auto |
+| سایر | survey, tapin |
+
+### JS behaviors (`admin-settings.js`)
+
+- Logo picker via `wp.media`
+- Channel toggle show/hide (`.fc-channel-fields`)
+- Template preview link updates on select change
+
+## AJAX (admin order screen)
+
+- `factorchi_send_invoice` — all enabled channels
+- `factorchi_send_invoice_payment` — payment link context
+- `factorchi_send_invoice_sms` / `_wa` — single channel
+
+Nonce: `factorchi_admin`, meta tag `factorchi-nonce`.

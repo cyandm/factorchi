@@ -1,0 +1,17 @@
+.factorchi-settings .form-table th {
+  width: 220px;
+}
+
+.factorchi-order-metabox .button,
+.factorchi-order-metabox a {
+  width: 100%;
+  text-align: center;
+}
+
+.factorchi-invoice-received {
+  background: #f0fff4 !important;
+}
+
+.factorchi-order-links a {
+  margin-left: 6px;
+}

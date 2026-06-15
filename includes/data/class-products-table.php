@@ -1,0 +1,111 @@
+<?php
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+class Factorchi_Products_Table
+{
+    private int $order_id;
+    private string $type;
+    /** @var WC_Order|null */
+    private $order;
+
+    public function __construct($order_id, string $type = 'invoice')
+    {
+        $this->order_id = is_array($order_id) ? (int) reset($order_id) : (int) $order_id;
+        $this->type     = $type;
+        $this->order    = $this->order_id > 0 ? wc_get_order($this->order_id) : null;
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    public function get_list(): array
+    {
+        $items = [];
+        if (!$this->order) {
+            return $items;
+        }
+
+        foreach ($this->order->get_items() as $item) {
+            if (!$item instanceof WC_Order_Item_Product) {
+                continue;
+            }
+            $product = $item->get_product();
+            $items[] = [
+                'name'     => $item->get_name(),
+                'sku'      => $product ? $product->get_sku() : '',
+                'qty'      => $item->get_quantity(),
+                'total'    => $item->get_total(),
+                'subtotal' => $item->get_subtotal(),
+            ];
+        }
+
+        return $items;
+    }
+
+    public function render_list_html(): string
+    {
+        $items = $this->get_list();
+        if ($items === []) {
+            return '';
+        }
+
+        $html = '<ul>';
+        foreach ($items as $item) {
+            $line = esc_html((string) $item['name']);
+            if (($item['sku'] ?? '') !== '') {
+                $line .= ' <small>(' . esc_html((string) $item['sku']) . ')</small>';
+            }
+            $html .= '<li>' . $line . ' &times; ' . esc_html((string) $item['qty']) . '</li>';
+        }
+        $html .= '</ul>';
+
+        return $html;
+    }
+
+    /**
+     * Build products table from cart for pre-invoice.
+     */
+    public static function from_cart(): string
+    {
+        if (!WC()->cart) {
+            return '';
+        }
+
+        $rows = '';
+        $show_image = Factorchi_View_Render::should_show_product_image('pre-invoice');
+        foreach (WC()->cart->get_cart() as $cart_item) {
+            $product = $cart_item['data'] ?? null;
+            if (!$product instanceof WC_Product) {
+                continue;
+            }
+            $qty   = (int) ($cart_item['quantity'] ?? 1);
+            $price = (float) $product->get_price() * $qty;
+            $sku   = $product->get_sku();
+            $rows .= '<tr>';
+            $rows .= Factorchi_View_Render::format_product_name_cell($product->get_name(), $sku, $product, $show_image);
+            $rows .= '<td class="fc-cell-qty">' . esc_html((string) $qty) . '</td>';
+            $rows .= '<td class="fc-cell-price">' . Factorchi_Helper::format_price($price) . '</td>';
+            $rows .= '</tr>';
+        }
+
+        if ($rows === '') {
+            return '';
+        }
+
+        return self::wrap_table($rows);
+    }
+
+    public static function wrap_table(string $rows): string
+    {
+        $html  = '<table class="factorchi-products-table fci-fix-table products-table">';
+        $html .= '<thead><tr>';
+        $html .= '<th>' . esc_html__('محصول', 'factorchi') . '</th>';
+        $html .= '<th>' . esc_html__('تعداد', 'factorchi') . '</th>';
+        $html .= '<th>' . esc_html__('قیمت', 'factorchi') . '</th>';
+        $html .= '</tr></thead><tbody>' . $rows . '</tbody></table>';
+        return $html;
+    }
+}

@@ -1,0 +1,325 @@
+pre.xdebug-var-dump {
+  direction: ltr;
+  text-align: left;
+  font-family: monospace; }
+
+@page {
+  size: auto;
+  margin: 0; }
+@media print {
+  body {
+    -webkit-print-color-adjust: exact;
+    color-adjust: exact; } }
+@media print {
+  html, body {
+    height: 99%;
+    page-break-after: avoid;
+    page-break-before: avoid; } }
+* {
+  box-sizing: border-box; }
+
+html, body, div, span, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+abbr, address, cite, code, del, dfn, em,
+img, ins, kbd, q, samp, small, strong, sub,
+sup, var, b, i, dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend, table, caption,
+tbody, tfoot, thead, tr, th, td, article,
+aside, canvas, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section,
+summary, time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  font-size: 100%;
+  vertical-align: baseline;
+  background: transparent; }
+
+body {
+  line-height: 34px;
+  color: #000;
+  font-size: 16px;
+  font-family: Tahoma, Arial, sans-serif; }
+
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+  display: block; }
+
+a {
+  color: #000;
+  margin: 0;
+  padding: 0;
+  font-size: 100%;
+  vertical-align: baseline;
+  background: transparent;
+  text-decoration: none; }
+
+ul {
+  list-style: none; }
+
+ins {
+  text-decoration: none;
+  display: block; }
+
+del {
+  text-decoration: line-through;
+  display: block; }
+
+img {
+  max-width: 100%;
+  height: auto; }
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  width: 100%;
+  max-width: 100%; }
+  table th, table td {
+    vertical-align: middle;
+    padding: 10px; }
+  table.fci-fix-table {
+    table-layout: fixed; }
+
+.button {
+  background: #ed3819;
+  color: #FFF;
+  text-align: center;
+  cursor: pointer;
+  display: inline-block;
+  margin: 0 3px;
+  padding: 4px 16px !important;
+  border-radius: 5px;
+}
+
+@media (max-width: 576px) {
+  .fci-res-table thead {
+    display: none; }
+  .fci-res-table td {
+    width: 100%;
+    display: block; } }
+.fci-border-table {
+  border: 1px solid #000; }
+  @media (min-width: 576px) {
+    .fci-border-table th, .fci-border-table td {
+      border: 1px solid #000; } }
+  @media (max-width: 576px) {
+    .fci-border-table tbody tr:not(:last-child) td:last-child {
+      border-bottom: 1px solid #000; } }
+
+@media (max-width: 576px) {
+  .total-table tbody tr:not(:last-child) td:last-child {
+    display: table-cell;
+    width: auto; }
+  .total-table tbody tr:not(:last-child) th {
+    border-bottom: 1px solid #000; } }
+.clearfix:after {
+  content: '';
+  display: block;
+  clear: both; }
+
+.container {
+  position: relative;
+  border: 1px solid transparent;
+  padding: 10px; }
+
+.section {
+  margin: 0 5px; }
+  .section .title {
+    font-weight: bold;
+    display: inline-block;
+    margin: 0 5px; }
+  .section .body {
+    display: inline-block; }
+
+.barcode > * {
+  margin: auto; }
+.barcode desc {
+  display: none !important; }
+
+@media (min-width: 576px) {
+  .products-table td .title-item {
+    display: none; } }
+.products-table img.wp-post-image {
+  max-width: 60px; }
+.products-table .product-attributes li {
+  display: inline-block; }
+
+@media (max-width: 576px) {
+  .products-table .row {
+    display: none; }
+  .products-table td {
+    min-height: 54px;
+    text-align: right; }
+  .products-table td .title-item {
+    font-weight: bold;
+    float: left;
+    margin-right: 5px; }
+  .products-table tbody tr.even td {
+    background: rgba(146, 146, 146, 0.25); }
+  .products-table tfoot {
+    display: none; }
+
+  .rtl .products-table td {
+    text-align: left; }
+    .rtl .products-table td .title-item {
+      float: right;
+      margin-right: 0;
+      margin-left: 5px; } }
+.profit-wrapper {
+  text-align: right;
+  margin: 10px 0; }
+  .profit-wrapper > div {
+    display: inline-block;
+    padding: 0 10px;
+    line-height: 20px; }
+  .profit-wrapper .profit {
+    border-right: 1px solid #000; }
+
+.fci-sign-table td {
+  vertical-align: top; }
+.fci-sign-table .shop-sign .title,
+.fci-sign-table .signature-customer .title {
+  display: block;
+  margin-bottom: 10px; }
+
+img.watermark {
+  position: absolute;
+  top: 50%;
+  right: 50%;
+  transform: translate(50%, -50%);
+  z-index: 999; }
+
+.print {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+ 
+}
+@media print {
+  .print {
+    display: none;
+  }
+}
+
+
+.condensed {
+  line-height: 20px; }
+  .condensed table th, .condensed table td {
+    padding: 1px; }
+  .condensed .profit-wrapper {
+    margin-top: 0;
+    margin-bottom: 0; }
+
+@media (max-width: 576px) {
+  td.to-word {
+    display: table-cell; } }
+.rtl {
+  text-align: right;
+  direction: rtl; }
+  .rtl .container {
+    text-align: right;
+    direction: rtl; }
+  .rtl .profit-wrapper .profit {
+    border-left: 1px solid #000;
+    border-right: none; }
+
+
+.invoice .top-line:after{
+  background: linear-gradient(-45deg, transparent 16px, #000 0), linear-gradient(45deg, transparent 16px, #000 0);
+  background-position-x: 0%, 0%;
+  background-position-y: 0%, 0%;
+  background-repeat: repeat, repeat;
+  background-size: auto, auto;
+  background-position-x: 0%, 0%;
+  background-position-y: 0%, 0%;
+  background-repeat: repeat, repeat;
+  background-size: auto, auto;
+  background-repeat: repeat-x;
+  background-position: left bottom;
+  background-size: 22px 32px;
+  content: "";
+  display: block;
+  width: 100%;
+  height: 32px;
+  position: relative;
+  top: -5px;
+  left: 0px;
+}
+@media (min-width: 576px) {
+  .invoice .view-6 .fci-border-table th, .invoice .view-6 .fci-border-table td {
+    border-color: #000; } }
+.invoice .view-6.container {
+  padding: 0 20px 20px 20px; }
+.invoice .view-6 .header-table .fci-title-invoice {
+  text-align: right;
+  font-weight: bold;
+  font-size: 150%; }
+@media (min-width: 576px) {
+  .invoice .view-6 .header-table .print-date {
+    text-align: right; } }
+@media (max-width: 576px) {
+  .invoice .view-6 .header-table {
+    text-align: center; } }
+.invoice .view-6 .fci-customer-shop-detail-table {
+  border-collapse: unset;
+  border: none;
+  border-spacing: 5px;
+  margin-bottom: 20px; }
+  .invoice .view-6 .fci-customer-shop-detail-table th {
+    background: rgba(146, 146, 146, 0.25); }
+    .invoice .view-6 .fci-customer-shop-detail-table th span {
+      text-align: center;
+      white-space: nowrap;
+      transform-origin: 50% 50%;
+      transform: rotate(-90deg);
+      display: inline-block; }
+  .invoice .view-6 .fci-customer-shop-detail-table .order-id {
+    font-size: 150%;
+    font-weight: bold; }
+  .invoice .view-6 .fci-customer-shop-detail-table td.info .section {
+    display: inline-block; }
+  .invoice .view-6 .fci-customer-shop-detail-table td.last {
+    text-align: center; }
+    .invoice .view-6 .fci-customer-shop-detail-table td.last .content .title {
+      display: none; }
+  .invoice .view-6 .fci-customer-shop-detail-table tbody tr:first-child th {
+    border-top-left-radius: 12px; }
+  .invoice .view-6 .fci-customer-shop-detail-table tbody tr:first-child td:last-child {
+    border-top-right-radius: 12px; }
+  .invoice .view-6 .fci-customer-shop-detail-table tbody tr:last-child th {
+    border-bottom-left-radius: 12px; }
+  .invoice .view-6 .fci-customer-shop-detail-table tbody tr:last-child td:last-child {
+    border-bottom-right-radius: 12px; }
+.invoice .view-6 .products-table th, .invoice .view-6 .products-table td {
+  text-align: center; }
+.invoice .view-6 td.note-section {
+  vertical-align: top; }
+  .invoice .view-6 td.note-section .section, .invoice .view-6 td.note-section .title {
+    margin: 0; }
+.invoice .view-6 td.total-section {
+  padding-left: 0;
+  padding-right: 0; }
+@media (min-width: 576px) {
+  .invoice.rtl .view-6 .header-table .print-date {
+    text-align: left; } }
+.invoice.rtl .view-6 .fci-customer-shop-detail-table tbody tr:first-child th {
+  border-top-right-radius: 12px;
+  border-top-left-radius: 0; }
+.invoice.rtl .view-6 .fci-customer-shop-detail-table tbody tr:first-child td:last-child {
+  border-top-right-radius: 0;
+  border-top-left-radius: 12px; }
+.invoice.rtl .view-6 .fci-customer-shop-detail-table tbody tr:last-child th {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 12px; }
+.invoice.rtl .view-6 .fci-customer-shop-detail-table tbody tr:last-child td:last-child {
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 12px; }
+.invoice.condensed .view-6 .fci-customer-shop-detail-table {
+  margin-bottom: 5px; }
+
+.woocommerce-Price-currencySymbol{
+  font-size: 12px;
+}
+
+

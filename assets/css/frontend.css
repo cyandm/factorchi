@@ -1,0 +1,14 @@
+.factorchi-thankyou-invoice,
+.factorchi-order-invoice-link {
+    margin: 1rem 0;
+    text-align: center;
+}
+
+.factorchi-invoice-btn {
+    display: inline-block;
+}
+
+.woocommerce-orders-table__cell-order-actions .woocommerce-button.factorchi-invoice,
+.woocommerce-orders-table__cell-order-actions a[href*="factorchi-show"] {
+    margin-left: 0.25rem;
+}
