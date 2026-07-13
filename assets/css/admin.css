@@ -1,3 +1,35 @@
 .factorchi-invoice-received td {
     background: #f0fff4;
 }
+
+/* Text button — override WooCommerce icon-only action styles (text-indent / fixed 2em box) */
+.post-type-shop_order .wp-list-table .column-wc_actions a.button.factorchi-invoice,
+.post-type-shop_order .wp-list-table .column-wc_actions a.button.wc-action-button-factorchi-invoice,
+.woocommerce_page_wc-orders .wp-list-table .column-wc_actions a.button.factorchi-invoice,
+.woocommerce_page_wc-orders .wp-list-table .column-wc_actions a.button.wc-action-button-factorchi-invoice,
+.widefat .column-wc_actions a.button.factorchi-invoice,
+.widefat .column-wc_actions a.button.wc-action-button-factorchi-invoice {
+    text-indent: 0 !important;
+    width: auto !important;
+    min-width: auto !important;
+    height: auto !important;
+    min-height: 30px;
+    padding: 0 10px !important;
+    overflow: visible !important;
+    position: static !important;
+    display: inline-block !important;
+    font-size: 13px;
+    line-height: 2.15384615;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+.post-type-shop_order .wp-list-table .column-wc_actions a.button.factorchi-invoice::after,
+.post-type-shop_order .wp-list-table .column-wc_actions a.button.wc-action-button-factorchi-invoice::after,
+.woocommerce_page_wc-orders .wp-list-table .column-wc_actions a.button.factorchi-invoice::after,
+.woocommerce_page_wc-orders .wp-list-table .column-wc_actions a.button.wc-action-button-factorchi-invoice::after,
+.widefat .column-wc_actions a.button.factorchi-invoice::after,
+.widefat .column-wc_actions a.button.wc-action-button-factorchi-invoice::after {
+    content: none !important;
+    display: none !important;
+}

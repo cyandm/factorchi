@@ -21,72 +21,55 @@
         }
     }
 
-    function getQueryParams() {
+    function getPrintSize() {
         var params = new URLSearchParams(window.location.search);
-        return {
-            printSize: params.get('print-size') || config.printSize || 'a4',
-            perPage: parseInt(params.get('per-page') || config.perPage || '1', 10)
-        };
+        return params.get('print-size') || config.printSize || 'a4';
     }
 
-    function applyBodyClasses(printSize, perPage) {
+    function applyBodyClasses(printSize) {
         var body = document.body;
-        body.classList.remove('fc-print-a4', 'fc-print-a5', 'fc-print-1up', 'fc-print-2up', 'fc-print-4up');
+        body.classList.remove('fc-print-a4', 'fc-print-a5');
         body.classList.add('fc-print-' + printSize);
-        body.classList.add('fc-print-' + perPage + 'up');
     }
 
-    function buildUrl(printSize, perPage) {
+    function buildUrl(printSize) {
         var url = new URL(window.location.href);
         url.searchParams.set('print-size', printSize);
-        url.searchParams.set('per-page', String(perPage));
-        if (!url.searchParams.get('mode')) {
-            url.searchParams.set('mode', 'compact');
-        }
         return url.toString();
     }
 
     function init() {
         var sizeSelect = document.getElementById('fc-print-size');
-        var perPageSelect = document.getElementById('fc-print-per-page');
         var printBtn = document.getElementById('fc-print-trigger');
 
-        if (!sizeSelect || !perPageSelect) {
+        if (!sizeSelect) {
+            if (printBtn) {
+                printBtn.addEventListener('click', function () {
+                    window.print();
+                });
+            }
             return;
         }
 
         var prefs = readPrefs();
-        var current = getQueryParams();
+        var current = getPrintSize();
 
         if (!window.location.search.includes('print-size') && prefs.printSize) {
-            current.printSize = prefs.printSize;
-        }
-        if (!window.location.search.includes('per-page') && prefs.perPage) {
-            current.perPage = prefs.perPage;
+            current = prefs.printSize;
         }
 
-        sizeSelect.value = current.printSize === 'a5' ? 'a5' : 'a4';
-        perPageSelect.value = [1, 2, 4].indexOf(current.perPage) !== -1 ? String(current.perPage) : '1';
+        sizeSelect.value = current === 'a5' ? 'a5' : 'a4';
+        applyBodyClasses(sizeSelect.value);
 
-        applyBodyClasses(sizeSelect.value, parseInt(perPageSelect.value, 10));
-
-        function onLayoutChange() {
+        sizeSelect.addEventListener('change', function () {
             var printSize = sizeSelect.value;
-            var perPage = parseInt(perPageSelect.value, 10);
-
-            writePrefs({ printSize: printSize, perPage: perPage });
-
-            var needsReload = printSize !== current.printSize || perPage !== current.perPage;
-            if (needsReload) {
-                window.location.href = buildUrl(printSize, perPage);
+            writePrefs({ printSize: printSize });
+            if (printSize !== current) {
+                window.location.href = buildUrl(printSize);
                 return;
             }
-
-            applyBodyClasses(printSize, perPage);
-        }
-
-        sizeSelect.addEventListener('change', onLayoutChange);
-        perPageSelect.addEventListener('change', onLayoutChange);
+            applyBodyClasses(printSize);
+        });
 
         if (printBtn) {
             printBtn.addEventListener('click', function () {

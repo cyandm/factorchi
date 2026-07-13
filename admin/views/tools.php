@@ -3,8 +3,6 @@
 if (!defined('ABSPATH')) {
     exit;
 }
-
-$report_url = add_query_arg(['action' => 'factorchi-show', 'type' => 'orders'], home_url('/'));
 ?>
 <div class="wrap factorchi-admin">
     <div class="fc-header">
@@ -14,14 +12,6 @@ $report_url = add_query_arg(['action' => 'factorchi-show', 'type' => 'orders'], 
 
     <div class="fc-card">
         <h2 class="fc-card-title"><?php esc_html_e('ابزارها', 'factorchi'); ?></h2>
-
-        <div class="fc-field">
-            <label><?php esc_html_e('گزارش سفارشات', 'factorchi'); ?></label>
-            <a href="<?php echo esc_url($report_url); ?>" target="_blank" rel="noopener" class="fc-tool-link">
-                <span class="dashicons dashicons-chart-bar"></span>
-                <?php esc_html_e('مشاهده گزارش سفارشات', 'factorchi'); ?>
-            </a>
-        </div>
 
         <div class="fc-field">
             <label><?php esc_html_e('شورت‌کد پیش‌فاکتور', 'factorchi'); ?></label>

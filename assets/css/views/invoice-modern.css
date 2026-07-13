@@ -1,0 +1,13 @@
+﻿/**
+ * Modern invoice — view-specific deltas only.
+ * Shared chrome lives in document-base.css
+ */
+
+.invoice .modern .products-table .variation dt,
+.invoice .modern .products-table .variation dd {
+  display: inline-block;
+}
+
+.woocommerce-Price-currencySymbol {
+  font-size: 12px;
+}

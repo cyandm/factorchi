@@ -19,9 +19,8 @@ function factorchi_get_setting(string $key, $default = '')
  * @param string       $type
  * @param string       $view
  * @param bool         $payment
- * @param bool         $compact
  */
-function factorchi_get_invoice_url($order, string $type = 'invoice', string $view = '', bool $payment = false, bool $compact = false): string
+function factorchi_get_invoice_url($order, string $type = 'invoice', string $view = '', bool $payment = false): string
 {
     $order_id = $order instanceof WC_Order ? $order->get_id() : (int) $order;
 
@@ -43,10 +42,9 @@ function factorchi_get_invoice_url($order, string $type = 'invoice', string $vie
         $args['payment'] = '1';
     }
 
-    if ($compact && in_array($type, ['invoice', 'post-label'], true)) {
-        $args['mode']        = 'compact';
-        $args['print-size']  = (string) factorchi_get_setting('print_page_size', 'a4');
-        $args['per-page']    = (string) factorchi_get_setting('print_per_page', '1');
+    if ($type === 'post-label') {
+        $label_view = $view !== '' ? $view : (string) factorchi_get_setting('post_label_view', 'modern-a4');
+        $args['print-size'] = Factorchi_Settings::post_label_size_from_view($label_view);
     }
 
     $token = Factorchi_Invoice_Router::generate_access_token($order_id);
@@ -65,7 +63,7 @@ function factorchi_get_invoice_url($order, string $type = 'invoice', string $vie
 function factorchi_get_invoice_url_for_order($order): string
 {
     $type = (string) factorchi_get_setting('default_invoice_type', 'invoice');
-    $view = (string) factorchi_get_setting('invoice_default_view', 'view-1');
+    $view = (string) factorchi_get_setting('invoice_default_view', 'modern');
 
     return factorchi_get_invoice_url($order, $type, $view);
 }

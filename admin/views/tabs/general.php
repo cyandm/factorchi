@@ -58,19 +58,22 @@ include $partials . 'field-toggle.php';
 $name = 'use_jalali_date'; $label = __('تاریخ شمسی', 'factorchi'); $checked = ($s['use_jalali_date'] ?? 'yes') === 'yes';
 include $partials . 'field-toggle.php';
 
+$name = 'show_print_date'; $label = __('نمایش تاریخ چاپ', 'factorchi'); $checked = ($s['show_print_date'] ?? 'yes') === 'yes';
+include $partials . 'field-toggle.php';
+
+$name = 'show_order_date'; $label = __('نمایش تاریخ سفارش', 'factorchi'); $checked = ($s['show_order_date'] ?? 'yes') === 'yes';
+include $partials . 'field-toggle.php';
+
+$name = 'show_date_time'; $label = __('نمایش ساعت در تاریخ‌ها', 'factorchi'); $checked = ($s['show_date_time'] ?? 'yes') === 'yes';
+$description = __('اگر خاموش باشد، فقط تاریخ (بدون ساعت) نمایش داده می‌شود.', 'factorchi');
+include $partials . 'field-toggle.php';
+
 $name = 'page_break'; $label = __('صفحه‌بندی چاپ', 'factorchi'); $checked = ($s['page_break'] ?? 'no') === 'yes';
+$description = '';
 include $partials . 'field-toggle.php';
 
 $name = 'print_page_size'; $label = __('اندازه پیش‌فرض برگه', 'factorchi'); $value = (string) ($s['print_page_size'] ?? 'a4');
 $options = ['a4' => 'A4', 'a5' => 'A5'];
 include $partials . 'field-select.php';
-
-$name = 'print_per_page'; $label = __('تعداد در هر برگه (چاپ جمع‌وجور)', 'factorchi'); $value = (string) ($s['print_per_page'] ?? '1');
-$options = ['1' => __('۱ فاکتور در برگه', 'factorchi'), '2' => __('۲ در A4', 'factorchi'), '4' => __('۴ در A4', 'factorchi')];
-include $partials . 'field-select.php';
-
-$name = 'bulk_use_compact'; $label = __('چاپ همگانی با قالب جمع‌وجور', 'factorchi'); $checked = ($s['bulk_use_compact'] ?? 'yes') === 'yes';
-$description = __('در لیست سفارشات، عملیات همگانی «چاپ فاکتور» و «چاپ برچسب پستی» از قالب compact استفاده می‌کند.', 'factorchi');
-include $partials . 'field-toggle.php';
 
 include $partials . 'card-section-end.php';

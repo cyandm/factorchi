@@ -82,7 +82,9 @@ class Factorchi_Shop
         if ($address === '') {
             return '';
         }
-        return $html ? '<p class="shop-address">' . esc_html($address) . '</p>' : esc_html($address);
+        return $html
+            ? $this->label_line(__('آدرس:', 'factorchi'), $address, 'shop-address')
+            : esc_html($address);
     }
 
     public function postal_code_holder(bool $html = false): string
@@ -91,7 +93,9 @@ class Factorchi_Shop
         if ($code === '') {
             return '';
         }
-        return $html ? '<span class="shop-postcode">' . esc_html($code) . '</span>' : esc_html($code);
+        return $html
+            ? $this->label_line(__('کدپستی:', 'factorchi'), $code, 'shop-postcode')
+            : esc_html($code);
     }
 
     public function economical_num_holder(bool $html = false): string
@@ -100,7 +104,9 @@ class Factorchi_Shop
         if ($num === '') {
             return '';
         }
-        return $html ? '<span class="shop-economical">' . esc_html($num) . '</span>' : esc_html($num);
+        return $html
+            ? $this->label_line(__('شماره اقتصادی:', 'factorchi'), $num, 'shop-economical')
+            : esc_html($num);
     }
 
     public function reg_num_holder(bool $html = false): string
@@ -109,17 +115,27 @@ class Factorchi_Shop
         if ($num === '') {
             return '';
         }
-        return $html ? '<span class="shop-reg">' . esc_html($num) . '</span>' : esc_html($num);
+        return $html
+            ? $this->label_line(__('شماره ثبت:', 'factorchi'), $num, 'shop-reg')
+            : esc_html($num);
     }
 
     public function print_date_holder(): string
     {
+        if (factorchi_get_setting('show_print_date', 'yes') !== 'yes') {
+            return '';
+        }
+
         $date = Factorchi_Helper::date_format(time());
-        return '<span class="print-date">' . esc_html__('تاریخ چاپ: ', 'factorchi') . esc_html($date) . '</span>';
+        return '<span class="print-date section print-date"><span class="title">' . esc_html__('تاریخ چاپ:', 'factorchi') . '</span> ' . esc_html($date) . '</span>';
     }
 
     public function transmission_date_holder(): string
     {
+        if (factorchi_get_setting('show_order_date', 'yes') !== 'yes') {
+            return '';
+        }
+
         if (!$this->order) {
             return '';
         }
@@ -127,12 +143,12 @@ class Factorchi_Shop
         if (!$date) {
             return '';
         }
-        return '<span class="transmission-date">' . esc_html__('تاریخ سفارش: ', 'factorchi') . esc_html(Factorchi_Helper::date_format($date->getTimestamp())) . '</span>';
+        return '<span class="transmission-date section transmission-date"><span class="title">' . esc_html__('تاریخ سفارش:', 'factorchi') . '</span> ' . esc_html(Factorchi_Helper::date_format($date->getTimestamp())) . '</span>';
     }
 
     public function order_id_holder(): string
     {
-        return '<span class="order-id">' . esc_html__('شناسه سفارش: ', 'factorchi') . esc_html((string) $this->order_id) . '</span>';
+        return '<span class="order-id section order-id"><span class="title">' . esc_html__('شناسه سفارش:', 'factorchi') . '</span> ' . esc_html((string) $this->order_id) . '</span>';
     }
 
     public function order_status_holder(): string
@@ -140,7 +156,7 @@ class Factorchi_Shop
         return '';
     }
 
-    public function barcode_holder(int $type = 1, int $height = 50): string
+    public function barcode_holder(int $type = 1, int $height = 80): string
     {
         $code = (string) $this->order_id;
         $url  = 'https://barcode.tec-it.com/barcode.ashx?data=' . rawurlencode($code) . '&code=Code128&translate-esc=on&dpi=96';
@@ -152,17 +168,46 @@ class Factorchi_Shop
         if (!$this->order) {
             return '';
         }
-        $note = $this->order->get_customer_note();
-        return $note !== '' ? '<p class="customer-note">' . esc_html($note) . '</p>' : '';
+        $note = trim((string) $this->order->get_customer_note());
+        if ($note === '') {
+            return '';
+        }
+
+        return $this->note_table(
+            __('یادداشت', 'factorchi'),
+            $note,
+            'customer-note'
+        );
     }
 
     public function order_note_holder(bool $html = false): string
     {
-        $note = (string) factorchi_get_setting('shop_note', '');
+        $note = trim((string) factorchi_get_setting('shop_note', ''));
         if ($note === '') {
             return '';
         }
-        return $html ? '<p class="order-note">' . esc_html($note) . '</p>' : esc_html($note);
+        if (!$html) {
+            return esc_html($note);
+        }
+
+        return $this->note_table(
+            __('یادداشت فروشگاه', 'factorchi'),
+            $note,
+            'order-note'
+        );
+    }
+
+    /**
+     * Note block styled like the products table (brand header + bordered body).
+     */
+    private function note_table(string $title, string $body, string $class): string
+    {
+        $classes = trim('factorchi-note-table fci-form-table ' . $class);
+
+        return '<table class="' . esc_attr($classes) . '">'
+            . '<thead><tr><th>' . esc_html($title) . '</th></tr></thead>'
+            . '<tbody><tr><td>' . nl2br(esc_html($body)) . '</td></tr></tbody>'
+            . '</table>';
     }
 
     public function shop_signature_holder(): string

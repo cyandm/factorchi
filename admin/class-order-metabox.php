@@ -42,19 +42,13 @@ class Factorchi_Order_Metabox
 
     private function render_buttons(int $order_id, WC_Order $order): void
     {
-        $invoice_url         = factorchi_get_invoice_url($order);
-        $invoice_compact_url = factorchi_get_invoice_url($order, 'invoice', '', false, true);
-        $post_label_url      = factorchi_get_invoice_url($order, 'post-label', '', false, true);
+        $invoice_url    = factorchi_get_invoice_url($order);
+        $post_label_url = factorchi_get_invoice_url($order, 'post-label');
         ?>
         <div class="factorchi-order-metabox" style="display:flex;flex-direction:column;gap:8px;">
-            <?php if ($invoice_compact_url !== '') : ?>
-                <a class="button button-primary" target="_blank" href="<?php echo esc_url($invoice_compact_url); ?>">
-                    <?php esc_html_e('چاپ فاکتور', 'factorchi'); ?>
-                </a>
-            <?php endif; ?>
             <?php if ($invoice_url !== '') : ?>
-                <a class="button" target="_blank" href="<?php echo esc_url($invoice_url); ?>">
-                    <?php esc_html_e('پیش‌نمایش قالب', 'factorchi'); ?>
+                <a class="button button-primary" target="_blank" href="<?php echo esc_url($invoice_url); ?>">
+                    <?php esc_html_e('چاپ فاکتور', 'factorchi'); ?>
                 </a>
             <?php endif; ?>
             <?php if ($post_label_url !== '') : ?>

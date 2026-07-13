@@ -122,14 +122,8 @@ jQuery(document).ready(function ($) {
         });
 
         var url = FACTORCHI_JS_DATA.base_url + '?action=factorchi-show&type=' + encodeURIComponent($type) + '&order-id=' + ids;
-        if (FACTORCHI_JS_DATA.print_mode === 'compact') {
-            url += '&mode=compact';
-        }
         if (FACTORCHI_JS_DATA.print_size) {
             url += '&print-size=' + encodeURIComponent(FACTORCHI_JS_DATA.print_size);
-        }
-        if (FACTORCHI_JS_DATA.print_per_page) {
-            url += '&per-page=' + encodeURIComponent(FACTORCHI_JS_DATA.print_per_page);
         }
         window.open(url);
     }
@@ -327,7 +321,7 @@ jQuery(document).ready(function ($) {
         });
     });
 
-    $('.wp-list-table .factorchi-invoice, .wp-list-table .factorchi-packing-slip, .wp-list-table .factorchi-post-label, .wp-list-table .factorchi-order-label, .wp-list-table .factorchi-shop-label, .wp-list-table .factorchi-customer-label, .wp-list-table .factorchi-product-label').attr('target', '_blank');
+    $('.wp-list-table .factorchi-invoice, .wp-list-table .factorchi-packing-slip, .wp-list-table .factorchi-post-label, .wp-list-table .factorchi-shop-label, .wp-list-table .factorchi-customer-label, .wp-list-table .factorchi-product-label').attr('target', '_blank');
 
 
     $('#factorchi-send-invoice-sms-payment').click(function (e) {

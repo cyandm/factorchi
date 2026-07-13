@@ -1,35 +1,48 @@
-/* Factorchi unified document layer — modern polish over Factori views */
+/* Factorchi unified document layer — single source for shared invoice chrome */
 
 body.factorchi-document,
 body.factorchi-print {
+  box-sizing: border-box;
   color: #1e293b;
   background: #eef2f6;
   margin: 0;
-  font-size: var(--fc-font-size) !important;
-  line-height: var(--fc-line-height) !important;
+  font-size: var(--fc-font-size);
+  line-height: var(--fc-line-height);
 }
 
-/* Page wrapper */
+body.factorchi-document *,
+body.factorchi-document *::before,
+body.factorchi-document *::after,
+body.factorchi-print *,
+body.factorchi-print *::before,
+body.factorchi-print *::after {
+  box-sizing: border-box;
+}
+
 body.factorchi-document > div,
 body.factorchi-print > div:not(.fc-print-toolbar):not(.fc-print-root) {
-  max-width: 100%;
-  margin: 0 auto;
+  max-width: none;
+  width: 100%;
+  margin: 0;
   padding: 20px 16px 32px;
 }
 
-/* Paper card */
+/* Document wrapper — full width, no card chrome */
 body.factorchi-document .container,
 body.factorchi-document .container .inner,
-body.factorchi-print .fc-print-sheet .fc-compact {
-  background: var(--fc-surface);
-  border: 1px solid var(--fc-border);
-  border-radius: var(--fc-radius);
-  box-shadow: var(--fc-shadow);
-  padding: 20px 22px;
+body.factorchi-print .fc-print-sheet .container {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+  width: 100%;
+  max-width: none;
 }
 
 body.factorchi-document .container {
-  overflow: hidden;
+  overflow: visible;
+  position: relative;
 }
 
 body.factorchi-document .container + .container,
@@ -40,30 +53,47 @@ body.factorchi-document .inner {
   background: transparent;
 }
 
+/* Document type banner (pre-invoice) */
+body.factorchi-document .fc-document-type {
+  display: block;
+  width: 100%;
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  background: var(--fc-brand);
+  color: #fff;
+  font-size: var(--fc-font-size-lg);
+  font-weight: 700;
+  text-align: center;
+  border-radius: var(--fc-radius);
+  line-height: var(--fc-line-height);
+}
+
 /* ── Shop header ── */
 body.factorchi-document table.shop-detail,
 body.factorchi-document .shop-detail {
-  border: 1px solid var(--fc-border) !important;
+  border: 1px solid var(--fc-border);
   border-radius: var(--fc-radius);
   overflow: hidden;
   margin-bottom: 16px;
   background: var(--fc-surface);
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
 body.factorchi-document table.shop-detail td,
 body.factorchi-document table.shop-detail th,
 body.factorchi-document .shop-detail td,
 body.factorchi-document .shop-detail th {
-  border-color: var(--fc-border) !important;
-  padding: 12px 14px !important;
-  vertical-align: middle !important;
-  line-height: var(--fc-line-height) !important;
+  border-color: var(--fc-border);
+  padding: 12px 14px;
+  vertical-align: middle;
+  line-height: var(--fc-line-height);
 }
 
 body.factorchi-document table.shop-detail tfoot td,
 body.factorchi-document .shop-detail tfoot td {
-  background: var(--fc-soft) !important;
-  border-top: 1px solid var(--fc-border) !important;
+  background: var(--fc-soft);
 }
 
 body.factorchi-document .shop-title {
@@ -86,31 +116,141 @@ body.factorchi-document .shop-detail img {
 body.factorchi-document .shop-url,
 body.factorchi-document .shop-email,
 body.factorchi-document .shop-phone,
-body.factorchi-document .shop-address,
 body.factorchi-document .print-date,
 body.factorchi-document .transmission-date {
-  color: var(--fc-muted);
   font-size: var(--fc-font-size-sm);
+  font-weight: 500;
   margin-bottom: 2px;
+  line-height: var(--fc-line-height);
+}
+
+/* Shop meta — 2px smaller than customer-detail */
+body.factorchi-document .shop-address,
+body.factorchi-document .shop-postcode,
+body.factorchi-document .shop-economical,
+body.factorchi-document .shop-reg,
+body.factorchi-document table.shop-detail tfoot td p,
+body.factorchi-document .shop-detail tfoot td p,
+body.factorchi-document .sender-info p {
+  color: #1e293b;
+  font-size: calc(var(--fc-font-size) - 2px);
+  font-weight: 400;
+  margin: 0 0 2px;
+  padding: 0;
+  line-height: var(--fc-line-height);
+}
+
+body.factorchi-document .shop-address strong,
+body.factorchi-document .shop-postcode strong,
+body.factorchi-document .shop-economical strong,
+body.factorchi-document .shop-reg strong,
+body.factorchi-document table.shop-detail tfoot td p strong,
+body.factorchi-document .shop-detail tfoot td p strong,
+body.factorchi-document .sender-info p strong {
+  color: var(--fc-brand);
+  font-size: inherit;
+  font-weight: 600;
+}
+
+body.factorchi-document.invoice .shop-address,
+body.factorchi-document.pre-invoice .shop-address {
+  display: block;
+  width: 100%;
+  margin-bottom: 6px;
+}
+
+body.factorchi-document.invoice .shop-postcode,
+body.factorchi-document.invoice .shop-economical,
+body.factorchi-document.invoice .shop-reg,
+body.factorchi-document.pre-invoice .shop-postcode,
+body.factorchi-document.pre-invoice .shop-economical,
+body.factorchi-document.pre-invoice .shop-reg {
+  display: inline-block;
+  width: auto;
+  margin: 0 16px 0 0;
+  white-space: nowrap;
+  vertical-align: baseline;
+}
+
+body.factorchi-document.invoice.rtl .shop-postcode,
+body.factorchi-document.invoice.rtl .shop-economical,
+body.factorchi-document.invoice.rtl .shop-reg,
+body.factorchi-document.pre-invoice.rtl .shop-postcode,
+body.factorchi-document.pre-invoice.rtl .shop-economical,
+body.factorchi-document.pre-invoice.rtl .shop-reg {
+  margin: 0 0 0 16px;
 }
 
 body.factorchi-document .order-id {
   display: inline-block;
   font-weight: 700;
-  color: var(--fc-brand);
   font-size: var(--fc-font-size);
 }
 
 /* ── Customer block ── */
 body.factorchi-document .customer-detail {
-  border: 1px solid var(--fc-border) !important;
+  border: 1px solid var(--fc-border);
   border-radius: var(--fc-radius);
   background: var(--fc-soft);
-  padding: 16px 18px !important;
-  margin: 16px 0 !important;
+  padding: 16px 18px;
+  margin: 16px 0;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px 20px;
+}
+
+/* Corner labels: فروشگاه / خریدار */
+body.factorchi-document.invoice table.shop-detail tfoot td,
+body.factorchi-document.pre-invoice table.shop-detail tfoot td,
+body.factorchi-document.invoice .sender-info,
+body.factorchi-document.pre-invoice .sender-info,
+body.factorchi-document.invoice .customer-detail,
+body.factorchi-document.pre-invoice .customer-detail {
+  position: relative;
+  overflow: hidden;
+  padding-left: 40px;
+}
+
+body.factorchi-document.invoice table.shop-detail tfoot td::before,
+body.factorchi-document.pre-invoice table.shop-detail tfoot td::before,
+body.factorchi-document.invoice .sender-info::before,
+body.factorchi-document.pre-invoice .sender-info::before,
+body.factorchi-document.invoice .customer-detail::before,
+body.factorchi-document.pre-invoice .customer-detail::before {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 28px;
+  max-height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  background: var(--fc-brand);
+  color: #fff;
+  font-size: var(--fc-font-size-sm);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  z-index: 1;
+  border-radius: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+body.factorchi-document.invoice table.shop-detail tfoot td::before,
+body.factorchi-document.pre-invoice table.shop-detail tfoot td::before,
+body.factorchi-document.invoice .sender-info::before,
+body.factorchi-document.pre-invoice .sender-info::before {
+  content: "فروشگاه";
+}
+
+body.factorchi-document.invoice .customer-detail::before,
+body.factorchi-document.pre-invoice .customer-detail::before {
+  content: "خریدار";
 }
 
 body.factorchi-document .customer-detail p {
@@ -129,81 +269,145 @@ body.factorchi-document .customer-detail .customer-address {
   grid-column: 1 / -1;
 }
 
-/* ── Tables (products, totals, labels) ── */
+/* ── Tables ── */
 body.factorchi-document table.fci-fix-table,
 body.factorchi-document table.fci-border-table,
 body.factorchi-document table.fci-res-table,
-body.factorchi-document table.factorchi-products-table,
 body.factorchi-document table.factorchi-total-table,
-body.factorchi-document table.products-table,
 body.factorchi-document table.total-table,
 body.factorchi-print table.fci-fix-table,
 body.factorchi-print table.fci-border-table,
-body.factorchi-print table.factorchi-products-table,
 body.factorchi-print table.factorchi-total-table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
   font-size: var(--fc-font-size);
   line-height: var(--fc-line-height);
-  margin: 14px 0 !important;
-  border: 1px solid var(--fc-border) !important;
+  margin: 14px 0;
+  border: 1px solid var(--fc-border);
   border-radius: var(--fc-radius);
   overflow: hidden;
 }
 
 body.factorchi-document table.fci-fix-table th,
-body.factorchi-document table.fci-fix-table td,
 body.factorchi-document table.fci-border-table th,
 body.factorchi-document table.fci-border-table td,
 body.factorchi-document table.fci-res-table th,
-body.factorchi-document table.fci-res-table td,
-body.factorchi-document table.factorchi-products-table th,
-body.factorchi-document table.factorchi-products-table td,
-body.factorchi-document table.factorchi-total-table th,
-body.factorchi-document table.factorchi-total-table td,
-body.factorchi-document table.products-table th,
-body.factorchi-document table.products-table td,
-body.factorchi-document table.total-table th,
-body.factorchi-document table.total-table td,
 body.factorchi-print table.fci-fix-table th,
-body.factorchi-print table.fci-fix-table td,
-body.factorchi-print table.factorchi-products-table th,
-body.factorchi-print table.factorchi-products-table td {
-  border: none !important;
-  border-bottom: 1px solid var(--fc-border) !important;
-  padding: 10px 12px !important;
+body.factorchi-print table.fci-fix-table td {
+  border: none;
+  border-bottom: 1px solid var(--fc-border);
+  padding: 10px 12px;
   font-size: inherit;
   line-height: inherit;
   vertical-align: middle;
+}
+
+/* Avoid double line where last row meets the table outer border */
+body.factorchi-document table.fci-fix-table tr:last-child > th,
+body.factorchi-document table.fci-fix-table tr:last-child > td,
+body.factorchi-document table.fci-border-table tr:last-child > th,
+body.factorchi-document table.fci-border-table tr:last-child > td,
+body.factorchi-document table.fci-res-table tr:last-child > th,
+body.factorchi-document table.fci-res-table tr:last-child > td,
+body.factorchi-print table.fci-fix-table tr:last-child > th,
+body.factorchi-print table.fci-fix-table tr:last-child > td,
+body.factorchi-print table.fci-border-table tr:last-child > th,
+body.factorchi-print table.fci-border-table tr:last-child > td {
+  border-bottom: none;
+}
+
+body.factorchi-document table.fci-fix-table tfoot td {
+  border-top: 1px solid var(--fc-border);
+}
+
+/* Products table: rounded like other tables, single outer edge + internal grid */
+body.factorchi-document table.factorchi-products-table,
+body.factorchi-document table.products-table,
+body.factorchi-print table.factorchi-products-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: var(--fc-font-size);
+  line-height: var(--fc-line-height);
+  margin: 14px 0;
+  border: 1px solid var(--fc-border);
+  border-radius: var(--fc-radius);
+  overflow: hidden;
+}
+
+body.factorchi-document table.factorchi-products-table th,
+body.factorchi-document table.factorchi-products-table td,
+body.factorchi-document table.products-table th,
+body.factorchi-document table.products-table td,
+body.factorchi-print table.factorchi-products-table th,
+body.factorchi-print table.factorchi-products-table td {
+  text-align: center;
+  vertical-align: middle;
+  border: none;
+  border-inline-end: 1px solid var(--fc-border);
+  border-bottom: 1px solid var(--fc-border);
+  padding: 10px 12px;
+  font-size: inherit;
+  font-weight: 500;
+  line-height: inherit;
+}
+
+body.factorchi-document table.factorchi-products-table tr > *:last-child,
+body.factorchi-document table.products-table tr > *:last-child,
+body.factorchi-print table.factorchi-products-table tr > *:last-child {
+  border-inline-end: none;
+}
+
+body.factorchi-document table.factorchi-products-table tr:last-child > *,
+body.factorchi-document table.products-table tr:last-child > *,
+body.factorchi-print table.factorchi-products-table tr:last-child > * {
+  border-bottom: none;
 }
 
 body.factorchi-document table.factorchi-products-table thead th,
 body.factorchi-document table.products-table thead th,
 body.factorchi-document table.factorchi-products-table tr:first-child th,
 body.factorchi-document .products-table th {
-  background: var(--fc-brand) !important;
-  color: #fff !important;
+  background: var(--fc-brand);
+  color: #fff;
   font-weight: 600;
-  text-align: center;
 }
 
-body.factorchi-document table.factorchi-products-table tbody tr:nth-child(even) td,
-body.factorchi-document table.products-table tbody tr:nth-child(even) td {
-  background: var(--fc-soft);
-}
-
-body.factorchi-document table.factorchi-products-table tbody tr:last-child td,
-body.factorchi-document table.products-table tbody tr:last-child td {
-  border-bottom: none !important;
-}
-
-/* Totals — align right in RTL */
+/* Totals — same border grid as products table */
 body.factorchi-document table.factorchi-total-table,
 body.factorchi-document table.total-table {
   max-width: 360px;
-  margin-right: 0 !important;
-  margin-left: auto !important;
+  margin-right: 0;
+  margin-left: auto;
+}
+
+body.factorchi-document table.factorchi-total-table th,
+body.factorchi-document table.factorchi-total-table td,
+body.factorchi-document table.total-table th,
+body.factorchi-document table.total-table td,
+body.factorchi-print table.factorchi-total-table th,
+body.factorchi-print table.factorchi-total-table td {
+  text-align: center;
+  vertical-align: middle;
+  border: none;
+  border-inline-end: 1px solid var(--fc-border);
+  border-bottom: 1px solid var(--fc-border);
+  padding: 10px 12px;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+body.factorchi-document table.factorchi-total-table tr > *:last-child,
+body.factorchi-document table.total-table tr > *:last-child,
+body.factorchi-print table.factorchi-total-table tr > *:last-child {
+  border-inline-end: none;
+}
+
+body.factorchi-document table.factorchi-total-table tr:last-child > *,
+body.factorchi-document table.total-table tr:last-child > *,
+body.factorchi-print table.factorchi-total-table tr:last-child > * {
+  border-bottom: none;
 }
 
 body.factorchi-document table.factorchi-total-table tr:last-child td,
@@ -213,10 +417,118 @@ body.factorchi-document table.total-table tr.final td,
 body.factorchi-document table.factorchi-total-table tr:last-child th,
 body.factorchi-document table.total-table .final td,
 body.factorchi-document table.total-table .final th {
-  background: var(--fc-brand) !important;
-  color: #fff !important;
+  background: var(--fc-brand);
+  color: #fff;
   font-weight: 700;
-  border-bottom: none !important;
+}
+
+body.factorchi-document table.factorchi-total-table th,
+body.factorchi-document table.total-table th {
+  font-weight: 600;
+  color: #334155;
+}
+
+body.factorchi-document table.factorchi-total-table .final,
+body.factorchi-document table.total-table .final {
+  color: #fff;
+}
+
+/* Header meta stacked */
+body.factorchi-document.invoice .shop-meta-dates,
+body.factorchi-document.pre-invoice .shop-meta-dates {
+  text-align: left;
+  vertical-align: top;
+}
+
+body.factorchi-document.invoice .shop-meta-dates .print-date,
+body.factorchi-document.invoice .shop-meta-dates .transmission-date,
+body.factorchi-document.invoice .shop-meta-dates .order-id,
+body.factorchi-document.pre-invoice .shop-meta-dates .print-date,
+body.factorchi-document.pre-invoice .shop-meta-dates .transmission-date,
+body.factorchi-document.pre-invoice .shop-meta-dates .order-id {
+  display: block;
+  width: 100%;
+  margin: 0 0 6px;
+  text-align: left;
+}
+
+body.factorchi-document.invoice .shop-meta-dates .order-id,
+body.factorchi-document.pre-invoice .shop-meta-dates .order-id {
+  margin-bottom: 0;
+}
+
+/* Footer row: totals | note | barcode */
+body.factorchi-document.invoice .fc-invoice-footer-row,
+body.factorchi-document.pre-invoice .fc-invoice-footer-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 12px;
+  margin: 16px 0;
+}
+
+body.factorchi-document.invoice .fc-invoice-footer-total,
+body.factorchi-document.pre-invoice .fc-invoice-footer-total {
+  flex: 1 1 220px;
+  min-width: 200px;
+}
+
+body.factorchi-document.invoice
+  .fc-invoice-footer-total
+  table.factorchi-total-table,
+body.factorchi-document.invoice .fc-invoice-footer-total table.total-table,
+body.factorchi-document.pre-invoice
+  .fc-invoice-footer-total
+  table.factorchi-total-table,
+body.factorchi-document.pre-invoice .fc-invoice-footer-total table.total-table {
+  max-width: none;
+  width: 100%;
+  margin: 0;
+}
+
+body.factorchi-document.invoice .fc-invoice-footer-note,
+body.factorchi-document.pre-invoice .fc-invoice-footer-note {
+  flex: 1 1 220px;
+  min-width: 180px;
+}
+
+body.factorchi-document.invoice .fc-invoice-footer-note .customer-note,
+body.factorchi-document.invoice .fc-invoice-footer-note .order-note,
+body.factorchi-document.pre-invoice .fc-invoice-footer-note .customer-note,
+body.factorchi-document.pre-invoice .fc-invoice-footer-note .order-note {
+  height: 100%;
+  margin: 0;
+  width: 100%;
+}
+
+body.factorchi-document.invoice .fc-invoice-footer-barcode,
+body.factorchi-document.pre-invoice .fc-invoice-footer-barcode {
+  flex: 0 1 180px;
+  min-width: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  background: none;
+  border: 1px solid var(--fc-border);
+  border-radius: var(--fc-radius);
+}
+
+body.factorchi-document.invoice .fc-invoice-footer-barcode .barcode,
+body.factorchi-document.pre-invoice .fc-invoice-footer-barcode .barcode {
+  margin: 0;
+}
+
+@media (max-width: 640px) {
+  body.factorchi-document.invoice .fc-invoice-footer-row,
+  body.factorchi-document.pre-invoice .fc-invoice-footer-row {
+    flex-direction: column;
+  }
+
+  body.factorchi-document.invoice .fc-invoice-footer-barcode,
+  body.factorchi-document.pre-invoice .fc-invoice-footer-barcode {
+    width: 100%;
+  }
 }
 
 body.factorchi-document .fc-cell-qty {
@@ -225,16 +537,37 @@ body.factorchi-document .fc-cell-qty {
 }
 
 body.factorchi-document .fc-cell-price {
-  text-align: left;
+  text-align: center;
   font-weight: 600;
   white-space: nowrap;
 }
 
-body.factorchi-document.rtl .fc-cell-price {
-  text-align: left;
+/* Same price typography in products + totals */
+body.factorchi-document
+  table.factorchi-products-table
+  .woocommerce-Price-amount,
+body.factorchi-document table.products-table .woocommerce-Price-amount,
+body.factorchi-document table.factorchi-total-table .woocommerce-Price-amount,
+body.factorchi-document table.total-table .woocommerce-Price-amount,
+body.factorchi-document .fc-cell-price .woocommerce-Price-amount {
+  font-size: var(--fc-font-size);
+  font-weight: 600;
+  line-height: var(--fc-line-height);
 }
 
-/* Product thumbnail beside name */
+body.factorchi-document
+  table.factorchi-products-table
+  .woocommerce-Price-currencySymbol,
+body.factorchi-document table.products-table .woocommerce-Price-currencySymbol,
+body.factorchi-document
+  table.factorchi-total-table
+  .woocommerce-Price-currencySymbol,
+body.factorchi-document table.total-table .woocommerce-Price-currencySymbol,
+body.factorchi-document .fc-cell-price .woocommerce-Price-currencySymbol {
+  font-size: 12px;
+  font-weight: 600;
+}
+
 body.factorchi-document .fc-product-row,
 body.factorchi-print .fc-product-row {
   display: flex;
@@ -247,7 +580,7 @@ body.factorchi-document .fc-product-text,
 body.factorchi-print .fc-product-text {
   flex: 1;
   min-width: 0;
-  text-align: right;
+  text-align: center;
 }
 
 body.factorchi-document .fc-product-thumb,
@@ -266,15 +599,8 @@ body.factorchi-print .fc-product-cell {
   min-width: 0;
 }
 
-body.factorchi-document table.factorchi-total-table td:first-child,
-body.factorchi-document table.total-table td:first-child {
-  font-weight: 600;
-  color: #334155;
-}
-
 /* Label documents */
 body.factorchi-document.post-label .container,
-body.factorchi-document.order-label .container,
 body.factorchi-document.shop-label .container,
 body.factorchi-document.customer-label .container,
 body.factorchi-document.product-label .container,
@@ -283,10 +609,55 @@ body.factorchi-document.mini-label .container {
   line-height: var(--fc-line-height);
 }
 
-body.factorchi-document.post-label table.fci-border-table,
-body.factorchi-document.order-label table.fci-border-table {
-  border: 1px solid var(--fc-border-strong) !important;
+/* Post label layout: A4 = recipient | sender; A5 = stacked recipient → note → sender */
+body.factorchi-document.post-label .fc-post-label-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas:
+    "recipient sender"
+    "note note"
+    "products products"
+    "footer footer";
+  gap: 12px;
+  align-items: stretch;
+}
+
+body.factorchi-document.post-label .fc-label-recipient {
+  grid-area: recipient;
+}
+
+body.factorchi-document.post-label .fc-label-sender {
+  grid-area: sender;
+}
+
+body.factorchi-document.post-label .fc-label-note {
+  grid-area: note;
+}
+
+body.factorchi-document.post-label .fc-label-products {
+  grid-area: products;
+}
+
+body.factorchi-document.post-label .fc-label-footer {
+  grid-area: footer;
+}
+
+body.factorchi-document.post-label.fc-print-a5 .fc-post-label-layout {
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    "recipient"
+    "note"
+    "sender"
+    "products"
+    "footer";
+}
+
+body.factorchi-document.post-label .fc-label-party {
+  border: 1px solid var(--fc-border-strong);
   border-radius: var(--fc-radius);
+  padding: 12px 14px;
+  background: var(--fc-soft);
+  min-height: 120px;
 }
 
 body.factorchi-document.post-label .fc-label-party-title {
@@ -299,11 +670,11 @@ body.factorchi-document.post-label .fc-label-party-title {
   text-align: center;
 }
 
-body.factorchi-document.post-label .view-1 .fc-label-party-body {
+body.factorchi-document.post-label .fc-label-party-body {
   text-align: right;
 }
 
-body.factorchi-document.post-label .view-1 .fc-label-party-body p {
+body.factorchi-document.post-label .fc-label-party-body p {
   margin: 0 0 4px;
   padding: 0;
   font-size: var(--fc-font-size);
@@ -312,50 +683,31 @@ body.factorchi-document.post-label .view-1 .fc-label-party-body p {
   font-weight: 500;
 }
 
-body.factorchi-document.post-label .view-1 .fc-label-party-body p strong {
+body.factorchi-document.post-label .fc-label-party-body p strong {
   color: var(--fc-brand);
   font-weight: 600;
 }
 
-body.factorchi-document.post-label .view-1 .fc-label-party-body .shop-title,
-body.factorchi-document.post-label .view-1 .fc-label-party-body .shop-address,
-body.factorchi-document.post-label .view-1 .fc-label-party-body .shop-phone,
-body.factorchi-document.post-label .view-1 .fc-label-party-body .shop-url,
-body.factorchi-document.post-label .view-1 .fc-label-party-body .shop-postcode,
-body.factorchi-document.post-label .view-1 .fc-label-party-body .shop-economical,
-body.factorchi-document.post-label .view-1 .fc-label-party-body .shop-reg {
-  font-size: inherit;
-  color: inherit;
-  font-weight: inherit;
-}
-
-body.factorchi-document.post-label .view-1 .fc-label-party-body .shop-logo,
-body.factorchi-document.post-label .view-1 .fc-label-party-body img.shop-logo {
+body.factorchi-document.post-label .fc-label-party-body .shop-logo,
+body.factorchi-document.post-label .fc-label-party-body img.shop-logo {
   display: block;
   max-height: 64px;
   width: auto;
   margin: 0 auto 10px;
 }
 
-body.factorchi-document.post-label .view-1 .fc-label-party-body .barcode {
-  margin-top: 12px;
-  text-align: center;
+body.factorchi-document.post-label .fc-label-note table.factorchi-note-table,
+body.factorchi-document.post-label .fc-label-note table.customer-note {
+  margin: 0;
 }
 
-body.factorchi-document.post-label .view-1 .fc-label-party-body .customer-note {
-  margin: 0 0 4px !important;
-  padding: 0 !important;
-  border: none !important;
-  background: none !important;
-}
-
-body.factorchi-document.post-label .view-1 .fc-label-products {
+body.factorchi-document.post-label .fc-label-products {
   padding: 8px 4px 4px;
   border-top: 1px dashed var(--fc-border);
-  margin-top: 4px;
+  margin-top: 0;
 }
 
-body.factorchi-document.post-label .view-1 .fc-label-products-title {
+body.factorchi-document.post-label .fc-label-products-title {
   margin: 0 0 6px;
   font-size: var(--fc-font-size-sm);
   font-weight: 700;
@@ -363,69 +715,109 @@ body.factorchi-document.post-label .view-1 .fc-label-products-title {
   text-align: center;
 }
 
-body.factorchi-document.post-label .view-1 .fc-label-products-list,
-body.factorchi-document.post-label .view-1 .fc-label-products-list ul {
+body.factorchi-document.post-label .fc-label-products-list,
+body.factorchi-document.post-label .fc-label-products-list ul {
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-body.factorchi-document.post-label .view-1 .fc-label-products-list li {
+body.factorchi-document.post-label .fc-label-products-list li {
   font-size: var(--fc-font-size-sm);
   line-height: 1.5;
   margin: 0 0 3px;
-  padding: 0;
 }
 
-body.factorchi-document.post-label .view-1 .fc-label-products-list small {
+body.factorchi-document.post-label .fc-label-products-list small {
   font-size: 0.9em;
   color: var(--fc-muted);
 }
 
-/* Section helper (Factori) */
+body.factorchi-document.post-label .fc-label-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 8px;
+  border-top: 1px solid var(--fc-border);
+  font-size: var(--fc-font-size-sm);
+  color: var(--fc-muted);
+}
+
+@media print {
+  body.factorchi-document.post-label.fc-print-a4 .fc-post-label-layout {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "recipient sender"
+      "note note"
+      "products products"
+      "footer footer";
+  }
+
+  body.factorchi-document.post-label.fc-print-a5 .fc-post-label-layout {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "recipient"
+      "note"
+      "sender"
+      "products"
+      "footer";
+  }
+}
+
 body.factorchi-document .section .title {
   color: var(--fc-brand);
-  font-weight: 600;
+  font-weight: 500;
 }
 
-/* Notes */
-body.factorchi-document .customer-note,
-body.factorchi-document .order-note,
-body.factorchi-document p.customer-note,
-body.factorchi-document p.order-note {
-  margin: 16px 0 !important;
-  padding: 12px 14px 12px 16px !important;
-  border-right: 4px solid var(--fc-brand-light) !important;
-  border-left: none !important;
-  background: var(--fc-soft);
-  border-radius: 0 var(--fc-radius) var(--fc-radius) 0;
-  color: #334155;
-  position: relative;
-}
-
-body.factorchi-document .customer-note::before,
-body.factorchi-document .order-note::before {
-  display: none !important;
-}
-
-/* Orders report */
-body.factorchi-document.orders {
+/* Notes — same chrome as products table */
+body.factorchi-document table.factorchi-note-table,
+body.factorchi-document table.customer-note,
+body.factorchi-document table.order-note {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
   font-size: var(--fc-font-size);
-}
-
-body.factorchi-document.orders table {
+  line-height: var(--fc-line-height);
+  margin: 14px 0;
+  border: 1px solid var(--fc-border);
   border-radius: var(--fc-radius);
   overflow: hidden;
-  box-shadow: var(--fc-shadow);
 }
 
-body.factorchi-document.orders thead th {
-  background: var(--fc-brand) !important;
-  color: #fff !important;
+body.factorchi-document table.factorchi-note-table th,
+body.factorchi-document table.customer-note th,
+body.factorchi-document table.order-note th {
+  background: var(--fc-brand);
+  color: #fff;
+  font-weight: 600;
+  text-align: center;
+  vertical-align: middle;
+  border: none;
+  padding: 10px 12px;
 }
 
-body.factorchi-document.orders tbody tr:nth-child(even) td {
-  background: var(--fc-soft);
+body.factorchi-document table.factorchi-note-table td,
+body.factorchi-document table.customer-note td,
+body.factorchi-document table.order-note td {
+  text-align: center;
+  vertical-align: middle;
+  border: none;
+  padding: 10px 12px;
+  color: #334155;
+  font-size: 12px;
+}
+
+/* Legacy paragraph notes (labels / older markup) */
+body.factorchi-document p.customer-note,
+body.factorchi-document p.order-note {
+  margin: 16px 0;
+  padding: 12px 14px;
+  border: 1px solid var(--fc-border);
+  border-radius: var(--fc-radius);
+  background: var(--fc-surface);
+  color: #334155;
 }
 
 /* Barcode */
@@ -436,10 +828,24 @@ body.factorchi-print .barcode {
   margin: 8px 0;
 }
 
+body.factorchi-document .barcode,
+body.factorchi-print .barcode,
+body.factorchi-document .barcode *,
+body.factorchi-print .barcode * {
+  border-radius: 0;
+}
+
+body.factorchi-document .barcode desc,
+body.factorchi-print .barcode desc {
+  display: none;
+}
+
 body.factorchi-document .barcode img,
 body.factorchi-print .barcode img {
-  max-height: calc(var(--fc-font-size) * 3.5);
-  border-radius: 4px;
+  max-height: 80px;
+  height: 80px;
+  width: auto;
+  border-radius: 0;
 }
 
 /* Print button */
@@ -454,20 +860,26 @@ body.factorchi-document .print {
 body.factorchi-document .button,
 body.factorchi-document a.button,
 body.factorchi-document .print .button {
-  background: linear-gradient(135deg, var(--fc-accent) 0%, var(--fc-brand-light) 100%) !important;
-  color: #fff !important;
+  background: linear-gradient(
+    135deg,
+    var(--fc-accent) 0%,
+    var(--fc-brand-light) 100%
+  );
+  color: #fff;
   border: none;
   text-align: center;
   cursor: pointer;
   display: inline-block;
   margin: 0;
-  padding: 10px 28px !important;
+  padding: 10px 28px;
   border-radius: 8px;
   text-decoration: none;
   font-size: var(--fc-font-size);
   font-weight: 600;
   box-shadow: 0 4px 14px rgba(237, 56, 25, 0.35);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 body.factorchi-document .button:hover,
@@ -486,7 +898,6 @@ body.factorchi-print small {
   color: var(--fc-muted);
 }
 
-/* Signatures */
 body.factorchi-document table.fci-sign-table {
   margin-top: 20px;
   border: 1px dashed var(--fc-border-strong);
@@ -494,10 +905,9 @@ body.factorchi-document table.fci-sign-table {
 }
 
 body.factorchi-document table.fci-sign-table td {
-  padding: 16px !important;
+  padding: 16px;
 }
 
-/* Responsive */
 @media (max-width: 640px) {
   body.factorchi-document .customer-detail {
     grid-template-columns: 1fr;
@@ -515,6 +925,112 @@ body.factorchi-document table.fci-sign-table td {
   body.factorchi-document .container {
     padding: 14px 12px;
   }
+}
+
+/* Classic = modern layout; gray brand + dark text on brand surfaces */
+body.factorchi-document.invoice .classic,
+body.factorchi-document.pre-invoice .classic,
+body.factorchi-document.post-label .classic {
+  --fc-brand: #e1e1e1;
+  --fc-brand-light: #cfcfcf;
+  --fc-accent: #bdbdbd;
+}
+
+body.factorchi-document.post-label .classic .fc-label-party-title,
+body.factorchi-document.post-label .classic .fc-label-party-body p strong,
+body.factorchi-document.post-label .classic .fc-label-products-title {
+  color: #000;
+}
+
+body.factorchi-document.post-label .classic .fc-label-party-title {
+  border-bottom-color: #000;
+}
+
+body.factorchi-document.post-label .classic table.factorchi-note-table th,
+body.factorchi-document.post-label .classic table.customer-note th {
+  color: #000;
+}
+
+body.factorchi-document.invoice .classic .fc-document-type,
+body.factorchi-document.pre-invoice .classic .fc-document-type,
+body.factorchi-document.invoice .classic th,
+body.factorchi-document.pre-invoice .classic th,
+body.factorchi-document.invoice .classic td.final,
+body.factorchi-document.pre-invoice .classic td.final,
+body.factorchi-document.invoice .classic th.final,
+body.factorchi-document.pre-invoice .classic th.final,
+body.factorchi-document.invoice .classic .total-table .final,
+body.factorchi-document.pre-invoice .classic .total-table .final,
+body.factorchi-document.invoice
+  .classic
+  table.factorchi-total-table
+  tr:last-child
+  > *,
+body.factorchi-document.pre-invoice
+  .classic
+  table.factorchi-total-table
+  tr:last-child
+  > *,
+body.factorchi-document.invoice .classic table.total-table tr:last-child > *,
+body.factorchi-document.pre-invoice
+  .classic
+  table.total-table
+  tr:last-child
+  > *,
+body.factorchi-document.invoice .classic table.shop-detail tfoot td::before,
+body.factorchi-document.pre-invoice .classic table.shop-detail tfoot td::before,
+body.factorchi-document.invoice .classic .sender-info::before,
+body.factorchi-document.pre-invoice .classic .sender-info::before,
+body.factorchi-document.invoice .classic .customer-detail::before,
+body.factorchi-document.pre-invoice .classic .customer-detail::before,
+body.factorchi-document.invoice .classic table.factorchi-products-table th,
+body.factorchi-document.pre-invoice .classic table.factorchi-products-table th,
+body.factorchi-document.invoice .classic table.products-table th,
+body.factorchi-document.pre-invoice .classic table.products-table th,
+body.factorchi-document.invoice
+  .classic
+  table.factorchi-products-table
+  thead
+  th,
+body.factorchi-document.pre-invoice
+  .classic
+  table.factorchi-products-table
+  thead
+  th,
+body.factorchi-document.invoice .classic table.factorchi-note-table th,
+body.factorchi-document.pre-invoice .classic table.factorchi-note-table th {
+  color: #000;
+}
+
+body.factorchi-document.invoice .classic .shop-title,
+body.factorchi-document.pre-invoice .classic .shop-title,
+body.factorchi-document.invoice .classic .order-id,
+body.factorchi-document.pre-invoice .classic .order-id,
+body.factorchi-document.invoice .classic .customer-detail p strong,
+body.factorchi-document.pre-invoice .classic .customer-detail p strong,
+body.factorchi-document.invoice .classic .section .title,
+body.factorchi-document.pre-invoice .classic .section .title,
+body.factorchi-document.invoice .classic .shop-address strong,
+body.factorchi-document.pre-invoice .classic .shop-address strong,
+body.factorchi-document.invoice .classic .shop-postcode strong,
+body.factorchi-document.pre-invoice .classic .shop-postcode strong,
+body.factorchi-document.invoice .classic .shop-economical strong,
+body.factorchi-document.pre-invoice .classic .shop-economical strong,
+body.factorchi-document.invoice .classic .shop-reg strong,
+body.factorchi-document.pre-invoice .classic .shop-reg strong,
+body.factorchi-document.invoice .classic table.shop-detail tfoot td p strong,
+body.factorchi-document.pre-invoice
+  .classic
+  table.shop-detail
+  tfoot
+  td
+  p
+  strong,
+body.factorchi-document.invoice .classic .shop-detail tfoot td p strong,
+body.factorchi-document.pre-invoice .classic .shop-detail tfoot td p strong,
+body.factorchi-document.invoice .classic .sender-info p strong,
+body.factorchi-document.pre-invoice .classic .sender-info p strong {
+  color: #000;
 }
 
 @media print {
@@ -536,6 +1052,8 @@ body.factorchi-document table.fci-sign-table td {
     border-radius: 0;
     border: none;
     padding: 0;
+    max-width: none;
+    width: 100%;
   }
 
   body.factorchi-document .print,
@@ -551,6 +1069,6 @@ body.factorchi-document table.fci-sign-table td {
   body.factorchi-document table.fci-fix-table td,
   body.factorchi-document table.factorchi-products-table th,
   body.factorchi-document table.factorchi-products-table td {
-    padding: 6px 8px !important;
+    padding: 6px 8px;
   }
 }

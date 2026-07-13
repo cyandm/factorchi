@@ -30,7 +30,7 @@ class Factorchi_WooCommerce
         if ($url !== '') {
             $actions['factorchi_invoice'] = [
                 'url'    => $url,
-                'name'   => __('فاکتور', 'factorchi'),
+                'name'   => __('چاپ فاکتور', 'factorchi'),
                 'action' => 'factorchi-invoice',
             ];
         }
@@ -55,7 +55,7 @@ class Factorchi_WooCommerce
         }
 
         $links = [];
-        foreach (['invoice', 'post-label', 'order-label'] as $type) {
+        foreach (['invoice', 'post-label'] as $type) {
             $url = factorchi_get_invoice_url($post_id, $type);
             if ($url !== '') {
                 $links[] = '<a class="factorchi-' . esc_attr(str_replace('-', '_', $type)) . '" href="' . esc_url($url) . '" target="_blank">' . esc_html($type) . '</a>';

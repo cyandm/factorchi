@@ -104,9 +104,27 @@ class Factorchi_Admin
         check_admin_referer('factorchi_save_settings');
 
         $checkboxes = [
-            'use_persian_number', 'use_jalali_date', 'page_break', 'bulk_use_compact', 'show_product_image', 'guest_access',
-            'channel_email', 'channel_sms', 'channel_whatsapp', 'channel_socials', 'channel_telegram', 'channel_bale',
-            'show_on_thankyou', 'show_on_my_account', 'replace_view_order_url', 'show_pre_invoice_cart', 'tapin_status', 'survey_enabled',
+            'use_persian_number',
+            'use_jalali_date',
+            'show_print_date',
+            'show_order_date',
+            'show_date_time',
+            'page_break',
+            'show_product_image',
+            'enable_border_radius',
+            'guest_access',
+            'channel_email',
+            'channel_sms',
+            'channel_whatsapp',
+            'channel_socials',
+            'channel_telegram',
+            'channel_bale',
+            'show_on_thankyou',
+            'show_on_my_account',
+            'replace_view_order_url',
+            'show_pre_invoice_cart',
+            'tapin_status',
+            'survey_enabled',
         ];
 
         $data = [];
@@ -115,19 +133,51 @@ class Factorchi_Admin
         }
 
         $text_fields = [
-            'shop_name', 'shop_url', 'shop_email', 'shop_phone', 'shop_address', 'shop_postcode',
-            'shop_economical', 'shop_reg', 'shop_logo', 'shop_note', 'font_family',
-            'invoice_default_view', 'pre_invoice_view', 'post_label_view', 'order_label_view', 'orders_view',
-            'invoice_margin', 'pre_invoice_margin', 'post_label_margin',
-            'font_size_invoice', 'font_size_pre_invoice', 'font_size_post_label',
-            'font_size_order_label', 'font_size_orders', 'font_size_label',
+            'shop_name',
+            'shop_url',
+            'shop_email',
+            'shop_phone',
+            'shop_address',
+            'shop_postcode',
+            'shop_economical',
+            'shop_reg',
+            'shop_logo',
+            'shop_note',
+            'font_family',
+            'invoice_default_view',
+            'pre_invoice_view',
+            'post_label_view',
+            'invoice_margin',
+            'pre_invoice_margin',
+            'post_label_margin',
+            'font_size_invoice',
+            'font_size_pre_invoice',
+            'font_size_post_label',
+            'font_size_label',
             'product_image_size',
-            'print_page_size', 'print_per_page',
-            'email_subject', 'email_body', 'sms_panel', 'sms_username', 'sms_password', 'sms_sender',
-            'sms_pattern_id', 'sms_message', 'whatsapp_api_url', 'whatsapp_message',
-            'socials_api_url', 'socials_message', 'telegram_bot_token', 'telegram_chat_id', 'telegram_message',
-            'bale_bot_token', 'bale_chat_id', 'bale_message', 'tapin_barcode_meta', 'line_items_delete',
-            'survey_status', 'default_invoice_type',
+            'print_page_size',
+            'email_subject',
+            'email_body',
+            'sms_panel',
+            'sms_username',
+            'sms_password',
+            'sms_sender',
+            'sms_pattern_id',
+            'sms_message',
+            'whatsapp_api_url',
+            'whatsapp_message',
+            'socials_api_url',
+            'socials_message',
+            'telegram_bot_token',
+            'telegram_chat_id',
+            'telegram_message',
+            'bale_bot_token',
+            'bale_chat_id',
+            'bale_message',
+            'tapin_barcode_meta',
+            'line_items_delete',
+            'survey_status',
+            'default_invoice_type',
         ];
 
         foreach ($text_fields as $key) {
@@ -155,9 +205,6 @@ class Factorchi_Admin
         $data['survey_sms_delay_days']   = max(0, (int) ($_POST['survey_sms_delay_days'] ?? 3));
         $data['survey_email_delay_days'] = max(0, (int) ($_POST['survey_email_delay_days'] ?? 3));
 
-        if (isset($data['print_per_page']) && !in_array($data['print_per_page'], ['1', '2', '4'], true)) {
-            $data['print_per_page'] = '1';
-        }
         if (isset($data['print_page_size']) && !in_array($data['print_page_size'], ['a4', 'a5'], true)) {
             $data['print_page_size'] = 'a4';
         }
@@ -166,8 +213,6 @@ class Factorchi_Admin
             'font_size_invoice',
             'font_size_pre_invoice',
             'font_size_post_label',
-            'font_size_order_label',
-            'font_size_orders',
             'font_size_label',
         ];
         foreach ($font_size_keys as $font_key) {

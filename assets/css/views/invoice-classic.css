@@ -1,0 +1,13 @@
+﻿/**
+ * Classic invoice — same deltas as modern.
+ * Brand color (#e1e1e1) + contrast overrides live in document-base.css
+ */
+
+.invoice .classic .products-table .variation dt,
+.invoice .classic .products-table .variation dd {
+  display: inline-block;
+}
+
+.woocommerce-Price-currencySymbol {
+  font-size: 12px;
+}

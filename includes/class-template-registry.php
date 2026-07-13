@@ -11,8 +11,6 @@ class Factorchi_Template_Registry
         'invoice_default_view' => 'invoice',
         'pre_invoice_view'       => 'invoice',
         'post_label_view'        => 'post-label',
-        'order_label_view'       => 'order-label',
-        'orders_view'            => 'orders',
     ];
 
     /**
@@ -20,6 +18,22 @@ class Factorchi_Template_Registry
      */
     public static function get_options(string $folder): array
     {
+        if ($folder === 'invoice') {
+            return [
+                'modern'  => __('مدرن', 'factorchi'),
+                'classic' => __('کلاسیک', 'factorchi'),
+            ];
+        }
+
+        if ($folder === 'post-label') {
+            return [
+                'modern-a4'  => __('مدرن سایز A4', 'factorchi'),
+                'modern-a5'  => __('مدرن سایز A5', 'factorchi'),
+                'classic-a4' => __('کلاسیک سایز A4', 'factorchi'),
+                'classic-a5' => __('کلاسیک سایز A5', 'factorchi'),
+            ];
+        }
+
         $path = FACTORCHI_VIEW_PATH . 'front/' . $folder;
         if (!is_dir($path)) {
             return [];
@@ -51,38 +65,68 @@ class Factorchi_Template_Registry
     public static function label_for_slug(string $slug): string
     {
         $labels = [
-            'view-1'     => __('قالب ۱', 'factorchi'),
-            'view-2'     => __('قالب ۲', 'factorchi'),
-            'view-3'     => __('قالب ۳', 'factorchi'),
-            'view-4'     => __('قالب ۴', 'factorchi'),
-            'view-5'     => __('قالب ۵', 'factorchi'),
-            'view-6'     => __('قالب ۶', 'factorchi'),
-            'view-7'     => __('قالب ۷', 'factorchi'),
-            'view-8'     => __('قالب ۸', 'factorchi'),
-            'view-mini'  => __('قالب مینی', 'factorchi'),
-            'view-pdf'   => __('قالب PDF', 'factorchi'),
-            'view-1-new' => __('قالب ۱ (جدید)', 'factorchi'),
+            'modern'     => __('مدرن', 'factorchi'),
+            'classic'    => __('کلاسیک', 'factorchi'),
+            'modern-a4'  => __('مدرن سایز A4', 'factorchi'),
+            'modern-a5'  => __('مدرن سایز A5', 'factorchi'),
+            'classic-a4' => __('کلاسیک سایز A4', 'factorchi'),
+            'classic-a5' => __('کلاسیک سایز A5', 'factorchi'),
         ];
 
-        return $labels[$slug] ?? str_replace(['view-', '-'], ['قالب ', ' '], $slug);
+        return $labels[$slug] ?? $slug;
     }
 
     public static function preview_url(string $setting_key, string $view_slug): string
     {
+        if (!current_user_can('manage_woocommerce')) {
+            return '';
+        }
+
         $type_map = [
             'invoice_default_view' => 'invoice',
             'pre_invoice_view'     => 'pre-invoice',
             'post_label_view'      => 'post-label',
-            'order_label_view'     => 'order-label',
-            'orders_view'          => 'orders',
+        ];
+
+        $type = $type_map[$setting_key] ?? 'invoice';
+
+        $args = [
+            'action'     => 'factorchi-show',
+            'type'       => $type,
+            'view'       => $view_slug,
+            'fc_preview' => '1',
+            '_wpnonce'   => wp_create_nonce(Factorchi_Preview_Sample::NONCE_ACTION),
+        ];
+
+        if ($type === 'post-label') {
+            $args['print-size'] = Factorchi_Settings::post_label_size_from_view($view_slug);
+        }
+
+        return add_query_arg($args, home_url('/'));
+    }
+
+    /**
+     * Preview URL without view — JS appends/replaces view on select change.
+     */
+    public static function preview_base_url(string $setting_key): string
+    {
+        if (!current_user_can('manage_woocommerce')) {
+            return '';
+        }
+
+        $type_map = [
+            'invoice_default_view' => 'invoice',
+            'pre_invoice_view'     => 'pre-invoice',
+            'post_label_view'      => 'post-label',
         ];
 
         $type = $type_map[$setting_key] ?? 'invoice';
 
         return add_query_arg([
-            'action' => 'factorchi-show',
-            'type'   => $type,
-            'view'   => $view_slug,
+            'action'     => 'factorchi-show',
+            'type'       => $type,
+            'fc_preview' => '1',
+            '_wpnonce'   => wp_create_nonce(Factorchi_Preview_Sample::NONCE_ACTION),
         ], home_url('/'));
     }
 }

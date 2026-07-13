@@ -75,10 +75,16 @@
             var view = $(this).val();
             var $link = $row.find('.fc-preview-btn');
 
-            if (base && view) {
-                var url = base + (base.indexOf('?') > -1 ? '&' : '?') + 'view=' + encodeURIComponent(view);
-                $link.attr('href', url);
+            if (!base || !view || !$link.length) {
+                return;
             }
+
+            var url = base + (base.indexOf('?') > -1 ? '&' : '?') + 'view=' + encodeURIComponent(view);
+            var sizeMatch = String(view).match(/-a([45])$/i);
+            if (sizeMatch) {
+                url += '&print-size=a' + sizeMatch[1];
+            }
+            $link.attr('href', url);
         });
     }
 

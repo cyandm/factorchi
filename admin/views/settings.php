@@ -11,7 +11,7 @@ $partials = FACTORCHI_DIR . 'admin/views/partials/';
 
 $nav_groups = [
     __('فروشگاه', 'factorchi') => [
-        'general' => ['label' => __('عمومی', 'factorchi'), 'icon' => 'dashicons-store'],
+        'general' => ['label' => __('اطلاعات عمومی', 'factorchi'), 'icon' => 'dashicons-store'],
     ],
     __('نمایش', 'factorchi') => [
         'templates' => ['label' => __('قالب‌ها', 'factorchi'), 'icon' => 'dashicons-layout'],

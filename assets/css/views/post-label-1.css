@@ -99,7 +99,8 @@ table {
     width: 100%;
     display: block; } }
 .fci-border-table {
-  border: 1px solid #000; }
+  border: 0;
+  border-collapse: collapse; }
   @media (min-width: 576px) {
     .fci-border-table th, .fci-border-table td {
       border: 1px solid #000; } }
@@ -223,35 +224,47 @@ img.watermark {
     border-left: 1px solid #000;
     border-right: none; }
 
-.post-label .view-1 {
+.post-label .modern ,
+
+.post-label .classic {
   background-image: repeating-linear-gradient(135deg, #CF2004 0px, #CF2004 15px, transparent 15px, transparent 25px, #3EA8F2 25px, #3EA8F2 40px, transparent 40px, transparent 50px);
   padding: 10px; }
-  .post-label .view-1.container {
+  .post-label .modern.container ,
+  .post-label .classic.container {
     border: none; }
-  .post-label .view-1 .inner {
+  .post-label .modern .inner ,
+  .post-label .classic .inner {
     background: #FFF;
     height: 100%;
     padding: 15px; }
-  .post-label .view-1 .shop-logo {
+  .post-label .modern .shop-logo ,
+  .post-label .classic .shop-logo {
     text-align: center;
     padding: 15px 0;
     margin-bottom: 20px; }
-  .post-label .view-1 .section.title .title {
+  .post-label .modern .section.title .title ,
+  .post-label .classic .section.title .title {
     display: none; }
-  .post-label .view-1 .section.title .content {
+  .post-label .modern .section.title .content ,
+  .post-label .classic .section.title .content {
     font-size: 120%;
     font-weight: bold; }
-  .post-label .view-1 .barcode {
+  .post-label .modern .barcode ,
+  .post-label .classic .barcode {
     margin-top: 15px;
     text-align: center; }
-  .post-label .view-1 tfoot td > div {
+  .post-label .modern tfoot td > div ,
+  .post-label .classic tfoot td > div {
     text-align: center; }
-    .post-label .view-1 tfoot td > div .section {
+    .post-label .modern tfoot td > div .section ,
+    .post-label .classic tfoot td > div .section {
       display: inline-block;
       margin: 0;
       padding: 0 10px; }
-    .post-label .view-1 tfoot td > div .section:not(:last-child) {
+    .post-label .modern tfoot td > div .section:not(:last-child) ,
+    .post-label .classic tfoot td > div .section:not(:last-child) {
       border-right: 1px solid #000; }
-.post-label.rtl .view-1 tfoot td > div .section:not(:last-child) {
+.post-label.rtl .modern tfoot td > div .section:not(:last-child) ,
+.post-label.rtl .classic tfoot td > div .section:not(:last-child) {
   border-right: none;
  }

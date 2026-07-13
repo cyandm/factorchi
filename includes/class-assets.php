@@ -26,7 +26,7 @@ class Factorchi_Assets
         wp_enqueue_style(
             'factorchi-admin',
             FACTORCHI_CSS_URL . 'admin.css',
-            [],
+            ['woocommerce_admin_styles'],
             FACTORCHI_VERSION
         );
 
@@ -47,9 +47,7 @@ class Factorchi_Assets
             'invoice_send'       => __('فاکتور ارسال شد.', 'factorchi'),
             'payment_link_send'  => __('لینک پرداخت ارسال شد.', 'factorchi'),
             'error_happend'      => __('خطایی رخ داد.', 'factorchi'),
-            'print_mode'         => factorchi_get_setting('bulk_use_compact', 'yes') === 'yes' ? 'compact' : '',
             'print_size'         => (string) factorchi_get_setting('print_page_size', 'a4'),
-            'print_per_page'     => (string) factorchi_get_setting('print_per_page', '1'),
         ]);
     }
 }

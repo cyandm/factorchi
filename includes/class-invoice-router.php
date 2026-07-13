@@ -21,19 +21,20 @@ class Factorchi_Invoice_Router
         $type     = isset($_GET['type']) ? sanitize_key(wp_unslash($_GET['type'])) : 'invoice';
         $order_id = isset($_GET['order-id']) ? wp_unslash($_GET['order-id']) : '';
         $view     = isset($_GET['view']) ? sanitize_file_name(wp_unslash($_GET['view'])) : '';
+        $is_preview = $this->is_preview_request();
+
+        if ($is_preview) {
+            $this->render_admin_preview($type, $view);
+            return;
+        }
 
         if ($type === 'pre-invoice') {
             $this->render_pre_invoice($view);
             return;
         }
 
-        if ($type === 'orders') {
-            if (!$this->user_can_view_admin_report()) {
-                wp_die(esc_html__('دسترسی مجاز نیست.', 'factorchi'));
-            }
-            $invoice_view = new Factorchi_Invoice_View($type, 0, $view !== '' ? $view : (string) factorchi_get_setting('orders_view', 'view-1'));
-            $invoice_view->render();
-            exit;
+        if ($type === 'orders' || $type === 'order-label') {
+            wp_die(esc_html__('این نوع سند حذف شده است.', 'factorchi'), '', ['response' => 404]);
         }
 
         $order_ids = $this->parse_order_ids($order_id);
@@ -52,25 +53,54 @@ class Factorchi_Invoice_Router
         exit;
     }
 
+    /**
+     * Prefer fc_preview (avoids WP reserved "preview" query var). Accept legacy preview=1|true.
+     */
+    private function is_preview_request(): bool
+    {
+        if (isset($_GET['fc_preview'])) {
+            return in_array((string) wp_unslash($_GET['fc_preview']), ['1', 'true'], true);
+        }
+
+        if (isset($_GET['preview'])) {
+            return in_array((string) wp_unslash($_GET['preview']), ['1', 'true'], true);
+        }
+
+        return false;
+    }
+
+    private function render_admin_preview(string $type, string $view): void
+    {
+        if (!current_user_can('manage_woocommerce')) {
+            wp_die(esc_html__('دسترسی مجاز نیست.', 'factorchi'), '', ['response' => 403]);
+        }
+
+        $nonce = isset($_GET['_wpnonce']) ? sanitize_text_field(wp_unslash($_GET['_wpnonce'])) : '';
+        if ($nonce === '' || !wp_verify_nonce($nonce, Factorchi_Preview_Sample::NONCE_ACTION)) {
+            wp_die(esc_html__('دسترسی مجاز نیست.', 'factorchi'), '', ['response' => 403]);
+        }
+
+        if ($type === 'orders' || $type === 'order-label') {
+            wp_die(esc_html__('این نوع سند حذف شده است.', 'factorchi'), '', ['response' => 404]);
+        }
+
+        Factorchi_Preview_Sample::render($type, $view);
+        exit;
+    }
+
     private function render_pre_invoice(string $view): void
     {
         if (!WC()->cart || WC()->cart->is_empty()) {
             wp_die(esc_html__('سبد خرید خالی است.', 'factorchi'));
         }
 
-        $invoice_view = new Factorchi_Invoice_View('pre-invoice', 0, $view !== '' ? $view : 'view-mini');
-        $data         = [
-            'title'          => (new Factorchi_Shop(0, 'pre-invoice'))->title_holder(true),
-            'products_table' => Factorchi_Products_Table::from_cart(),
-            'total_table'    => Factorchi_Total_Table::from_cart_html(),
-            'shop_order_id'  => __('پیش‌فاکتور', 'factorchi'),
-        ];
-        $template = FACTORCHI_VIEW_PATH . 'front/invoice/view-mini.php';
-        if (file_exists($template)) {
-            include $template;
-        } else {
-            echo wp_kses_post($data['products_table'] . $data['total_table']);
-        }
+        $default = (string) factorchi_get_setting('pre_invoice_view', 'modern');
+        $invoice_view = new Factorchi_Invoice_View(
+            'pre-invoice',
+            0,
+            $view !== '' ? $view : $default
+        );
+        $invoice_view->render();
         exit;
     }
 
@@ -116,11 +146,6 @@ class Factorchi_Invoice_Router
         }
 
         return (bool) apply_filters('factorchi_can_view_invoice', false, $order_id, $order);
-    }
-
-    private function user_can_view_admin_report(): bool
-    {
-        return current_user_can('manage_woocommerce');
     }
 
     public static function generate_access_token(int $order_id): string

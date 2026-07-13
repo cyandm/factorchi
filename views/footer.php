@@ -4,6 +4,11 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+/** @var bool $fc_document_embed */
+if (!empty($fc_document_embed)) {
+    return;
+}
+
 if (factorchi_get_setting('use_persian_number', 'yes') === 'yes' && !$this->get_check_email()) {
     echo Factorchi_View_Render::footer_js();
 }

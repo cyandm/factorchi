@@ -160,12 +160,6 @@ class Factorchi_View_Render
         );
         $data['url'] = '';
 
-        if ($shop->get_order_id() > 0) {
-            $order = wc_get_order($shop->get_order_id());
-            $note  = $order ? (string) $order->get_customer_note() : '';
-            $data['customer_note'] = $shop->label_line(__('یادداشت:', 'factorchi'), $note, 'customer-note');
-        }
-
         return $data;
     }
 
@@ -192,6 +186,9 @@ class Factorchi_View_Render
             'shop_sign',
             'customer_sign',
             'watermark',
+            'barcode',
+            'postbarcode',
+            'shop_barcode_render',
         ] as $key) {
             $data[$key] = '';
         }

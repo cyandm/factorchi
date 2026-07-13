@@ -1,7 +1,9 @@
 .factorchi-admin {
   direction: rtl;
   padding: 20px 20px 40px;
-  max-width: 1400px;
+  max-width: none;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .factorchi-admin * {

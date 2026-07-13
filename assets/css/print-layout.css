@@ -1,4 +1,4 @@
-/* Factorchi print layout: A4/A5 and multi-up (1/2/4 per page) */
+/* Factorchi batch print layout — one full template document per page */
 
 *,
 *::before,
@@ -27,7 +27,6 @@ body.fc-print-a5 .fc-print-root {
   width: 148mm;
 }
 
-/* Page size */
 body.fc-print-a4 {
   --fc-page-width: 210mm;
   --fc-page-height: 297mm;
@@ -38,167 +37,101 @@ body.fc-print-a5 {
   --fc-page-height: 210mm;
 }
 
-body.fc-print-a4 .fc-print-page,
-body.fc-print-a4 .fc-print-sheet.fc-print-sheet--solo {
-  width: 210mm;
-  min-height: 297mm;
-}
-
-body.fc-print-a5 .fc-print-page,
-body.fc-print-a5 .fc-print-sheet.fc-print-sheet--solo {
-  width: 148mm;
-  min-height: 210mm;
-}
-
-/* Toolbar (screen only) */
 .fc-print-toolbar {
   position: sticky;
   top: 0;
   z-index: 100;
   display: flex;
   flex-wrap: wrap;
+  gap: 12px;
   align-items: center;
   justify-content: center;
-  gap: 10px 16px;
-  padding: 12px 16px;
-  margin-bottom: 16px;
-  background: #1d2327;
+  padding: 10px 16px;
+  margin: 0 0 16px;
+  background: #1e293b;
   color: #fff;
-  font-family: Tahoma, sans-serif;
-  font-size: 13px;
 }
 
 .fc-print-toolbar label {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  font-size: 13px;
 }
 
 .fc-print-toolbar select {
-  padding: 4px 8px;
   border-radius: 4px;
-  border: 1px solid #8c8f94;
-  font-size: 13px;
+  border: none;
+  padding: 4px 8px;
 }
 
 .fc-print-toolbar .fc-print-btn {
-  background: #ed3819;
-  color: #fff;
   border: none;
-  border-radius: 5px;
-  padding: 6px 18px;
+  border-radius: 4px;
+  padding: 6px 16px;
+  background: #22c55e;
+  color: #fff;
+  font-weight: 600;
   cursor: pointer;
-  font-size: 13px;
 }
 
 .fc-print-toolbar .fc-print-btn:hover {
-  background: #c42f14;
+  background: #16a34a;
 }
 
-/* 1-up: one document per physical page */
 body.fc-print-1up .fc-print-grid {
   display: block;
 }
 
+/* Screen preview only — full page height looks like paper */
 body.fc-print-1up .fc-print-sheet--solo {
-  padding: 6mm;
-  page-break-after: always;
-  break-after: page;
-}
-
-body.fc-print-1up .fc-print-sheet--solo:last-child {
-  page-break-after: auto;
-  break-after: auto;
-}
-
-/* 2-up: two documents per A4 page */
-body.fc-print-2up .fc-print-grid {
-  display: block;
-}
-
-body.fc-print-2up .fc-print-page {
-  display: grid;
-  grid-template-rows: 1fr 1fr;
-  gap: 2mm;
-  padding: 4mm;
-  page-break-after: always;
-  break-after: page;
   min-height: var(--fc-page-height);
-  height: var(--fc-page-height);
-  overflow: hidden;
 }
 
-body.fc-print-2up .fc-print-page:last-child {
-  page-break-after: auto;
-  break-after: auto;
-}
-
-body.fc-print-2up .fc-print-sheet {
-  overflow: hidden;
-  transform-origin: top center;
-  transform: scale(0.88);
-  height: calc((var(--fc-page-height) - 8mm) / 2);
-  max-height: calc((var(--fc-page-height) - 8mm) / 2);
-}
-
-/* 4-up: four documents per A4 page */
-body.fc-print-4up .fc-print-grid {
-  display: block;
-}
-
-body.fc-print-4up .fc-print-page {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
-  gap: 2mm;
-  padding: 4mm;
-  page-break-after: always;
-  break-after: page;
-  min-height: var(--fc-page-height);
-  height: var(--fc-page-height);
-  overflow: hidden;
-}
-
-body.fc-print-4up .fc-print-page:last-child {
-  page-break-after: auto;
-  break-after: auto;
-}
-
-body.fc-print-4up .fc-print-sheet {
-  overflow: hidden;
-  transform-origin: top center;
-  transform: scale(0.72);
-  height: calc((var(--fc-page-height) - 8mm) / 2);
-  max-height: calc((var(--fc-page-height) - 8mm) / 2);
-}
-
-/* A5 adjustments for multi-up */
-body.fc-print-a5.fc-print-2up .fc-print-sheet {
-  transform: scale(0.82);
-}
-
-body.fc-print-a5.fc-print-4up .fc-print-sheet {
-  transform: scale(0.58);
+body.fc-print-1up .fc-print-sheet--solo:not(:last-child) {
+  margin-bottom: 16px;
 }
 
 @media print {
   body.factorchi-print {
-    padding: 0;
     background: #fff;
+    padding: 0;
   }
 
   body.factorchi-print .fc-print-root {
+    width: 100% !important;
     box-shadow: none;
-    width: 100%;
-    margin: 0;
   }
 
   .fc-print-toolbar {
     display: none !important;
   }
-}
 
-@page {
-  margin: 6mm;
-}
+  /*
+   * Do NOT set min-height to page height when printing — that plus content
+   * overflow creates a blank page between invoices.
+   */
+  body.fc-print-1up .fc-print-sheet--solo {
+    min-height: 0 !important;
+    height: auto !important;
+    margin: 0 !important;
+    page-break-after: always;
+    break-after: page;
+    page-break-inside: auto;
+  }
 
+  body.fc-print-1up .fc-print-sheet--solo:last-child {
+    page-break-after: auto !important;
+    break-after: auto !important;
+  }
+
+  body.factorchi-print .fc-print-sheet .container,
+  body.factorchi-print .fc-print-sheet .container .inner {
+    box-shadow: none !important;
+    border: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: none !important;
+    width: 100% !important;
+  }
+}

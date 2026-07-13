@@ -154,6 +154,10 @@ class Factorchi_Customer_Data
 
     public function order_date_holder(bool $html = false): string
     {
+        if (factorchi_get_setting('show_order_date', 'yes') !== 'yes') {
+            return '';
+        }
+
         return $this->field_line(__('تاریخ سفارش:', 'factorchi'), $this->get_order_date(), $html, 'order-date');
     }
 

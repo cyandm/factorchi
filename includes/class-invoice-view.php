@@ -9,8 +9,9 @@ class Factorchi_Invoice_View
     public string $type = 'invoice';
     /** @var int|array<int, int>|string */
     public $order_id = 0;
-    private string $view = 'view-1';
+    private string $view = 'modern';
     private bool $check_email = false;
+    private bool $is_preview = false;
 
     /**
      * @param int|array<int, int>|string $order_id
@@ -19,7 +20,25 @@ class Factorchi_Invoice_View
     {
         $this->type     = sanitize_key($type);
         $this->order_id = $order_id;
-        $this->view     = $view !== '' ? sanitize_file_name($view) : $this->resolve_default_view($type);
+        $resolved = $view !== '' ? sanitize_file_name($view) : $this->resolve_default_view($type);
+
+        if (in_array($type, ['invoice', 'pre-invoice'], true)) {
+            $this->view = Factorchi_Settings::normalize_invoice_view($resolved);
+        } elseif ($type === 'post-label') {
+            $this->view = Factorchi_Settings::normalize_post_label_view($resolved);
+        } else {
+            $this->view = $resolved;
+        }
+    }
+
+    public function set_preview(bool $value): void
+    {
+        $this->is_preview = $value;
+    }
+
+    public function is_preview(): bool
+    {
+        return $this->is_preview;
     }
 
     private function resolve_default_view(string $type): string
@@ -28,12 +47,24 @@ class Factorchi_Invoice_View
             'invoice'        => 'invoice_default_view',
             'pre-invoice'    => 'pre_invoice_view',
             'post-label'     => 'post_label_view',
-            'order-label'    => 'order_label_view',
-            'orders'         => 'orders_view',
         ];
 
-        $key = $map[$type] ?? 'invoice_default_view';
-        return (string) factorchi_get_setting($key, 'view-1');
+        $key     = $map[$type] ?? 'invoice_default_view';
+        $default = $type === 'post-label' ? 'modern-a4' : (in_array($type, ['invoice', 'pre-invoice'], true) ? 'modern' : 'view-1');
+
+        return (string) factorchi_get_setting($key, $default);
+    }
+
+    /**
+     * Style slug used for template/CSS files (modern|classic for invoices and post labels).
+     */
+    public function get_view_style(): string
+    {
+        if ($this->type === 'post-label') {
+            return Factorchi_Settings::post_label_style_from_view($this->view);
+        }
+
+        return $this->view;
     }
 
     public function get_order_id(): int
@@ -62,49 +93,20 @@ class Factorchi_Invoice_View
         return is_array($this->order_id) && count($this->order_id) > 1;
     }
 
-    public function is_compact_mode(): bool
-    {
-        if (!in_array($this->type, ['invoice', 'post-label'], true)) {
-            return false;
-        }
-
-        $mode = isset($_GET['mode']) ? sanitize_key(wp_unslash($_GET['mode'])) : '';
-        if ($mode === 'compact') {
-            return true;
-        }
-
-        if ($this->is_batch() && factorchi_get_setting('bulk_use_compact', 'yes') === 'yes') {
-            return true;
-        }
-
-        return false;
-    }
-
     public function get_print_size(): string
     {
         $size = isset($_GET['print-size']) ? sanitize_key(wp_unslash($_GET['print-size'])) : '';
-        if (!in_array($size, ['a4', 'a5'], true)) {
-            $size = (string) factorchi_get_setting('print_page_size', 'a4');
+        if (in_array($size, ['a4', 'a5'], true)) {
+            return $size;
         }
 
+        if ($this->type === 'post-label') {
+            return Factorchi_Settings::post_label_size_from_view($this->view);
+        }
+
+        $size = (string) factorchi_get_setting('print_page_size', 'a4');
+
         return in_array($size, ['a4', 'a5'], true) ? $size : 'a4';
-    }
-
-    public function get_per_page(): int
-    {
-        $raw = isset($_GET['per-page']) ? (int) $_GET['per-page'] : (int) factorchi_get_setting('print_per_page', 1);
-        return in_array($raw, [1, 2, 4], true) ? $raw : 1;
-    }
-
-    public function get_compact_template_path(): string
-    {
-        $map = [
-            'invoice'    => 'invoice-compact.php',
-            'post-label' => 'post-label-compact.php',
-        ];
-
-        $file = $map[$this->type] ?? 'invoice-compact.php';
-        return FACTORCHI_VIEW_PATH . 'print/' . $file;
     }
 
     public function get_font_family(): string
@@ -127,8 +129,6 @@ class Factorchi_Invoice_View
             'invoice'        => 'font_size_invoice',
             'pre-invoice'    => 'font_size_pre_invoice',
             'post-label'     => 'font_size_post_label',
-            'order-label'    => 'font_size_order_label',
-            'orders'         => 'font_size_orders',
             'shop-label'     => 'font_size_label',
             'customer-label' => 'font_size_label',
             'product-label'  => 'font_size_label',
@@ -139,8 +139,6 @@ class Factorchi_Invoice_View
             'font_size_invoice'     => 14,
             'font_size_pre_invoice' => 14,
             'font_size_post_label'  => 12,
-            'font_size_order_label' => 12,
-            'font_size_orders'      => 13,
             'font_size_label'       => 12,
         ];
 
@@ -158,6 +156,7 @@ class Factorchi_Invoice_View
         $font_lg     = min(28, (int) round($font_size * 1.15));
         $line_height = max(1.3, min(2.2, round(($font_size / 14) * 1.6, 2)));
         $product_img = max(24, min(200, (int) factorchi_get_setting('product_image_size', 70)));
+        $radius      = factorchi_get_setting('enable_border_radius', 'yes') === 'yes' ? '10px' : '0';
 
         return '<style>'
             . ':root{'
@@ -175,10 +174,10 @@ class Factorchi_Invoice_View
             . '--fc-surface:#ffffff;'
             . '--fc-muted:#64748b;'
             . '--fc-soft:#f8fafc;'
-            . '--fc-radius:10px;'
+            . '--fc-radius:' . $radius . ';'
             . '--fc-shadow:0 4px 24px rgba(15,23,42,0.08);'
             . '}'
-            . 'body.factorchi-document,body.factorchi-print,body.factorchi-document.post-label .view-1,body.factorchi-document.post-label .view-1 .inner{'
+            . 'body.factorchi-document,body.factorchi-print,body.factorchi-document.post-label .modern,body.factorchi-document.post-label .classic,body.factorchi-document.post-label .modern .inner,body.factorchi-document.post-label .classic .inner{'
             . 'font-family:var(--fc-font-family)!important;'
             . 'font-size:var(--fc-font-size);'
             . 'line-height:var(--fc-line-height);'
@@ -214,7 +213,6 @@ class Factorchi_Invoice_View
             $html .= '<link rel="stylesheet" href="' . esc_url(FACTORCHI_CSS_URL . 'views/' . $css_file) . '?ver=' . esc_attr(FACTORCHI_VERSION) . '" />';
         }
 
-        $html .= '<link rel="stylesheet" href="' . esc_url(FACTORCHI_CSS_URL . 'theme.css') . '?ver=' . esc_attr(FACTORCHI_VERSION) . '" />';
         $html .= $this->append_document_base_stylesheet();
         $html .= $this->append_document_variables();
 
@@ -223,21 +221,13 @@ class Factorchi_Invoice_View
 
     public function append_print_styles(): string
     {
-        $html  = Factorchi_Font_Registry::append_stylesheet_link($this->get_font_setting_key());
-        $html .= '<link rel="stylesheet" href="' . esc_url(FACTORCHI_CSS_URL . 'fontawesome.min.css') . '?ver=' . esc_attr(FACTORCHI_VERSION) . '" />';
-        $html .= '<link rel="stylesheet" href="' . esc_url(FACTORCHI_CSS_URL . 'print-layout.css') . '?ver=' . esc_attr(FACTORCHI_VERSION) . '" />';
-        $html .= '<link rel="stylesheet" href="' . esc_url(FACTORCHI_CSS_URL . 'print-compact.css') . '?ver=' . esc_attr(FACTORCHI_VERSION) . '" />';
-        $html .= '<link rel="stylesheet" href="' . esc_url(FACTORCHI_CSS_URL . 'theme.css') . '?ver=' . esc_attr(FACTORCHI_VERSION) . '" />';
-        $html .= $this->append_document_base_stylesheet();
-        $html .= $this->append_document_variables();
-
-        return $html;
+        return $this->append_styles()
+            . '<link rel="stylesheet" href="' . esc_url(FACTORCHI_CSS_URL . 'print-layout.css') . '?ver=' . esc_attr(FACTORCHI_VERSION) . '" />';
     }
 
     public function get_print_body_classes(): string
     {
-        $size     = $this->get_print_size();
-        $per_page = $this->get_per_page();
+        $size = $this->get_print_size();
 
         $classes = [
             'factorchi-print',
@@ -245,9 +235,12 @@ class Factorchi_Invoice_View
             'rtl',
             esc_attr($this->type),
             'fc-print-' . $size,
-            'fc-print-' . $per_page . 'up',
-            'fc-compact-mode',
+            'fc-print-1up',
         ];
+
+        if ($this->type === 'pre-invoice') {
+            $classes[] = 'invoice';
+        }
 
         return implode(' ', $classes);
     }
@@ -256,35 +249,21 @@ class Factorchi_Invoice_View
     {
         if ($this->type === 'invoice' || $this->type === 'pre-invoice') {
             $map = [
-                'view-1'    => 'invoice-1.css',
-                'view-2'    => 'invoice-2.css',
-                'view-3'    => 'invoice-3.css',
-                'view-4'    => 'invoice-4.css',
-                'view-5'    => 'invoice-5.css',
-                'view-6'    => 'invoice-6.css',
-                'view-7'    => 'invoice-1.css',
-                'view-8'    => 'invoice-6.css',
-                'view-mini' => 'pre-invoice-1.css',
-                'view-pdf'  => 'invoice-1.css',
+                'modern'  => 'invoice-modern.css',
+                'classic' => 'invoice-classic.css',
             ];
 
-            if ($this->type === 'pre-invoice') {
-                return 'pre-invoice-1.css';
-            }
-
-            return $map[$this->view] ?? 'invoice-1.css';
-        }
-
-        if ($this->type === 'orders') {
-            return $this->view === 'view-2' ? 'orders-2.css' : 'orders-1.css';
+            return $map[$this->view] ?? 'invoice-modern.css';
         }
 
         if ($this->type === 'post-label') {
-            return $this->view === 'view-2' ? 'post-label-2.css' : 'post-label-1.css';
-        }
+            $style = $this->get_view_style();
+            $map   = [
+                'modern'  => 'post-label-modern.css',
+                'classic' => 'post-label-classic.css',
+            ];
 
-        if ($this->type === 'order-label') {
-            return $this->view === 'view-2' ? 'order-label-2.css' : 'order-label-1.css';
+            return $map[$style] ?? 'post-label-modern.css';
         }
 
         $label_map = [
@@ -299,10 +278,17 @@ class Factorchi_Invoice_View
 
     public function append_body_class(): string
     {
-        $type = esc_attr($this->type);
-        $view = esc_attr($this->view);
+        $type  = esc_attr($this->type);
+        $view  = esc_attr($this->view);
+        $extra = $this->type === 'pre-invoice' ? ' invoice' : '';
+        $print = '';
 
-        return $type . ' rtl ' . $view . ' factorchi-document';
+        if ($this->type === 'post-label') {
+            $style = esc_attr($this->get_view_style());
+            $print = ' ' . $style . ' fc-print-' . esc_attr($this->get_print_size());
+        }
+
+        return $type . $extra . ' rtl ' . $view . ' factorchi-document' . $print;
     }
 
     public function render(): void
@@ -317,7 +303,7 @@ class Factorchi_Invoice_View
             wp_die(esc_html__('قالب فاکتور یافت نشد.', 'factorchi'));
         }
 
-        if ($this->type !== 'orders' && $this->type !== 'pre-invoice') {
+        if ($this->type !== 'pre-invoice') {
             $data = Factorchi_View_Render::build_data($this->get_order_id(), $this->type);
         }
 
@@ -330,7 +316,7 @@ class Factorchi_Invoice_View
             return false;
         }
 
-        return $this->is_compact_mode();
+        return $this->is_batch();
     }
 
     public function render_print_batch(): void
@@ -340,28 +326,26 @@ class Factorchi_Invoice_View
             wp_die(esc_html__('شناسه سفارش نامعتبر است.', 'factorchi'));
         }
 
-        $compact_template = $this->get_compact_template_path();
-        if (!file_exists($compact_template)) {
-            wp_die(esc_html__('قالب چاپ یافت نشد.', 'factorchi'));
+        if (!file_exists($this->resolve_template_path_public())) {
+            wp_die(esc_html__('قالب فاکتور یافت نشد.', 'factorchi'));
         }
 
         $print_size = $this->get_print_size();
-        $per_page   = $this->get_per_page();
 
         include FACTORCHI_VIEW_PATH . 'print/shell.php';
     }
 
+    public function resolve_template_path_public(): string
+    {
+        return $this->resolve_template_path();
+    }
+
     private function resolve_template_path(): string
     {
-        if ($this->type === 'orders') {
-            return FACTORCHI_VIEW_PATH . 'front/orders/' . $this->view . '.php';
-        }
-
         $dir_map = [
             'invoice'         => 'invoice',
             'pre-invoice'     => 'invoice',
             'post-label'      => 'post-label',
-            'order-label'     => 'order-label',
             'shop-label'      => 'shop-label',
             'customer-label'  => 'customer-label',
             'product-label'   => 'product-label',
@@ -369,7 +353,7 @@ class Factorchi_Invoice_View
         ];
 
         $subdir = $dir_map[$this->type] ?? 'invoice';
-        $view   = $this->type === 'pre-invoice' ? (string) factorchi_get_setting('pre_invoice_view', 'view-mini') : $this->view;
+        $view   = $this->type === 'post-label' ? $this->get_view_style() : $this->view;
 
         return FACTORCHI_VIEW_PATH . 'front/' . $subdir . '/' . $view . '.php';
     }

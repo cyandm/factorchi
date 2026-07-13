@@ -27,19 +27,26 @@ class Factorchi_Helper
 
     public static function date_format(int $timestamp, bool $jalali = true): string
     {
+        $with_time = factorchi_get_setting('show_date_time', 'yes') === 'yes';
+
+        // Use DateTime directly — wp_date/date_i18n are often filtered to Jalali
+        // by Persian calendar plugins, which would double-convert (e.g. 1404 → 0784).
+        $dt = (new DateTimeImmutable('@' . $timestamp))->setTimezone(wp_timezone());
+
         if ($jalali && factorchi_get_setting('use_jalali_date', 'yes') === 'yes') {
-            $gy = (int) wp_date('Y', $timestamp);
-            $gm = (int) wp_date('n', $timestamp);
-            $gd = (int) wp_date('j', $timestamp);
+            $gy = (int) $dt->format('Y');
+            $gm = (int) $dt->format('n');
+            $gd = (int) $dt->format('j');
             [$jy, $jm, $jd] = Factorchi_Date_Convert::gregorian_to_jalali($gy, $gm, $gd);
-            $date = sprintf('%04d/%02d/%02d', $jy, $jm, $jd);
-            $time = wp_date('H:i', $timestamp);
-            $formatted = $date . ' ' . $time;
+            $formatted = sprintf('%04d/%02d/%02d', $jy, $jm, $jd);
+            if ($with_time) {
+                $formatted .= ' ' . $dt->format('H:i');
+            }
 
             return self::maybe_persian($formatted);
         }
 
-        $formatted = date_i18n('Y/m/d H:i', $timestamp);
+        $formatted = $dt->format($with_time ? 'Y/m/d H:i' : 'Y/m/d');
 
         return self::maybe_persian($formatted);
     }

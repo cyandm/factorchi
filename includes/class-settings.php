@@ -27,26 +27,24 @@ class Factorchi_Settings
             'font_family'            => 'peyda',
             'use_persian_number'     => 'yes',
             'use_jalali_date'        => 'yes',
+            'show_print_date'        => 'yes',
+            'show_order_date'        => 'yes',
+            'show_date_time'         => 'yes',
             'page_break'             => 'no',
             'print_page_size'        => 'a4',
-            'print_per_page'         => '1',
-            'bulk_use_compact'       => 'yes',
-            'invoice_default_view'   => 'view-1',
-            'pre_invoice_view'       => 'view-1',
-            'post_label_view'        => 'view-1',
-            'order_label_view'       => 'view-1',
-            'orders_view'            => 'view-1',
+            'invoice_default_view'   => 'modern',
+            'pre_invoice_view'       => 'modern',
+            'post_label_view'        => 'modern-a4',
             'invoice_margin'         => '10',
             'pre_invoice_margin'     => '10',
             'post_label_margin'      => '5',
             'font_size_invoice'      => '14',
             'font_size_pre_invoice'  => '14',
             'font_size_post_label'   => '12',
-            'font_size_order_label'  => '12',
-            'font_size_orders'       => '13',
             'font_size_label'        => '12',
             'show_product_image'     => 'no',
             'product_image_size'     => '70',
+            'enable_border_radius'   => 'yes',
             'allowed_statuses'       => ['processing', 'completed'],
             'allowed_roles'          => ['customer', 'administrator', 'shop_manager'],
             'guest_access'           => 'yes',
@@ -86,26 +84,8 @@ class Factorchi_Settings
             'survey_enabled'         => 'no',
             'survey_status'          => 'completed',
             'survey_sms_delay_days'  => 3,
-            'survey_email_delay_days'=> 3,
+            'survey_email_delay_days' => 3,
             'default_invoice_type'   => 'invoice',
-            'sections'               => [
-                'order-row',
-                'order-id',
-                'order-date',
-                'order-full-name',
-                'order-phone',
-                'order-meli-code',
-                'order-addr',
-                'order-postcode',
-                'order-shipping-method',
-                'order-payment-method',
-                'order-transaction-id',
-                'order-customer-note',
-                'order-note',
-                'order-products',
-                'order-price',
-                'order-provider-price',
-            ],
         ];
     }
 
@@ -130,6 +110,7 @@ class Factorchi_Settings
         if (self::$cache === null) {
             $stored = get_option(self::OPTION_KEY, []);
             self::$cache = is_array($stored) ? array_merge(self::defaults(), $stored) : self::defaults();
+            self::$cache = self::normalize_cached_settings(self::$cache);
         }
 
         $legacy_key = str_replace('-', '_', $key);
@@ -156,11 +137,92 @@ class Factorchi_Settings
     }
 
     /**
+     * Map legacy invoice/pre-invoice template slugs to modern|classic.
+     */
+    public static function normalize_invoice_view(string $view): string
+    {
+        $view = sanitize_file_name($view);
+
+        if ($view === 'view-2' || $view === 'classic') {
+            return 'classic';
+        }
+
+        if ($view === 'modern' || $view === 'view-1') {
+            return 'modern';
+        }
+
+        // view-3+, view-mini, view-pdf, empty, unknown → modern
+        return 'modern';
+    }
+
+    /**
+     * Post-label templates combine style + page size.
+     */
+    public static function normalize_post_label_view(string $view): string
+    {
+        $view = sanitize_file_name($view);
+
+        $allowed = ['modern-a4', 'modern-a5', 'classic-a4', 'classic-a5'];
+        if (in_array($view, $allowed, true)) {
+            return $view;
+        }
+
+        $style = (strpos($view, 'classic') !== false || $view === 'view-2') ? 'classic' : 'modern';
+        $size  = (strpos($view, 'a5') !== false) ? 'a5' : 'a4';
+
+        return $style . '-' . $size;
+    }
+
+    public static function post_label_style_from_view(string $view): string
+    {
+        $view = self::normalize_post_label_view($view);
+
+        return strpos($view, 'classic') === 0 ? 'classic' : 'modern';
+    }
+
+    public static function post_label_size_from_view(string $view): string
+    {
+        $view = self::normalize_post_label_view($view);
+
+        return substr($view, -2) === 'a5' ? 'a5' : 'a4';
+    }
+
+    /**
+     * @param array<string, mixed> $settings
+     * @return array<string, mixed>
+     */
+    private static function normalize_cached_settings(array $settings): array
+    {
+        foreach (['invoice_default_view', 'pre_invoice_view'] as $key) {
+            if (isset($settings[$key]) && is_string($settings[$key])) {
+                $settings[$key] = self::normalize_invoice_view($settings[$key]);
+            }
+        }
+
+        if (isset($settings['post_label_view']) && is_string($settings['post_label_view'])) {
+            $settings['post_label_view'] = self::normalize_post_label_view($settings['post_label_view']);
+        }
+
+        return $settings;
+    }
+
+    /**
      * @param array<string, mixed> $settings
      */
     public static function update(array $settings): void
     {
+        foreach (['invoice_default_view', 'pre_invoice_view'] as $key) {
+            if (isset($settings[$key]) && is_string($settings[$key])) {
+                $settings[$key] = self::normalize_invoice_view($settings[$key]);
+            }
+        }
+
+        if (isset($settings['post_label_view']) && is_string($settings['post_label_view'])) {
+            $settings['post_label_view'] = self::normalize_post_label_view($settings['post_label_view']);
+        }
+
         $merged = array_merge(self::defaults(), get_option(self::OPTION_KEY, []), $settings);
+        $merged = self::normalize_cached_settings($merged);
         update_option(self::OPTION_KEY, $merged);
         self::$cache = $merged;
     }
