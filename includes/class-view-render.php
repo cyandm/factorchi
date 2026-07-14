@@ -26,17 +26,23 @@ class Factorchi_View_Render
             return '';
         }
 
-        $image_id = $product->get_image_id();
-        if (!$image_id) {
+        $image_id = self::resolve_product_image_id($product);
+        if ($image_id <= 0) {
             return '';
         }
 
         $size = self::get_product_image_size();
-        $url  = wp_get_attachment_image_url($image_id, [$size, $size]);
-        if ($url === false || $url === '') {
+        $url  = wp_get_attachment_image_url($image_id, 'woocommerce_thumbnail');
+        if (!$url) {
             $url = wp_get_attachment_image_url($image_id, 'thumbnail');
         }
-        if ($url === false || $url === '') {
+        if (!$url) {
+            $url = wp_get_attachment_image_url($image_id, 'medium');
+        }
+        if (!$url) {
+            $url = wp_get_attachment_image_url($image_id, 'full');
+        }
+        if (!$url) {
             return '';
         }
 
@@ -44,19 +50,52 @@ class Factorchi_View_Render
             . (int) $size . '" height="' . (int) $size . '" loading="lazy" decoding="async" />';
     }
 
+    /**
+     * Resolve featured image (variation → parent → gallery).
+     */
+    private static function resolve_product_image_id(WC_Product $product): int
+    {
+        $image_id = (int) $product->get_image_id();
+        if ($image_id > 0) {
+            return $image_id;
+        }
+
+        $parent_id = (int) $product->get_parent_id();
+        if ($parent_id > 0) {
+            $parent = wc_get_product($parent_id);
+            if ($parent) {
+                $image_id = (int) $parent->get_image_id();
+                if ($image_id > 0) {
+                    return $image_id;
+                }
+                $gallery = $parent->get_gallery_image_ids();
+                if (!empty($gallery[0])) {
+                    return (int) $gallery[0];
+                }
+            }
+        }
+
+        $gallery = $product->get_gallery_image_ids();
+        if (!empty($gallery[0])) {
+            return (int) $gallery[0];
+        }
+
+        return 0;
+    }
+
     public static function format_product_name_cell(string $name, string $sku, ?WC_Product $product, bool $with_image): string
     {
         $thumb = $with_image ? self::get_product_thumbnail_html($product) : '';
 
         $html  = '<td class="fc-product-cell"><div class="fc-product-row">';
+        if ($thumb !== '') {
+            $html .= $thumb;
+        }
         $html .= '<span class="fc-product-text">' . esc_html($name);
         if ($sku !== '') {
             $html .= '<br><small>' . esc_html($sku) . '</small>';
         }
         $html .= '</span>';
-        if ($thumb !== '') {
-            $html .= $thumb;
-        }
         $html .= '</div></td>';
 
         return $html;

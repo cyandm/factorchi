@@ -10,7 +10,68 @@ class Factorchi_Admin
     {
         add_action('admin_menu', [$this, 'register_menu']);
         add_action('admin_post_factorchi_save_settings', [$this, 'save_settings']);
+        add_action('wp_ajax_factorchi_save_toggle', [$this, 'ajax_save_toggle']);
         add_action('admin_enqueue_scripts', [$this, 'settings_assets']);
+    }
+
+    /**
+     * Toggle keys grouped by settings tab.
+     *
+     * @return array<string, list<string>>
+     */
+    private function checkboxes_by_tab(): array
+    {
+        return [
+            'general'   => [
+                'use_persian_number',
+                'use_jalali_date',
+                'show_print_date',
+                'show_order_date',
+                'show_date_time',
+            ],
+            'templates' => [
+                'enable_border_radius',
+                'show_product_image',
+                'show_barcode_top',
+                'show_barcode_bottom',
+            ],
+            'access'    => [
+                'guest_access',
+                'show_on_thankyou',
+                'show_on_my_account',
+                'replace_view_order_url',
+                'show_pre_invoice_cart',
+            ],
+            'notify'    => [
+                'channel_email',
+                'channel_sms',
+                'channel_whatsapp',
+                'channel_socials',
+                'channel_telegram',
+                'channel_bale',
+            ],
+            'tapin'     => [
+                'tapin_status',
+            ],
+            'survey'    => [
+                'survey_enabled',
+            ],
+        ];
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function allowed_toggle_keys(): array
+    {
+        $keys = [];
+        foreach ($this->checkboxes_by_tab() as $tab_keys) {
+            foreach ($tab_keys as $key) {
+                $keys[] = $key;
+            }
+        }
+
+        return $keys;
     }
 
     public function register_menu(): void
@@ -74,6 +135,19 @@ class Factorchi_Admin
                 FACTORCHI_VERSION,
                 true
             );
+            wp_localize_script(
+                'factorchi-admin-settings',
+                'factorchiSettings',
+                [
+                    'ajaxUrl' => admin_url('admin-ajax.php'),
+                    'nonce'   => wp_create_nonce('factorchi_save_toggle'),
+                    'i18n'    => [
+                        'saving' => __('در حال ذخیره…', 'factorchi'),
+                        'saved'  => __('ذخیره شد', 'factorchi'),
+                        'error'  => __('خطا در ذخیره سوئیچ', 'factorchi'),
+                    ],
+                ]
+            );
             wp_enqueue_media();
         }
     }
@@ -103,32 +177,12 @@ class Factorchi_Admin
 
         check_admin_referer('factorchi_save_settings');
 
-        $checkboxes = [
-            'use_persian_number',
-            'use_jalali_date',
-            'show_print_date',
-            'show_order_date',
-            'show_date_time',
-            'page_break',
-            'show_product_image',
-            'enable_border_radius',
-            'guest_access',
-            'channel_email',
-            'channel_sms',
-            'channel_whatsapp',
-            'channel_socials',
-            'channel_telegram',
-            'channel_bale',
-            'show_on_thankyou',
-            'show_on_my_account',
-            'replace_view_order_url',
-            'show_pre_invoice_cart',
-            'tapin_status',
-            'survey_enabled',
-        ];
+        $tab = sanitize_key(wp_unslash($_POST['factorchi_tab'] ?? 'general'));
 
+        // Only update toggles belonging to the submitted tab. Missing checkboxes
+        // from other tabs must not be forced to "no".
         $data = [];
-        foreach ($checkboxes as $key) {
+        foreach ($this->checkboxes_by_tab()[$tab] ?? [] as $key) {
             $data[$key] = !empty($_POST[$key]) ? 'yes' : 'no';
         }
 
@@ -192,18 +246,26 @@ class Factorchi_Admin
 
         if (isset($_POST['allowed_statuses']) && is_array($_POST['allowed_statuses'])) {
             $data['allowed_statuses'] = array_map('sanitize_key', wp_unslash($_POST['allowed_statuses']));
+        } elseif ($tab === 'access') {
+            $data['allowed_statuses'] = [];
         }
 
         if (isset($_POST['auto_send_statuses']) && is_array($_POST['auto_send_statuses'])) {
             $data['auto_send_statuses'] = array_map('sanitize_key', wp_unslash($_POST['auto_send_statuses']));
+        } elseif ($tab === 'auto') {
+            $data['auto_send_statuses'] = [];
         }
 
         if (isset($_POST['auto_send_channels']) && is_array($_POST['auto_send_channels'])) {
             $data['auto_send_channels'] = array_map('sanitize_key', wp_unslash($_POST['auto_send_channels']));
+        } elseif ($tab === 'auto') {
+            $data['auto_send_channels'] = [];
         }
 
-        $data['survey_sms_delay_days']   = max(0, (int) ($_POST['survey_sms_delay_days'] ?? 3));
-        $data['survey_email_delay_days'] = max(0, (int) ($_POST['survey_email_delay_days'] ?? 3));
+        if ($tab === 'survey') {
+            $data['survey_sms_delay_days']   = max(0, (int) ($_POST['survey_sms_delay_days'] ?? 3));
+            $data['survey_email_delay_days'] = max(0, (int) ($_POST['survey_email_delay_days'] ?? 3));
+        }
 
         if (isset($data['print_page_size']) && !in_array($data['print_page_size'], ['a4', 'a5'], true)) {
             $data['print_page_size'] = 'a4';
@@ -227,7 +289,30 @@ class Factorchi_Admin
 
         Factorchi_Settings::update($data);
 
-        wp_safe_redirect(add_query_arg(['page' => 'factorchi', 'tab' => sanitize_key(wp_unslash($_POST['factorchi_tab'] ?? 'general')), 'updated' => '1'], admin_url('admin.php')));
+        wp_safe_redirect(add_query_arg(['page' => 'factorchi', 'tab' => $tab, 'updated' => '1'], admin_url('admin.php')));
         exit;
+    }
+
+    public function ajax_save_toggle(): void
+    {
+        if (!current_user_can('manage_woocommerce')) {
+            wp_send_json_error(['message' => __('Unauthorized', 'factorchi')], 403);
+        }
+
+        check_ajax_referer('factorchi_save_toggle', 'nonce');
+
+        $key   = sanitize_key(wp_unslash($_POST['key'] ?? ''));
+        $value = (isset($_POST['value']) && (string) wp_unslash($_POST['value']) === 'yes') ? 'yes' : 'no';
+
+        if ($key === '' || !in_array($key, $this->allowed_toggle_keys(), true)) {
+            wp_send_json_error(['message' => __('کلید نامعتبر است.', 'factorchi')], 400);
+        }
+
+        Factorchi_Settings::update([$key => $value]);
+
+        wp_send_json_success([
+            'key'   => $key,
+            'value' => $value,
+        ]);
     }
 }

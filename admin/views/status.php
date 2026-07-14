@@ -15,6 +15,7 @@ $cron_next    = wp_next_scheduled(Factorchi_Survey::CRON_HOOK);
         <h1><?php esc_html_e('وضعیت سیستم', 'factorchi'); ?></h1>
         <p><?php esc_html_e('بررسی سلامت افزونه و وابستگی‌ها', 'factorchi'); ?></p>
     </div>
+    <hr class="wp-header-end" />
 
     <div class="fc-card">
         <h2 class="fc-card-title"><?php esc_html_e('وضعیت', 'factorchi'); ?></h2>

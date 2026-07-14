@@ -88,11 +88,69 @@
         });
     }
 
+    function initToggleAutoSave() {
+        var cfg = window.factorchiSettings || {};
+        if (!cfg.ajaxUrl || !cfg.nonce) {
+            return;
+        }
+
+        var timers = {};
+        var clearTimers = {};
+        var $status = $('.fc-autosave-status');
+        var i18n = cfg.i18n || {};
+
+        function setStatus(state, message) {
+            $status
+                .removeClass('is-saving is-saved is-error')
+                .addClass(state)
+                .text(message || '');
+        }
+
+        $('.factorchi-admin').on('change', '.fc-switch input[type="checkbox"]', function () {
+            var $input = $(this);
+            var key = $input.attr('name');
+            if (!key) {
+                return;
+            }
+
+            clearTimeout(timers[key]);
+            clearTimeout(clearTimers[key]);
+
+            timers[key] = setTimeout(function () {
+                setStatus('is-saving', i18n.saving || '…');
+
+                $.post(cfg.ajaxUrl, {
+                    action: 'factorchi_save_toggle',
+                    nonce: cfg.nonce,
+                    key: key,
+                    value: $input.is(':checked') ? 'yes' : 'no'
+                })
+                    .done(function (res) {
+                        if (res && res.success) {
+                            setStatus('is-saved', i18n.saved || 'OK');
+                            clearTimers[key] = setTimeout(function () {
+                                if ($status.hasClass('is-saved')) {
+                                    setStatus('', '');
+                                }
+                            }, 2000);
+                        } else {
+                            var msg = (res && res.data && res.data.message) || i18n.error || 'Error';
+                            setStatus('is-error', msg);
+                        }
+                    })
+                    .fail(function () {
+                        setStatus('is-error', i18n.error || 'Error');
+                    });
+            }, 150);
+        });
+    }
+
     $(document).ready(function () {
         if ($('.factorchi-admin').length) {
             initLogoPicker();
             initChannelPanels();
             initTemplatePreview();
+            initToggleAutoSave();
         }
     });
 })(jQuery);

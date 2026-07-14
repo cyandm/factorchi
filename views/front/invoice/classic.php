@@ -5,15 +5,21 @@ if (!defined('ABSPATH')) {
 
 include(FCI_VIEW_PATH . 'header.php');
 
+$show_barcode_top    = factorchi_get_setting('show_barcode_top', 'no') === 'yes';
+$show_barcode_bottom = factorchi_get_setting('show_barcode_bottom', 'yes') === 'yes';
+$barcode_top_html    = ($show_barcode_top && !empty($data['barcode'])) ? $data['barcode'] : '';
+$barcode_bottom_html = ($show_barcode_bottom && !empty($data['barcode'])) ? $data['barcode'] : '';
+$show_logo_cell      = !empty($data['logo']) || $barcode_top_html !== '';
+
 ?>
     <div class="classic container">
 		<?php if ($type === 'pre-invoice'): ?>
             <div class="fc-document-type"><?php echo esc_html($labels->get_label('pre-invoice')); ?></div>
 		<?php endif; ?>
-		<?php if ($data['title'] || $data['print_date'] ||
+		<?php if ($data['title'] || $show_logo_cell || $data['print_date'] ||
             $data['transmission_date'] || $data['url'] || $data['email'] || $data['phone'] || $data['order_id_html'] ||
             $data['sender'] || $data['postcode'] || $data['economical'] || $data['reg']): ?>
-            <table class="shop-detail fci-res-table fci-fix-table">
+            <table class="shop-detail fci-res-table fci-form-table">
                 <tbody>
                 <tr>
 					<?php $colspan = 0; ?>
@@ -26,8 +32,19 @@ include(FCI_VIEW_PATH . 'header.php');
                         </td>
 						<?php $colspan++; ?>
 					<?php endif; ?>
-					<?php if ($data['logo']): ?>
-                        <td><?php echo $data['logo']; ?></td>
+					<?php if ($show_logo_cell): ?>
+                        <td class="fc-shop-logo-cell">
+                            <div class="fc-shop-logo-row">
+								<?php if ($data['logo']): ?>
+									<?php echo $data['logo']; ?>
+								<?php endif; ?>
+								<?php if ($barcode_top_html !== ''): ?>
+                                    <div class="fc-shop-barcode-top">
+										<?php echo $barcode_top_html; ?>
+                                    </div>
+								<?php endif; ?>
+                            </div>
+                        </td>
 						<?php $colspan++; ?>
 					<?php endif; ?>
 					<?php if ($data['print_date'] || $data['transmission_date'] || $data['order_id_html']): ?>
@@ -76,7 +93,7 @@ include(FCI_VIEW_PATH . 'header.php');
 		<?php if ($data['products_table']): ?>
 			<?php echo $data['products_table']; ?>
 		<?php endif; ?>
-		<?php if ($data['total_table'] || $data['customer_note'] || $data['order_note'] || $data['barcode']): ?>
+		<?php if ($data['total_table'] || $data['customer_note'] || $data['order_note'] || $barcode_bottom_html !== ''): ?>
             <div class="fc-invoice-footer-row">
 				<?php if ($data['total_table']): ?>
                     <div class="fc-invoice-footer-total">
@@ -93,9 +110,9 @@ include(FCI_VIEW_PATH . 'header.php');
 						<?php endif; ?>
                     </div>
 				<?php endif; ?>
-				<?php if ($data['barcode']): ?>
+				<?php if ($barcode_bottom_html !== ''): ?>
                     <div class="fc-invoice-footer-barcode">
-						<?php echo $data['barcode']; ?>
+						<?php echo $barcode_bottom_html; ?>
                     </div>
 				<?php endif; ?>
             </div>

@@ -117,10 +117,22 @@ $checked = ($s['show_product_image'] ?? 'no') === 'yes';
 include $partials . 'field-toggle.php';
 
 $name = 'product_image_size';
-$label = __('اندازه تصویر (پیکسل — مربع)', 'factorchi');
+$label = __('اندازه تصویر محصول (پیکسل - مربع)', 'factorchi');
 $value = (string) ($s['product_image_size'] ?? '70');
 $type = 'number';
-$description = __('مثال: ۷۰ — محدوده ۲۴ تا ۲۰۰ پیکسل.', 'factorchi');
+$description = __('مثال: ۷۰ - محدوده ۲۴ تا ۲۰۰ پیکسل.', 'factorchi');
 include $partials . 'field-text.php';
+
+$name = 'show_barcode_top';
+$label = __('نمایش بارکد در بالای فاکتور', 'factorchi');
+$description = __('بارکد کنار لوگوی فروشگاه در هدر فاکتور و پیش‌فاکتور نمایش داده می‌شود.', 'factorchi');
+$checked = ($s['show_barcode_top'] ?? 'no') === 'yes';
+include $partials . 'field-toggle.php';
+
+$name = 'show_barcode_bottom';
+$label = __('نمایش بارکد در پایین فاکتور', 'factorchi');
+$description = __('بارکد در ردیف پایین فاکتور و پیش‌فاکتور (کنار جمع و یادداشت) نمایش داده می‌شود.', 'factorchi');
+$checked = ($s['show_barcode_bottom'] ?? 'yes') === 'yes';
+include $partials . 'field-toggle.php';
 
 include $partials . 'card-section-end.php';

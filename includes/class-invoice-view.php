@@ -281,14 +281,14 @@ class Factorchi_Invoice_View
         $type  = esc_attr($this->type);
         $view  = esc_attr($this->view);
         $extra = $this->type === 'pre-invoice' ? ' invoice' : '';
+        $size  = ' fc-print-' . esc_attr($this->get_print_size());
         $print = '';
 
         if ($this->type === 'post-label') {
-            $style = esc_attr($this->get_view_style());
-            $print = ' ' . $style . ' fc-print-' . esc_attr($this->get_print_size());
+            $print = ' ' . esc_attr($this->get_view_style());
         }
 
-        return $type . $extra . ' rtl ' . $view . ' factorchi-document' . $print;
+        return $type . $extra . ' rtl ' . $view . ' factorchi-document' . $print . $size;
     }
 
     public function render(): void

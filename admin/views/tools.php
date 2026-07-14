@@ -9,6 +9,7 @@ if (!defined('ABSPATH')) {
         <h1><?php esc_html_e('ابزارهای فاکتورچی', 'factorchi'); ?></h1>
         <p><?php esc_html_e('لینک‌های سریع و شورت‌کدهای کاربردی', 'factorchi'); ?></p>
     </div>
+    <hr class="wp-header-end" />
 
     <div class="fc-card">
         <h2 class="fc-card-title"><?php esc_html_e('ابزارها', 'factorchi'); ?></h2>

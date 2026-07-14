@@ -49,9 +49,12 @@ $base_url     = admin_url('admin.php?page=factorchi');
         <h1><?php esc_html_e('فاکتورچی', 'factorchi'); ?></h1>
         <p><?php esc_html_e('مدیریت فاکتور، قالب‌ها، ارسال و یکپارچگی ووکامرس', 'factorchi'); ?></p>
     </div>
+    <hr class="wp-header-end" />
 
     <?php if (!empty($_GET['updated'])) : ?>
-        <div class="notice notice-success is-dismissible"><p><?php esc_html_e('تنظیمات ذخیره شد.', 'factorchi'); ?></p></div>
+        <div class="notice notice-success is-dismissible fc-notice">
+            <p><?php esc_html_e('تنظیمات ذخیره شد.', 'factorchi'); ?></p>
+        </div>
     <?php endif; ?>
 
     <div class="fc-layout">
@@ -93,6 +96,8 @@ $base_url     = admin_url('admin.php?page=factorchi');
                     <button type="submit" class="button button-primary button-large">
                         <?php esc_html_e('ذخیره تنظیمات', 'factorchi'); ?>
                     </button>
+                    <span class="fc-autosave-status" aria-live="polite"></span>
+                    <span class="fc-autosave-hint"><?php esc_html_e('سوئیچ‌ها خودکار ذخیره می‌شوند', 'factorchi'); ?></span>
                 </div>
             </form>
         </main>

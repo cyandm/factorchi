@@ -15,7 +15,7 @@
   color: #fff;
   padding: 28px 32px;
   border-radius: 16px;
-  margin-bottom: 24px;
+  margin-bottom: 12px;
   box-shadow: 0 10px 40px rgba(15, 23, 42, 0.2);
 }
 
@@ -31,6 +31,84 @@
   color: rgba(255, 255, 255, 0.85) !important;
   margin: 0;
   font-size: 14px;
+}
+
+/* Anchor for WP admin notices (common.js places them after .wp-header-end). */
+.factorchi-admin > .wp-header-end {
+  display: none;
+}
+
+.factorchi-admin > .notice {
+  margin: 0 0 12px !important;
+  padding: 14px 48px 14px 18px !important;
+  border: 1px solid #bbf7d0 !important;
+  border-right: 4px solid #16a34a !important;
+  border-radius: 14px !important;
+  background: #f0fdf4 !important;
+  box-shadow: 0 4px 16px rgba(22, 163, 74, 0.08);
+  font-size: 14px;
+  color: #166534;
+}
+
+.factorchi-admin > .notice p {
+  margin: 0;
+  padding: 0;
+  font-weight: 600;
+  color: #166534;
+}
+
+.factorchi-admin > .notice .notice-dismiss {
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 8px;
+  border-radius: 8px;
+}
+
+.factorchi-admin > .notice .notice-dismiss:hover {
+  background: rgba(22, 163, 74, 0.1);
+  color: #166534;
+}
+
+.factorchi-admin > .notice-error,
+.factorchi-admin > .notice.notice-error {
+  border-color: #fecaca !important;
+  border-right-color: #dc2626 !important;
+  background: #fef2f2 !important;
+  box-shadow: 0 4px 16px rgba(220, 38, 38, 0.08);
+  color: #991b1b;
+}
+
+.factorchi-admin > .notice-error p,
+.factorchi-admin > .notice.notice-error p {
+  color: #991b1b;
+}
+
+.factorchi-admin > .notice-warning,
+.factorchi-admin > .notice.notice-warning {
+  border-color: #fde68a !important;
+  border-right-color: #d97706 !important;
+  background: #fffbeb !important;
+  box-shadow: 0 4px 16px rgba(217, 119, 6, 0.08);
+  color: #92400e;
+}
+
+.factorchi-admin > .notice-warning p,
+.factorchi-admin > .notice.notice-warning p {
+  color: #92400e;
+}
+
+.factorchi-admin > .notice-info,
+.factorchi-admin > .notice.notice-info {
+  border-color: #bae6fd !important;
+  border-right-color: #0284c7 !important;
+  background: #f0f9ff !important;
+  box-shadow: 0 4px 16px rgba(2, 132, 199, 0.08);
+  color: #075985;
+}
+
+.factorchi-admin > .notice-info p,
+.factorchi-admin > .notice.notice-info p {
+  color: #075985;
 }
 
 .fc-layout {
@@ -51,6 +129,9 @@
 
 .fc-nav-group {
   margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .fc-nav-group:last-child {
@@ -77,7 +158,9 @@
   text-decoration: none;
   font-size: 14px;
   font-weight: 500;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
 }
 
 .fc-nav-item .dashicons {
@@ -164,24 +247,26 @@
 }
 
 .fc-input {
-  width: 100%;
-  max-width: 100%;
-  padding: 10px 14px;
-  border: 1px solid #cbd5e1;
-  border-radius: 10px;
-  font-size: 14px;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  width: 100% !important;
+  max-width: 100% !important;
+  padding: 10px 14px !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 10px !important;
+  font-size: 14px !important;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s !important;
 }
 
 .fc-input:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
-  outline: none;
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
+  outline: none !important;
 }
 
 .fc-textarea {
-  min-height: 90px;
-  resize: vertical;
+  min-height: 90px !important;
+  resize: vertical !important;
 }
 
 .fc-select-row {
@@ -292,7 +377,9 @@
   background: #f8fafc;
   border-radius: 8px;
   border: 1px solid #e2e8f0;
-  transition: border-color 0.15s, background 0.15s;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
 }
 
 .fc-checkbox-item:hover {
@@ -364,9 +451,16 @@
   position: sticky;
   bottom: 0;
   margin-top: 24px;
-  padding: 16px 0;
-  background: linear-gradient(to top, #f0f0f1 60%, transparent);
+  padding: 14px 18px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  box-shadow: 0 4px 24px rgba(15, 23, 42, 0.08);
   z-index: 10;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
 }
 
 .fc-save-bar .button-primary {
@@ -374,6 +468,39 @@
   height: auto !important;
   font-size: 14px !important;
   border-radius: 10px !important;
+}
+
+.fc-autosave-status {
+  font-size: 13px;
+  font-weight: 600;
+  min-height: 1.2em;
+}
+
+.fc-autosave-status.is-saving,
+.fc-autosave-status.is-saved,
+.fc-autosave-status.is-error {
+  padding: 6px 12px;
+  border-radius: 999px;
+}
+
+.fc-autosave-status.is-saving {
+  color: #64748b;
+  background: #f1f5f9;
+}
+
+.fc-autosave-status.is-saved {
+  color: #15803d;
+  background: #f0fdf4;
+}
+
+.fc-autosave-status.is-error {
+  color: #b91c1c;
+  background: #fef2f2;
+}
+
+.fc-autosave-hint {
+  font-size: 12px;
+  color: #94a3b8;
 }
 
 .fc-hint {

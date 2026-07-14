@@ -68,12 +68,9 @@ $name = 'show_date_time'; $label = __('نمایش ساعت در تاریخ‌ه�
 $description = __('اگر خاموش باشد، فقط تاریخ (بدون ساعت) نمایش داده می‌شود.', 'factorchi');
 include $partials . 'field-toggle.php';
 
-$name = 'page_break'; $label = __('صفحه‌بندی چاپ', 'factorchi'); $checked = ($s['page_break'] ?? 'no') === 'yes';
-$description = '';
-include $partials . 'field-toggle.php';
-
 $name = 'print_page_size'; $label = __('اندازه پیش‌فرض برگه', 'factorchi'); $value = (string) ($s['print_page_size'] ?? 'a4');
 $options = ['a4' => 'A4', 'a5' => 'A5'];
+$description = '';
 include $partials . 'field-select.php';
 
 include $partials . 'card-section-end.php';

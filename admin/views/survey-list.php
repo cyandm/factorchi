@@ -9,6 +9,7 @@ if (!defined('ABSPATH')) {
         <h1><?php esc_html_e('صف نظرسنجی', 'factorchi'); ?></h1>
         <p><?php esc_html_e('۱۰۰ درخواست اخیر نظرسنجی پس از خرید', 'factorchi'); ?></p>
     </div>
+    <hr class="wp-header-end" />
 
     <div class="fc-card">
         <h2 class="fc-card-title"><?php esc_html_e('صف ارسال', 'factorchi'); ?></h2>

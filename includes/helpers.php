@@ -77,7 +77,6 @@ function get_fci_settings(string $key, $default = '')
     $boolean_keys = [
         'tapin_status',
         'use_persian_number',
-        'page_break',
     ];
 
     if (in_array($normalized, $boolean_keys, true)) {
