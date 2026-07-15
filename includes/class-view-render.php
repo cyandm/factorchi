@@ -83,7 +83,91 @@ class Factorchi_View_Render
         return 0;
     }
 
-    public static function format_product_name_cell(string $name, string $sku, ?WC_Product $product, bool $with_image): string
+    /**
+     * Strip trailing product codes like G00927 from a product name.
+     */
+    public static function filter_product_name_codes(string $name, string $sku = ''): string
+    {
+        if (factorchi_get_setting('filter_product_name_codes', 'no') !== 'yes') {
+            return $name;
+        }
+
+        $name = trim($name);
+        if ($name === '') {
+            return $name;
+        }
+
+        // Remove embedded SKU as a whole token (if provided).
+        if ($sku !== '') {
+            $quoted = preg_quote($sku, '/');
+            $name   = preg_replace('/(?:^|[\s\-–—|\/])' . $quoted . '(?=[\s\-–—|\/,]|$)/u', ' ', $name) ?? $name;
+            $name   = trim(preg_replace('/\s{2,}/u', ' ', $name) ?? $name);
+        }
+
+        // Remove trailing codes: letter(s) + digits (+ optional alnum), e.g. G00927, AB12, XYZ001.
+        do {
+            $prev = $name;
+            $name = preg_replace('/\s+[A-Za-z][A-Za-z0-9_-]*\d[A-Za-z0-9_-]*$/u', '', $name) ?? $name;
+            $name = trim($name);
+        } while ($name !== $prev && $name !== '');
+
+        return $name;
+    }
+
+    /**
+     * Format: "Product name, variation - SKU"
+     */
+    public static function build_product_label(string $item_name, ?WC_Product $product, ?WC_Order_Item_Product $item = null): string
+    {
+        $base      = trim($item_name);
+        $variation = '';
+        $sku       = $product ? trim((string) $product->get_sku()) : '';
+
+        if ($product && $product->is_type('variation')) {
+            $parent = wc_get_product($product->get_parent_id());
+            if ($parent) {
+                $base = trim($parent->get_name());
+            }
+
+            $formatted = wc_get_formatted_variation($product, true, false, true);
+            $variation = is_string($formatted) ? trim(wp_strip_all_tags($formatted)) : '';
+            $variation = trim(preg_replace('/\s*,\s*/u', '، ', $variation) ?? $variation);
+
+            if ($variation === '' && $item instanceof WC_Order_Item_Product) {
+                $attrs = [];
+                foreach ($item->get_formatted_meta_data('_', true) as $meta) {
+                    $val = trim(wp_strip_all_tags((string) $meta->display_value));
+                    if ($val !== '') {
+                        $attrs[] = $val;
+                    }
+                }
+                $variation = implode('، ', $attrs);
+            }
+        } elseif ($item instanceof WC_Order_Item_Product) {
+            $attrs = [];
+            foreach ($item->get_formatted_meta_data('_', true) as $meta) {
+                $val = trim(wp_strip_all_tags((string) $meta->display_value));
+                if ($val !== '') {
+                    $attrs[] = $val;
+                }
+            }
+            $variation = implode('، ', $attrs);
+        }
+
+        $base = self::filter_product_name_codes($base, $sku);
+
+        $label = $base;
+        if ($variation !== '') {
+            $label .= '، ' . $variation;
+        }
+        if ($sku !== '') {
+            $label .= ' - ' . $sku;
+        }
+
+        return $label;
+    }
+
+    public static function format_product_name_cell(string $label, ?WC_Product $product, bool $with_image): string
     {
         $thumb = $with_image ? self::get_product_thumbnail_html($product) : '';
 
@@ -91,11 +175,7 @@ class Factorchi_View_Render
         if ($thumb !== '') {
             $html .= $thumb;
         }
-        $html .= '<span class="fc-product-text">' . esc_html($name);
-        if ($sku !== '') {
-            $html .= '<br><small>' . esc_html($sku) . '</small>';
-        }
-        $html .= '</span>';
+        $html .= '<span class="fc-product-text">' . esc_html($label) . '</span>';
         $html .= '</div></td>';
 
         return $html;
@@ -148,7 +228,8 @@ class Factorchi_View_Render
             'total_table'         => $is_post_label ? '' : ($total?->render_html(true) ?? ''),
             'postbarcode'         => $shop->get_post_barcode($shop->get_order_id()),
             'shop_order_id'       => $shop->get_order_id(),
-            'shop_barcode_render' => $shop->barcode_holder(2, 70),
+            'shop_barcode_render' => $shop->barcode_holder(1, 60),
+            'tearoff'             => $is_post_label ? '' : self::build_tearoff_html($customer, $shop),
         ];
 
         if ($is_post_label) {
@@ -157,6 +238,94 @@ class Factorchi_View_Render
         }
 
         return $data;
+    }
+
+    /**
+     * Tear-off strip under the invoice footer for cutting and keeping.
+     */
+    public static function build_tearoff_html(Factorchi_Customer_Data $customer, Factorchi_Shop $shop): string
+    {
+        if (factorchi_get_setting('show_tearoff', 'yes') !== 'yes') {
+            return '';
+        }
+
+        $fields = [];
+
+        if (factorchi_get_setting('show_tearoff_payment', 'yes') === 'yes') {
+            $value = $customer->get_payment_method();
+            if ($value !== '') {
+                $fields[] = '<p class="fc-tearoff-item fc-tearoff-payment"><strong>' . esc_html__('روش پرداخت:', 'factorchi') . '</strong> ' . esc_html($value) . '</p>';
+            }
+        }
+
+        if (factorchi_get_setting('show_tearoff_tracking', 'yes') === 'yes') {
+            $value = $customer->get_transaction_id();
+            if ($value !== '') {
+                $fields[] = '<p class="fc-tearoff-item fc-tearoff-tracking"><strong>' . esc_html__('شناسه پیگیری:', 'factorchi') . '</strong> ' . esc_html($value) . '</p>';
+            }
+        }
+
+        if (factorchi_get_setting('show_tearoff_order_date', 'yes') === 'yes') {
+            $value = $customer->get_order_date();
+            if ($value !== '') {
+                $fields[] = '<p class="fc-tearoff-item fc-tearoff-order-date"><strong>' . esc_html__('تاریخ سفارش:', 'factorchi') . '</strong> ' . esc_html($value) . '</p>';
+            }
+        }
+
+        if (factorchi_get_setting('show_tearoff_order_id', 'yes') === 'yes') {
+            $order_id = $shop->get_order_id();
+            if ($order_id > 0) {
+                $fields[] = '<p class="fc-tearoff-item fc-tearoff-order-id"><strong>' . esc_html__('شناسه سفارش:', 'factorchi') . '</strong> ' . esc_html((string) $order_id) . '</p>';
+            }
+        }
+
+        if ($fields === []) {
+            return '';
+        }
+
+        return '<div class="fc-invoice-tearoff">'
+            . '<div class="fc-invoice-tearoff-cut" aria-hidden="true"></div>'
+            . '<div class="fc-invoice-tearoff-fields">' . implode('', $fields) . '</div>'
+            . '</div>';
+    }
+
+    /**
+     * Preview helper with sample tear-off values.
+     *
+     * @param array{payment?:string,tracking?:string,order_date?:string,order_id?:string} $sample
+     */
+    public static function build_tearoff_html_from_values(array $sample): string
+    {
+        if (factorchi_get_setting('show_tearoff', 'yes') !== 'yes') {
+            return '';
+        }
+
+        $fields = [];
+
+        if (factorchi_get_setting('show_tearoff_payment', 'yes') === 'yes' && !empty($sample['payment'])) {
+            $fields[] = '<p class="fc-tearoff-item fc-tearoff-payment"><strong>' . esc_html__('روش پرداخت:', 'factorchi') . '</strong> ' . esc_html((string) $sample['payment']) . '</p>';
+        }
+
+        if (factorchi_get_setting('show_tearoff_tracking', 'yes') === 'yes' && !empty($sample['tracking'])) {
+            $fields[] = '<p class="fc-tearoff-item fc-tearoff-tracking"><strong>' . esc_html__('شناسه پیگیری:', 'factorchi') . '</strong> ' . esc_html((string) $sample['tracking']) . '</p>';
+        }
+
+        if (factorchi_get_setting('show_tearoff_order_date', 'yes') === 'yes' && !empty($sample['order_date'])) {
+            $fields[] = '<p class="fc-tearoff-item fc-tearoff-order-date"><strong>' . esc_html__('تاریخ سفارش:', 'factorchi') . '</strong> ' . esc_html((string) $sample['order_date']) . '</p>';
+        }
+
+        if (factorchi_get_setting('show_tearoff_order_id', 'yes') === 'yes' && !empty($sample['order_id'])) {
+            $fields[] = '<p class="fc-tearoff-item fc-tearoff-order-id"><strong>' . esc_html__('شناسه سفارش:', 'factorchi') . '</strong> ' . esc_html((string) $sample['order_id']) . '</p>';
+        }
+
+        if ($fields === []) {
+            return '';
+        }
+
+        return '<div class="fc-invoice-tearoff">'
+            . '<div class="fc-invoice-tearoff-cut" aria-hidden="true"></div>'
+            . '<div class="fc-invoice-tearoff-fields">' . implode('', $fields) . '</div>'
+            . '</div>';
     }
 
     /**
@@ -210,25 +379,28 @@ class Factorchi_View_Render
      */
     private static function strip_post_label_order_fields(array $data): array
     {
-        foreach ([
-            'products_table',
-            'total_table',
-            'order_date',
-            'transmission_date',
-            'pay_method',
-            'trans_id',
-            'order_meta',
-            'order_note',
-            'delivery_date',
-            'deliver_date',
-            'deliver_time',
-            'shop_sign',
-            'customer_sign',
-            'watermark',
-            'barcode',
-            'postbarcode',
-            'shop_barcode_render',
-        ] as $key) {
+        foreach (
+            [
+                'products_table',
+                'total_table',
+                'order_date',
+                'transmission_date',
+                'pay_method',
+                'trans_id',
+                'order_meta',
+                'order_note',
+                'delivery_date',
+                'deliver_date',
+                'deliver_time',
+                'shop_sign',
+                'customer_sign',
+                'watermark',
+                'barcode',
+                'postbarcode',
+                'shop_barcode_render',
+                'tearoff',
+            ] as $key
+        ) {
             $data[$key] = '';
         }
 
@@ -253,9 +425,9 @@ class Factorchi_View_Render
                 continue;
             }
             $product = $item->get_product();
-            $sku     = $product ? $product->get_sku() : '';
+            $label   = self::build_product_label($item->get_name(), $product instanceof WC_Product ? $product : null, $item);
             $rows   .= '<tr>';
-            $rows   .= self::format_product_name_cell($item->get_name(), $sku, $product, $show_image);
+            $rows   .= self::format_product_name_cell($label, $product instanceof WC_Product ? $product : null, $show_image);
             $rows   .= '<td class="fc-cell-qty">' . esc_html((string) $item->get_quantity()) . '</td>';
             $rows   .= '<td class="fc-cell-price">' . Factorchi_Helper::format_price($item->get_total()) . '</td>';
             $rows   .= '</tr>';

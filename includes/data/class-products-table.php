@@ -33,9 +33,14 @@ class Factorchi_Products_Table
                 continue;
             }
             $product = $item->get_product();
+            $label   = Factorchi_View_Render::build_product_label(
+                $item->get_name(),
+                $product instanceof WC_Product ? $product : null,
+                $item
+            );
             $items[] = [
-                'name'     => $item->get_name(),
-                'sku'      => $product ? $product->get_sku() : '',
+                'name'     => $label,
+                'sku'      => $product instanceof WC_Product ? (string) $product->get_sku() : '',
                 'qty'      => $item->get_quantity(),
                 'total'    => $item->get_total(),
                 'subtotal' => $item->get_subtotal(),
@@ -54,11 +59,7 @@ class Factorchi_Products_Table
 
         $html = '<ul>';
         foreach ($items as $item) {
-            $line = esc_html((string) $item['name']);
-            if (($item['sku'] ?? '') !== '') {
-                $line .= ' <small>(' . esc_html((string) $item['sku']) . ')</small>';
-            }
-            $html .= '<li>' . $line . ' &times; ' . esc_html((string) $item['qty']) . '</li>';
+            $html .= '<li>' . esc_html((string) $item['name']) . ' &times; ' . esc_html((string) $item['qty']) . '</li>';
         }
         $html .= '</ul>';
 
@@ -83,9 +84,9 @@ class Factorchi_Products_Table
             }
             $qty   = (int) ($cart_item['quantity'] ?? 1);
             $price = (float) $product->get_price() * $qty;
-            $sku   = $product->get_sku();
+            $label = Factorchi_View_Render::build_product_label($product->get_name(), $product);
             $rows .= '<tr>';
-            $rows .= Factorchi_View_Render::format_product_name_cell($product->get_name(), $sku, $product, $show_image);
+            $rows .= Factorchi_View_Render::format_product_name_cell($label, $product, $show_image);
             $rows .= '<td class="fc-cell-qty">' . esc_html((string) $qty) . '</td>';
             $rows .= '<td class="fc-cell-price">' . Factorchi_Helper::format_price($price) . '</td>';
             $rows .= '</tr>';

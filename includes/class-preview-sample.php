@@ -47,8 +47,8 @@ class Factorchi_Preview_Sample
             . '<th>' . esc_html__('تعداد', 'factorchi') . '</th>'
             . '<th>' . esc_html__('مبلغ', 'factorchi') . '</th>'
             . '</tr></thead><tbody>'
-            . '<tr><td>' . esc_html__('محصول نمونه ۱', 'factorchi') . '</td><td class="fc-cell-qty">۲</td><td class="fc-cell-price">' . Factorchi_Helper::format_price(250000) . '</td></tr>'
-            . '<tr><td>' . esc_html__('محصول نمونه ۲', 'factorchi') . '</td><td class="fc-cell-qty">۱</td><td class="fc-cell-price">' . Factorchi_Helper::format_price(180000) . '</td></tr>'
+            . '<tr><td>' . esc_html__('محصول نمونه ۱، قرمز - PRD-1001', 'factorchi') . '</td><td class="fc-cell-qty">۲</td><td class="fc-cell-price">' . Factorchi_Helper::format_price(250000) . '</td></tr>'
+            . '<tr><td>' . esc_html__('محصول نمونه ۲ - PRD-1002', 'factorchi') . '</td><td class="fc-cell-qty">۱</td><td class="fc-cell-price">' . Factorchi_Helper::format_price(180000) . '</td></tr>'
             . '</tbody></table>';
 
         $total = '<table class="factorchi-total-table fci-fix-table total-table">'
@@ -63,9 +63,9 @@ class Factorchi_Preview_Sample
 
         $data = [
             'title'               => '<p class="shop-title">' . esc_html($shop_name !== '' ? $shop_name : $title_prefix) . '</p>',
-            'url'                 => '<p class="shop-url">' . esc_html($shop_url) . '</p>',
+            'url'                 => $p('shop-url', __('سایت:', 'factorchi'), $shop_url),
             'email'               => '',
-            'phone'               => $p('shop-phone', '', $shop_phone !== '' ? $shop_phone : '021-12345678'),
+            'phone'               => $p('shop-phone', __('تلفن:', 'factorchi'), $shop_phone !== '' ? $shop_phone : '021-12345678'),
             'logo'                => $logo,
             'print_date'          => factorchi_get_setting('show_print_date', 'yes') === 'yes'
                 ? '<span class="print-date section print-date"><span class="title">' . esc_html__('تاریخ چاپ:', 'factorchi') . '</span> ' . esc_html($date) . '</span>'
@@ -74,7 +74,7 @@ class Factorchi_Preview_Sample
                 ? '<span class="transmission-date section transmission-date"><span class="title">' . esc_html__('تاریخ سفارش:', 'factorchi') . '</span> ' . esc_html($date) . '</span>'
                 : '',
             'order_id_html'       => '<span class="order-id section order-id"><span class="title">' . esc_html__('شناسه سفارش:', 'factorchi') . '</span> ' . esc_html((string) $sample_id) . '</span>',
-            'barcode'             => '<div class="barcode"><img src="' . esc_url('https://barcode.tec-it.com/barcode.ashx?data=' . rawurlencode((string) $sample_id) . '&code=Code128&translate-esc=on&dpi=96') . '" height="80" alt="" /></div>',
+            'barcode'             => Factorchi_Barcode::html((string) $sample_id, 80),
             'sender'              => $p('shop-address', __('آدرس:', 'factorchi'), $shop_addr),
             'postcode'            => $p('shop-postcode', __('کدپستی:', 'factorchi'), $shop_post !== '' ? $shop_post : '1234567890'),
             'economical'          => $p('shop-economical', __('شماره اقتصادی:', 'factorchi'), '123456789012'),
@@ -87,10 +87,16 @@ class Factorchi_Preview_Sample
             'order_date'          => factorchi_get_setting('show_order_date', 'yes') === 'yes'
                 ? $p('order-date', __('تاریخ سفارش:', 'factorchi'), $date)
                 : '',
-            'pay_method'          => $p('payment-method', __('روش پرداخت:', 'factorchi'), __('پرداخت آنلاین', 'factorchi')),
-            'trans_id'            => $p('transaction-id', __('شناسه تراکنش:', 'factorchi'), 'TRX-SAMPLE-1001'),
+            'pay_method'          => factorchi_get_setting('show_payment_method', 'yes') === 'yes'
+                ? $p('payment-method', __('روش پرداخت:', 'factorchi'), __('پرداخت آنلاین', 'factorchi'))
+                : '',
+            'trans_id'            => factorchi_get_setting('show_transaction_id', 'yes') === 'yes'
+                ? $p('transaction-id', __('شناسه تراکنش:', 'factorchi'), 'TRX-SAMPLE-1001')
+                : '',
             'national_id'         => $p('national-id', __('کد ملی:', 'factorchi'), '0012345678'),
-            'shipping'            => $p('shipping-method', __('روش ارسال:', 'factorchi'), __('پست پیشتاز', 'factorchi')),
+            'shipping'            => factorchi_get_setting('show_shipping_method', 'yes') === 'yes'
+                ? $p('shipping-method', __('روش ارسال:', 'factorchi'), __('پست پیشتاز', 'factorchi'))
+                : '',
             'user_meta'           => '',
             'order_meta'          => '',
             'delivery_date'       => '',
@@ -102,11 +108,17 @@ class Factorchi_Preview_Sample
             'deliver_time'        => '',
             'watermark'           => '',
             'products_table'      => $products,
-            'products_list'       => '<ul><li>' . esc_html__('محصول نمونه ۱ × ۲', 'factorchi') . '</li><li>' . esc_html__('محصول نمونه ۲ × ۱', 'factorchi') . '</li></ul>',
+            'products_list'       => '<ul><li>' . esc_html__('محصول نمونه ۱، قرمز - PRD-1001 × ۲', 'factorchi') . '</li><li>' . esc_html__('محصول نمونه ۲ - PRD-1002 × ۱', 'factorchi') . '</li></ul>',
             'total_table'         => $total,
             'postbarcode'         => '',
             'shop_order_id'       => $sample_id,
-            'shop_barcode_render' => '',
+            'shop_barcode_render' => Factorchi_Barcode::html((string) $sample_id, 60),
+            'tearoff'             => Factorchi_View_Render::build_tearoff_html_from_values([
+                'payment'    => __('پرداخت آنلاین', 'factorchi'),
+                'tracking'   => 'TRX-SAMPLE-1001',
+                'order_date' => $date,
+                'order_id'   => (string) $sample_id,
+            ]),
         ];
 
         if ($type === 'post-label') {
@@ -117,6 +129,7 @@ class Factorchi_Preview_Sample
             $data['postbarcode'] = '';
             $data['products_table'] = '';
             $data['total_table'] = '';
+            $data['tearoff'] = '';
         }
 
         return $data;

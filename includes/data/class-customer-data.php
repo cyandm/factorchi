@@ -27,6 +27,37 @@ class Factorchi_Customer_Data
         return $plain;
     }
 
+    /**
+     * Remove customer name from address text (name is shown separately).
+     */
+    private function strip_name_from_address(string $formatted_html): string
+    {
+        $name = $this->get_full_name();
+        if ($name === '' || $formatted_html === '') {
+            return $this->format_plain_address($formatted_html);
+        }
+
+        $lines = preg_split('/<br\s*\/?>/i', $formatted_html) ?: [$formatted_html];
+        $lines = array_values(array_filter(array_map(static function ($line) {
+            return trim(wp_strip_all_tags($line));
+        }, $lines)));
+
+        if (isset($lines[0]) && $lines[0] === $name) {
+            array_shift($lines);
+        }
+
+        $plain = implode(' - ', $lines);
+        $plain = preg_replace('/\s*-\s*-\s*/', ' - ', $plain) ?? $plain;
+        $plain = trim(preg_replace('/\s+/', ' ', $plain) ?? $plain);
+
+        // Fallback if WC joins name without a line break.
+        $quoted = preg_quote($name, '/');
+        $plain  = preg_replace('/^' . $quoted . '\s*[-–,]\s*/u', '', $plain) ?? $plain;
+        $plain  = preg_replace('/^' . $quoted . '\s+/u', '', $plain) ?? $plain;
+
+        return trim($plain);
+    }
+
     private function append_plaque_unit_if_missing(string $address, string $prefix): string
     {
         if (!$this->order || $address === '') {
@@ -86,7 +117,7 @@ class Factorchi_Customer_Data
             $prefix    = '_billing_';
         }
 
-        $plain = $this->format_plain_address($formatted);
+        $plain = $this->strip_name_from_address($formatted);
 
         return $this->append_plaque_unit_if_missing($plain, $prefix);
     }
@@ -177,6 +208,10 @@ class Factorchi_Customer_Data
 
     public function payment_method_holder(bool $html = false): string
     {
+        if (factorchi_get_setting('show_payment_method', 'yes') !== 'yes') {
+            return '';
+        }
+
         return $this->field_line(__('روش پرداخت:', 'factorchi'), $this->get_payment_method(), $html, 'pay-method');
     }
 
@@ -191,6 +226,10 @@ class Factorchi_Customer_Data
 
     public function transaction_id_holder(bool $html = false): string
     {
+        if (factorchi_get_setting('show_transaction_id', 'yes') !== 'yes') {
+            return '';
+        }
+
         return $this->field_line(__('شماره تراکنش:', 'factorchi'), $this->get_transaction_id(), $html, 'trans-id');
     }
 
@@ -224,6 +263,10 @@ class Factorchi_Customer_Data
 
     public function shipping_method_holder(bool $html = false): string
     {
+        if (factorchi_get_setting('show_shipping_method', 'yes') !== 'yes') {
+            return '';
+        }
+
         return $this->field_line(__('روش ارسال:', 'factorchi'), $this->get_shipping_method(), $html, 'shipping-method');
     }
 

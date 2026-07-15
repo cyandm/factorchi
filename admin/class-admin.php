@@ -22,18 +22,26 @@ class Factorchi_Admin
     private function checkboxes_by_tab(): array
     {
         return [
-            'general'   => [
+            'general'   => [],
+            'templates' => [
                 'use_persian_number',
                 'use_jalali_date',
                 'show_print_date',
                 'show_order_date',
                 'show_date_time',
-            ],
-            'templates' => [
                 'enable_border_radius',
                 'show_product_image',
                 'show_barcode_top',
                 'show_barcode_bottom',
+                'show_payment_method',
+                'show_shipping_method',
+                'show_transaction_id',
+                'filter_product_name_codes',
+                'show_tearoff',
+                'show_tearoff_payment',
+                'show_tearoff_tracking',
+                'show_tearoff_order_date',
+                'show_tearoff_order_id',
             ],
             'access'    => [
                 'guest_access',

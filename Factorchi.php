@@ -37,6 +37,7 @@ define('FCI_CSS_URL', FACTORCHI_CSS_URL);
 define('FCI_JS_URL', FACTORCHI_JS_URL);
 
 require_once FACTORCHI_INCLUDES . 'helpers.php';
+require_once FACTORCHI_INCLUDES . 'class-barcode.php';
 require_once FACTORCHI_INCLUDES . 'data/class-date-convert.php';
 require_once FACTORCHI_INCLUDES . 'data/class-labels.php';
 require_once FACTORCHI_INCLUDES . 'data/class-shop-data.php';

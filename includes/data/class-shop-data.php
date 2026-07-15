@@ -48,7 +48,13 @@ class Factorchi_Shop
     public function url_holder(bool $html = false): string
     {
         $url = (string) factorchi_get_setting('shop_url', home_url('/'));
-        return $html ? '<p class="shop-url">' . esc_html($url) . '</p>' : esc_html($url);
+        if ($url === '') {
+            return '';
+        }
+
+        return $html
+            ? $this->label_line(__('سایت:', 'factorchi'), $url, 'shop-url')
+            : esc_html($url);
     }
 
     public function email_holder(bool $html = false): string
@@ -62,7 +68,10 @@ class Factorchi_Shop
         if ($phone === '') {
             return '';
         }
-        return $html ? '<p class="shop-phone">' . esc_html($phone) . '</p>' : esc_html($phone);
+
+        return $html
+            ? $this->label_line(__('تلفن:', 'factorchi'), $phone, 'shop-phone')
+            : esc_html($phone);
     }
 
     public function logo_holder(bool $html = false): string
@@ -158,9 +167,7 @@ class Factorchi_Shop
 
     public function barcode_holder(int $type = 1, int $height = 80): string
     {
-        $code = (string) $this->order_id;
-        $url  = 'https://barcode.tec-it.com/barcode.ashx?data=' . rawurlencode($code) . '&code=Code128&translate-esc=on&dpi=96';
-        return '<div class="barcode"><img src="' . esc_url($url) . '" height="' . (int) $height . '" alt="" /></div>';
+        return Factorchi_Barcode::html((string) $this->order_id, $height);
     }
 
     public function customer_note_holder(): string

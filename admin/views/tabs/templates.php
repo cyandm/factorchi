@@ -55,6 +55,38 @@ foreach ($template_fields as $key => $label) {
 
 include $partials . 'card-section-end.php';
 
+$title = __('چاپ و نمایش', 'factorchi');
+$description = __('فونت، تاریخ و گزینه‌های نمایش مشترک اسناد.', 'factorchi');
+include $partials . 'card-section.php';
+
+$name = 'font_family'; $label = __('فونت', 'factorchi');
+$value = Factorchi_Font_Registry::normalize_key((string) ($s['font_family'] ?? 'peyda'));
+$options = Factorchi_Font_Registry::options();
+include $partials . 'field-select.php';
+
+$name = 'use_persian_number'; $label = __('اعداد فارسی', 'factorchi'); $checked = ($s['use_persian_number'] ?? 'yes') === 'yes';
+include $partials . 'field-toggle.php';
+
+$name = 'use_jalali_date'; $label = __('تاریخ شمسی', 'factorchi'); $checked = ($s['use_jalali_date'] ?? 'yes') === 'yes';
+include $partials . 'field-toggle.php';
+
+$name = 'show_print_date'; $label = __('نمایش تاریخ چاپ', 'factorchi'); $checked = ($s['show_print_date'] ?? 'yes') === 'yes';
+include $partials . 'field-toggle.php';
+
+$name = 'show_order_date'; $label = __('نمایش تاریخ سفارش', 'factorchi'); $checked = ($s['show_order_date'] ?? 'yes') === 'yes';
+include $partials . 'field-toggle.php';
+
+$name = 'show_date_time'; $label = __('نمایش ساعت در تاریخ‌ها', 'factorchi'); $checked = ($s['show_date_time'] ?? 'yes') === 'yes';
+$description = __('اگر خاموش باشد، فقط تاریخ (بدون ساعت) نمایش داده می‌شود.', 'factorchi');
+include $partials . 'field-toggle.php';
+
+$name = 'print_page_size'; $label = __('اندازه پیش‌فرض برگه', 'factorchi'); $value = (string) ($s['print_page_size'] ?? 'a4');
+$options = ['a4' => 'A4', 'a5' => 'A5'];
+$description = '';
+include $partials . 'field-select.php';
+
+include $partials . 'card-section-end.php';
+
 $title = __('حاشیه چاپ (پیکسل)', 'factorchi');
 $description = '';
 include $partials . 'card-section.php';
@@ -133,6 +165,72 @@ $name = 'show_barcode_bottom';
 $label = __('نمایش بارکد در پایین فاکتور', 'factorchi');
 $description = __('بارکد در ردیف پایین فاکتور و پیش‌فاکتور (کنار جمع و یادداشت) نمایش داده می‌شود.', 'factorchi');
 $checked = ($s['show_barcode_bottom'] ?? 'yes') === 'yes';
+include $partials . 'field-toggle.php';
+
+$name = 'filter_product_name_codes';
+$label = __('فیلتر نام محصولات', 'factorchi');
+$description = __('کدهایی مثل G00927 را از انتهای نام محصول حذف می‌کند؛ مثلاً «پولوشرت نیهان G00927» → «پولوشرت نیهان».', 'factorchi');
+$checked = ($s['filter_product_name_codes'] ?? 'no') === 'yes';
+include $partials . 'field-toggle.php';
+
+include $partials . 'card-section-end.php';
+
+$title = __('اطلاعات خریدار', 'factorchi');
+$description = __('نمایش یا مخفی‌کردن فیلدهای بلوک خریدار در فاکتور و پیش‌فاکتور.', 'factorchi');
+include $partials . 'card-section.php';
+
+$name = 'show_payment_method';
+$label = __('روش پرداخت', 'factorchi');
+$description = __('نمایش روش پرداخت در بخش اطلاعات خریدار.', 'factorchi');
+$checked = ($s['show_payment_method'] ?? 'yes') === 'yes';
+include $partials . 'field-toggle.php';
+
+$name = 'show_shipping_method';
+$label = __('روش ارسال', 'factorchi');
+$description = __('نمایش روش ارسال در بخش اطلاعات خریدار.', 'factorchi');
+$checked = ($s['show_shipping_method'] ?? 'yes') === 'yes';
+include $partials . 'field-toggle.php';
+
+$name = 'show_transaction_id';
+$label = __('شماره تراکنش', 'factorchi');
+$description = __('نمایش شماره تراکنش در بخش اطلاعات خریدار.', 'factorchi');
+$checked = ($s['show_transaction_id'] ?? 'yes') === 'yes';
+include $partials . 'field-toggle.php';
+
+include $partials . 'card-section-end.php';
+
+$title = __('برگه جداشدنی (برش پایین)', 'factorchi');
+$description = __('نوار پایین فاکتور برای بریدن و نگه‌داشتن؛ زیر ردیف جمع/یادداشت/بارکد نمایش داده می‌شود.', 'factorchi');
+include $partials . 'card-section.php';
+
+$name = 'show_tearoff';
+$label = __('نمایش برگه جداشدنی', 'factorchi');
+$description = __('کل نوار برش پایین فاکتور و پیش‌فاکتور.', 'factorchi');
+$checked = ($s['show_tearoff'] ?? 'yes') === 'yes';
+include $partials . 'field-toggle.php';
+
+$name = 'show_tearoff_payment';
+$label = __('روش پرداخت', 'factorchi');
+$description = '';
+$checked = ($s['show_tearoff_payment'] ?? 'yes') === 'yes';
+include $partials . 'field-toggle.php';
+
+$name = 'show_tearoff_tracking';
+$label = __('شناسه پیگیری', 'factorchi');
+$description = '';
+$checked = ($s['show_tearoff_tracking'] ?? 'yes') === 'yes';
+include $partials . 'field-toggle.php';
+
+$name = 'show_tearoff_order_date';
+$label = __('تاریخ سفارش', 'factorchi');
+$description = '';
+$checked = ($s['show_tearoff_order_date'] ?? 'yes') === 'yes';
+include $partials . 'field-toggle.php';
+
+$name = 'show_tearoff_order_id';
+$label = __('شناسه سفارش', 'factorchi');
+$description = '';
+$checked = ($s['show_tearoff_order_id'] ?? 'yes') === 'yes';
 include $partials . 'field-toggle.php';
 
 include $partials . 'card-section-end.php';
