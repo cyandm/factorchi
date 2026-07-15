@@ -833,7 +833,7 @@ body.factorchi-document.pre-invoice
   .fc-invoice-tearoff-fields
   .fc-tearoff-item
   strong {
-  color: var(--fc-brand);
+  color: #000;
   font-weight: 600;
 }
 
