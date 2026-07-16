@@ -44,6 +44,7 @@ class Factorchi_Settings
             'font_size_post_label'   => '12',
             'font_size_label'        => '12',
             'show_product_image'     => 'no',
+            'shop_logo_size'         => '80',
             'show_barcode_top'       => 'no',
             'show_barcode_top_text'  => 'yes',
             'show_barcode_under_title' => 'no',

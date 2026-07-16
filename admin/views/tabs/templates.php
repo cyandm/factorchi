@@ -161,6 +161,13 @@ $description = __('در صورت خاموش بودن، گوشه‌های کار�
 $checked = ($s['enable_border_radius'] ?? 'yes') === 'yes';
 include $partials . 'field-toggle.php';
 
+$name = 'shop_logo_size';
+$label = __('اندازه لوگو در بالای فاکتور (پیکسل - ارتفاع)', 'factorchi');
+$value = (string) ($s['shop_logo_size'] ?? '80');
+$type = 'number';
+$description = __('مثال: ۸۰ - محدوده ۲۴ تا ۳۰۰ پیکسل.', 'factorchi');
+include $partials . 'field-text.php';
+
 $name = 'show_product_image';
 $label = __('نمایش تصویر محصول', 'factorchi');
 $description = __('تصویر مربع محصول کنار نام در جدول اقلام نمایش داده می‌شود.', 'factorchi');

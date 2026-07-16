@@ -223,6 +223,7 @@ class Factorchi_Admin
             'font_size_post_label',
             'font_size_label',
             'product_image_size',
+            'shop_logo_size',
             'print_page_size',
             'email_subject',
             'email_body',
@@ -299,6 +300,10 @@ class Factorchi_Admin
 
         if (isset($data['product_image_size'])) {
             $data['product_image_size'] = (string) max(24, min(200, (int) $data['product_image_size']));
+        }
+
+        if (isset($data['shop_logo_size'])) {
+            $data['shop_logo_size'] = (string) max(24, min(300, (int) $data['shop_logo_size']));
         }
 
         $section_gap_keys = ['section_gap_a4', 'section_gap_a5'];

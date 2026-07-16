@@ -256,7 +256,7 @@ body.factorchi-document .shop-logo,
 body.factorchi-document .shop-detail img.shop-logo,
 body.factorchi-document .shop-detail img {
   display: block;
-  max-height: 72px;
+  max-height: var(--fc-shop-logo-size, 80px);
   width: auto;
   margin: 0 auto;
   border-radius: 6px;
@@ -309,7 +309,7 @@ body.factorchi-print .fc-shop-logo-row img {
   display: block;
   margin: 0 auto;
   max-width: 100%;
-  max-height: 88px;
+  max-height: var(--fc-shop-logo-size, 80px);
   width: auto;
   height: auto;
   object-fit: contain;
@@ -1452,7 +1452,7 @@ body.factorchi-document.pre-invoice .classic .sender-info p strong {
   body.factorchi-print .fc-shop-logo-row .shop-logo,
   body.factorchi-print .fc-shop-logo-row img.shop-logo {
     max-width: 100% !important;
-    max-height: 88px !important;
+    max-height: var(--fc-shop-logo-size, 80px) !important;
   }
 
   body.factorchi-document .button:hover {

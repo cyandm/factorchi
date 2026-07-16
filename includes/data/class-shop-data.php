@@ -81,7 +81,7 @@ class Factorchi_Shop
             return '';
         }
         return $html
-            ? '<img src="' . esc_url($logo) . '" alt="logo" class="shop-logo" style="max-height:80px;" />'
+            ? '<img src="' . esc_url($logo) . '" alt="logo" class="shop-logo" />'
             : esc_url($logo);
     }
 
