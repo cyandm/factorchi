@@ -610,7 +610,7 @@ body.factorchi-print table.factorchi-products-table td {
   border: none;
   border-inline-end: 1px solid var(--fc-border);
   border-bottom: 1px solid var(--fc-border);
-  padding: 10px 12px;
+  padding: 8px 12px;
   font-size: inherit;
   font-weight: 500;
   line-height: inherit;
@@ -726,7 +726,7 @@ body.factorchi-document.pre-invoice .fc-invoice-footer-row {
   display: flex;
   flex-wrap: nowrap;
   align-items: stretch;
-  gap: 12px;
+  gap: var(--fc-section-gap, 12px);
   margin: var(--fc-section-gap, 12px) 0;
 }
 
@@ -847,7 +847,7 @@ body.factorchi-document.pre-invoice .fc-invoice-tearoff-fields {
   flex-wrap: wrap;
   align-items: baseline;
   gap: 6px 20px;
-  padding: 10px 12px;
+  padding: 8px 8px;
   border: 1px solid var(--fc-border);
   border-radius: var(--fc-radius);
   background: var(--fc-soft, #f8fafc);
