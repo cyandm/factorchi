@@ -242,6 +242,428 @@ class Factorchi_Customer_Data
         return (string) $this->order->get_transaction_id();
     }
 
+    /**
+     * Gateway tracking code returned by the payment provider (e.g. PayZito "کدپیگیری درگاه").
+     */
+    public function get_gateway_tracking_code(): string
+    {
+        if (!$this->order) {
+            return '';
+        }
+
+        $code = $this->resolve_gateway_tracking_code();
+
+        return (string) apply_filters('factorchi_gateway_tracking_code', $code, $this->order, $this->order_id);
+    }
+
+    private function resolve_gateway_tracking_code(): string
+    {
+        if ($this->should_use_payzito_gateway_tracking() && $this->is_payzito_installed()) {
+            return $this->resolve_payzito_gateway_tracking_code();
+        }
+
+        return $this->resolve_woocommerce_gateway_tracking_code();
+    }
+
+    private function should_use_payzito_gateway_tracking(): bool
+    {
+        return factorchi_get_setting('use_payzito_gateway_tracking', 'no') === 'yes';
+    }
+
+    private function is_payzito_installed(): bool
+    {
+        static $active = null;
+
+        if ($active !== null) {
+            return $active;
+        }
+
+        if (defined('PAYZITO_VERSION') || class_exists('Payzito', false)) {
+            $active = true;
+
+            return $active;
+        }
+
+        if (!function_exists('is_plugin_active')) {
+            require_once ABSPATH . 'wp-admin/includes/plugin.php';
+        }
+
+        foreach (['payzito/payzito.php', 'payzito-pro/payzito.php'] as $plugin) {
+            if (is_plugin_active($plugin)) {
+                $active = true;
+
+                return $active;
+            }
+        }
+
+        global $wpdb;
+        static $table_exists = null;
+
+        if ($table_exists === null) {
+            $table_exists = $this->get_payzito_transactions_table() !== '';
+        }
+
+        $active = $table_exists;
+
+        return $active;
+    }
+
+    private function resolve_payzito_gateway_tracking_code(): string
+    {
+        $from_payzito = $this->get_payzito_gateway_ref();
+        if ($from_payzito !== '') {
+            return $from_payzito;
+        }
+
+        foreach ($this->get_payzito_gateway_tracking_meta_keys() as $meta_key) {
+            $value = trim((string) $this->order->get_meta($meta_key));
+            if ($value !== '' && !$this->looks_like_payzito_invoice($value)) {
+                return $value;
+            }
+        }
+
+        $from_notes = $this->parse_gateway_ref_from_notes();
+        if ($from_notes !== '') {
+            return $from_notes;
+        }
+
+        $transaction_id = trim((string) $this->order->get_transaction_id());
+        if ($transaction_id !== '' && !$this->looks_like_payzito_invoice($transaction_id)) {
+            return $transaction_id;
+        }
+
+        return '';
+    }
+
+    private function resolve_woocommerce_gateway_tracking_code(): string
+    {
+        $transaction_id = trim((string) $this->order->get_transaction_id());
+        if ($transaction_id !== '') {
+            return $transaction_id;
+        }
+
+        foreach ($this->get_woocommerce_gateway_tracking_meta_keys() as $meta_key) {
+            $value = trim((string) $this->order->get_meta($meta_key));
+            if ($value !== '') {
+                return $value;
+            }
+        }
+
+        foreach ($this->order->get_meta_data() as $meta) {
+            $key = strtolower((string) $meta->key);
+            if (
+                (str_contains($key, 'gateway') && (str_contains($key, 'ref') || str_contains($key, 'track')))
+                || str_contains($key, 'ref_num')
+                || str_contains($key, 'refnum')
+                || str_contains($key, 'transaction')
+                || $key === '_rrn'
+            ) {
+                $value = trim((string) $meta->value);
+                if ($value !== '') {
+                    return $value;
+                }
+            }
+        }
+
+        return $this->parse_gateway_ref_from_notes();
+    }
+
+    /**
+     * @return string[]
+     */
+    private function get_payzito_gateway_tracking_meta_keys(): array
+    {
+        return [
+            '_payzito_gateway_ref_num',
+            '_payzito_gateway_ref',
+            '_payzito_ref_num',
+            'payzito_gateway_ref_num',
+        ];
+    }
+
+    /**
+     * @return string[]
+     */
+    private function get_woocommerce_gateway_tracking_meta_keys(): array
+    {
+        return [
+            '_gateway_ref_num',
+            '_gateway_tracking_code',
+            'gateway_ref_num',
+            '_ref_num',
+            '_RRN',
+            'RefNum',
+            '_payment_reference',
+            '_transaction_id',
+        ];
+    }
+
+    private function looks_like_payzito_invoice(string $value): bool
+    {
+        return (bool) preg_match('/^[A-Z]{1,5}-\d+$/u', $value);
+    }
+
+    private function get_payzito_gateway_ref(): string
+    {
+        global $wpdb;
+
+        $table = $this->get_payzito_transactions_table();
+        if ($table === '') {
+            return '';
+        }
+
+        $order_id = (string) $this->order->get_id();
+        $row      = $this->get_payzito_transaction_row($table, $order_id);
+        if ($row === null) {
+            return '';
+        }
+
+        return $this->extract_gateway_ref_from_payzito_row($row, $order_id);
+    }
+
+    private function get_payzito_transactions_table(): string
+    {
+        global $wpdb;
+
+        static $table = null;
+        if ($table !== null) {
+            return $table;
+        }
+
+        foreach (
+            [
+                $wpdb->prefix . 'payzito_transactions',
+                $wpdb->prefix . 'payzito_transctions',
+            ] as $candidate
+        ) {
+            if ($wpdb->get_var($wpdb->prepare('SHOW TABLES LIKE %s', $candidate)) === $candidate) {
+                $table = $candidate;
+
+                return $table;
+            }
+        }
+
+        $found = $wpdb->get_col("SHOW TABLES LIKE '%payzito%trans%'");
+        $table = !empty($found[0]) ? (string) $found[0] : '';
+
+        return $table;
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    private function get_payzito_transaction_row(string $table, string $order_id): ?array
+    {
+        global $wpdb;
+
+        $columns = $wpdb->get_col("SHOW COLUMNS FROM `{$table}`");
+        if (!is_array($columns) || $columns === []) {
+            return null;
+        }
+
+        $columns = array_map('strval', $columns);
+        $like    = '%' . $wpdb->esc_like($order_id) . '%';
+
+        $exact_candidates = [
+            'order_id',
+            'app_order_id',
+            'extension_id',
+            'extension_order_id',
+            'wc_order_id',
+            'woocommerce_order_id',
+            'factor_id',
+            'ref_id',
+        ];
+
+        foreach ($exact_candidates as $column) {
+            if (!in_array($column, $columns, true)) {
+                continue;
+            }
+
+            $row = $wpdb->get_row(
+                $wpdb->prepare(
+                    "SELECT * FROM `{$table}` WHERE `{$column}` = %s ORDER BY id DESC LIMIT 1",
+                    $order_id
+                ),
+                ARRAY_A
+            );
+            if (is_array($row)) {
+                return $row;
+            }
+        }
+
+        foreach (['extension_data', 'params', 'data', 'logs', 'log', 'meta'] as $column) {
+            if (!in_array($column, $columns, true)) {
+                continue;
+            }
+
+            $row = $wpdb->get_row(
+                $wpdb->prepare(
+                    "SELECT * FROM `{$table}` WHERE `{$column}` LIKE %s ORDER BY id DESC LIMIT 1",
+                    $like
+                ),
+                ARRAY_A
+            );
+            if (is_array($row)) {
+                return $row;
+            }
+        }
+
+        // Last resort: any column equals order id.
+        foreach ($columns as $column) {
+            if (in_array($column, ['id', 'amount', 'price', 'paid', 'total'], true)) {
+                continue;
+            }
+
+            $row = $wpdb->get_row(
+                $wpdb->prepare(
+                    "SELECT * FROM `{$table}` WHERE `{$column}` = %s ORDER BY id DESC LIMIT 1",
+                    $order_id
+                ),
+                ARRAY_A
+            );
+            if (is_array($row)) {
+                return $row;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param array<string, mixed> $row
+     */
+    private function extract_gateway_ref_from_payzito_row(array $row, string $order_id): string
+    {
+        $preferred = [
+            'gateway_ref_num',
+            'gateway_ref',
+            'gateway_tracking',
+            'gateway_track',
+            'ref_num',
+            'refnum',
+            'reference_number',
+            'rrn',
+            'RRN',
+            'track_id',
+            'tracking_code',
+            'authority',
+        ];
+
+        foreach ($preferred as $key) {
+            if (!array_key_exists($key, $row)) {
+                continue;
+            }
+            $value = $this->normalize_payzito_gateway_value((string) $row[$key], $order_id);
+            if ($value !== '') {
+                return $value;
+            }
+        }
+
+        // Parse JSON/text blobs (logs / extension_data) for "کدپیگیری درگاه: …"
+        foreach ($row as $value) {
+            if (!is_string($value) || $value === '') {
+                continue;
+            }
+            if (!str_contains($value, 'کدپیگیری') && !str_contains($value, 'کد پیگیری')) {
+                continue;
+            }
+            if (preg_match('/کد\s*پیگیری\s*درگاه\s*[:：]\s*([0-9A-Za-z\-]+)/u', $value, $matches)) {
+                $normalized = $this->normalize_payzito_gateway_value($matches[1], $order_id);
+                if ($normalized !== '') {
+                    return $normalized;
+                }
+            }
+        }
+
+        // Fallback: first scalar that looks like a gateway tracking code.
+        foreach ($row as $key => $value) {
+            $key_l = strtolower((string) $key);
+            if (
+                str_contains($key_l, 'factor')
+                || str_contains($key_l, 'invoice')
+                || str_contains($key_l, 'mobile')
+                || str_contains($key_l, 'phone')
+                || str_contains($key_l, 'amount')
+                || str_contains($key_l, 'price')
+                || str_contains($key_l, 'order')
+                || $key_l === 'id'
+            ) {
+                continue;
+            }
+
+            if (!is_scalar($value)) {
+                continue;
+            }
+
+            $normalized = $this->normalize_payzito_gateway_value((string) $value, $order_id);
+            if ($normalized !== '' && preg_match('/^\d{6,}$/', $normalized)) {
+                return $normalized;
+            }
+        }
+
+        return '';
+    }
+
+    private function normalize_payzito_gateway_value(string $value, string $order_id): string
+    {
+        $value = trim($value);
+        if ($value === '' || $value === '0' || $value === $order_id) {
+            return '';
+        }
+
+        if ($this->looks_like_payzito_invoice($value)) {
+            return '';
+        }
+
+        // Mobile numbers (e.g. 09100257904).
+        if (preg_match('/^09\d{9}$/', $value)) {
+            return '';
+        }
+
+        // Keep only leading tracking token if Persian text was glued on.
+        if (preg_match('/^([0-9A-Za-z\-]+)/u', $value, $matches)) {
+            $value = $matches[1];
+        }
+
+        if ($value === '' || $value === '0' || $value === $order_id || $this->looks_like_payzito_invoice($value)) {
+            return '';
+        }
+
+        return $value;
+    }
+
+    private function parse_gateway_ref_from_notes(): string
+    {
+        $notes = wc_get_order_notes([
+            'order_id' => $this->order->get_id(),
+            'limit'    => 20,
+        ]);
+
+        // Digits/latin only — after wp_strip_all_tags, PayZito lines can glue as "248101322موبایل".
+        $patterns = [
+            '/کد\s*پیگیری\s*درگاه\s*[:：]\s*([0-9A-Za-z\-]+)/u',
+            '/کدپیگیری\s*درگاه\s*[:：]\s*([0-9A-Za-z\-]+)/u',
+        ];
+
+        foreach ($notes as $note) {
+            if (!$note instanceof stdClass || !isset($note->content)) {
+                continue;
+            }
+
+            $content = wp_strip_all_tags((string) $note->content);
+            $content = preg_replace('/\s+/u', ' ', $content) ?? $content;
+
+            foreach ($patterns as $pattern) {
+                if (preg_match($pattern, $content, $matches)) {
+                    return trim($matches[1]);
+                }
+            }
+        }
+
+        return '';
+    }
+
     public function national_id_holder(bool $html = false): string
     {
         return $this->field_line(__('کد ملی:', 'factorchi'), $this->get_national_id(), $html, 'national-id');

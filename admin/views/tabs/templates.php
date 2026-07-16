@@ -265,8 +265,14 @@ $description = '';
 $checked = ($s['show_tearoff_payment'] ?? 'yes') === 'yes';
 include $partials . 'field-toggle.php';
 
+$name = 'use_payzito_gateway_tracking';
+$label = __('نوشتن کد پیگیری پرداخت از پی‌زیتو', 'factorchi');
+$description = __('خاموش: همیشه از ووکامرس. روشن: اگر پی‌زیتو فعال باشد از پی‌زیتو، وگرنه از ووکامرس.', 'factorchi');
+$checked = ($s['use_payzito_gateway_tracking'] ?? 'no') === 'yes';
+include $partials . 'field-toggle.php';
+
 $name = 'show_tearoff_tracking';
-$label = __('شناسه پیگیری', 'factorchi');
+$label = __('کدپیگیری درگاه', 'factorchi');
 $description = '';
 $checked = ($s['show_tearoff_tracking'] ?? 'yes') === 'yes';
 include $partials . 'field-toggle.php';

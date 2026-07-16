@@ -44,6 +44,7 @@ class Factorchi_Admin
                 'show_tearoff',
                 'show_tearoff_payment',
                 'show_tearoff_tracking',
+                'use_payzito_gateway_tracking',
                 'show_tearoff_order_date',
                 'show_tearoff_order_id',
             ],

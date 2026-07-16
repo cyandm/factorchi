@@ -259,9 +259,9 @@ class Factorchi_View_Render
         }
 
         if (factorchi_get_setting('show_tearoff_tracking', 'yes') === 'yes') {
-            $value = $customer->get_transaction_id();
+            $value = $customer->get_gateway_tracking_code();
             if ($value !== '') {
-                $fields[] = '<p class="fc-tearoff-item fc-tearoff-tracking"><strong>' . esc_html__('شناسه پیگیری:', 'factorchi') . '</strong> ' . esc_html($value) . '</p>';
+                $fields[] = '<p class="fc-tearoff-item fc-tearoff-tracking"><strong>' . esc_html__('کدپیگیری درگاه:', 'factorchi') . '</strong> ' . esc_html($value) . '</p>';
             }
         }
 
@@ -307,7 +307,7 @@ class Factorchi_View_Render
         }
 
         if (factorchi_get_setting('show_tearoff_tracking', 'yes') === 'yes' && !empty($sample['tracking'])) {
-            $fields[] = '<p class="fc-tearoff-item fc-tearoff-tracking"><strong>' . esc_html__('شناسه پیگیری:', 'factorchi') . '</strong> ' . esc_html((string) $sample['tracking']) . '</p>';
+            $fields[] = '<p class="fc-tearoff-item fc-tearoff-tracking"><strong>' . esc_html__('کدپیگیری درگاه:', 'factorchi') . '</strong> ' . esc_html((string) $sample['tracking']) . '</p>';
         }
 
         if (factorchi_get_setting('show_tearoff_order_date', 'yes') === 'yes' && !empty($sample['order_date'])) {

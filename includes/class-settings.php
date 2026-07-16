@@ -58,6 +58,7 @@ class Factorchi_Settings
             'show_tearoff'              => 'yes',
             'show_tearoff_payment'      => 'yes',
             'show_tearoff_tracking'     => 'yes',
+            'use_payzito_gateway_tracking' => 'no',
             'show_tearoff_order_date'   => 'yes',
             'show_tearoff_order_id'     => 'yes',
             'product_image_size'     => '70',

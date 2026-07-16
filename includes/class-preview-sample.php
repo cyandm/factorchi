@@ -115,7 +115,7 @@ class Factorchi_Preview_Sample
             'shop_barcode_render' => Factorchi_Barcode::html((string) $sample_id, 60),
             'tearoff'             => Factorchi_View_Render::build_tearoff_html_from_values([
                 'payment'    => __('پرداخت آنلاین', 'factorchi'),
-                'tracking'   => 'TRX-SAMPLE-1001',
+                'tracking'   => '111111111',
                 'order_date' => $date,
                 'order_id'   => (string) $sample_id,
             ]),
