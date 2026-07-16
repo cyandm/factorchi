@@ -200,16 +200,30 @@ class Factorchi_Barcode
     /**
      * Wrapped barcode HTML matching existing template markup.
      */
-    public static function html(string $data, int $height = 80): string
+    public static function html(string $data, int $height = 80, bool $show_text = true): string
     {
         $svg = self::svg($data, $height);
         if ($svg === '') {
             return '';
         }
 
-        return '<div class="barcode">'
-            . $svg
-            . '<span class="barcode-text">' . esc_html($data) . '</span>'
-            . '</div>';
+        $html = '<div class="barcode">' . $svg;
+        if ($show_text) {
+            $html .= '<span class="barcode-text">' . esc_html($data) . '</span>';
+        }
+
+        return $html . '</div>';
+    }
+
+    /**
+     * Remove the human-readable value under a barcode when the setting is off.
+     */
+    public static function with_text_option(string $html, bool $show_text): string
+    {
+        if ($show_text || $html === '') {
+            return $html;
+        }
+
+        return (string) preg_replace('/\s*<span class="barcode-text">.*?<\/span>/s', '', $html);
     }
 }

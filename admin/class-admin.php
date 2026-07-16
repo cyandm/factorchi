@@ -32,7 +32,11 @@ class Factorchi_Admin
                 'enable_border_radius',
                 'show_product_image',
                 'show_barcode_top',
+                'show_barcode_top_text',
+                'show_barcode_under_title',
+                'show_barcode_under_title_text',
                 'show_barcode_bottom',
+                'show_barcode_bottom_text',
                 'show_payment_method',
                 'show_shipping_method',
                 'show_transaction_id',
@@ -212,6 +216,8 @@ class Factorchi_Admin
             'invoice_margin',
             'pre_invoice_margin',
             'post_label_margin',
+            'section_gap_a4',
+            'section_gap_a5',
             'font_size_invoice',
             'font_size_pre_invoice',
             'font_size_post_label',
@@ -293,6 +299,13 @@ class Factorchi_Admin
 
         if (isset($data['product_image_size'])) {
             $data['product_image_size'] = (string) max(24, min(200, (int) $data['product_image_size']));
+        }
+
+        $section_gap_keys = ['section_gap_a4', 'section_gap_a5'];
+        foreach ($section_gap_keys as $gap_key) {
+            if (isset($data[$gap_key])) {
+                $data[$gap_key] = (string) max(0, min(60, (int) $data[$gap_key]));
+            }
         }
 
         Factorchi_Settings::update($data);

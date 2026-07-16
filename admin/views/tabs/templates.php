@@ -106,6 +106,25 @@ foreach (
 
 include $partials . 'card-section-end.php';
 
+$title = __('فاصله بین قسمت‌های فاکتور (پیکسل)', 'factorchi');
+$description = __('فاصله بین بخش‌های فاکتور (سربرگ فروشگاه، اطلاعات خریدار، جدول اقلام، جمع/یادداشت/بارکد، نوار جداکننده) به‌صورت جداگانه برای سایز A4 و A5.', 'factorchi');
+include $partials . 'card-section.php';
+
+foreach (
+    [
+        'section_gap_a4' => __('فاصله بین قسمت های فاکتور در سایز A4', 'factorchi'),
+        'section_gap_a5' => __('فاصله بین قسمت های فاکتور در سایز A5', 'factorchi'),
+    ] as $key => $label
+) {
+    $name = $key;
+    $value = (string) ($s[$key] ?? '12');
+    $type = 'number';
+    $description = '';
+    include $partials . 'field-text.php';
+}
+
+include $partials . 'card-section-end.php';
+
 $title = __('سایز فونت (پیکسل)', 'factorchi');
 $description = __('سایز پایه متن برای هر نوع سند. محدوده ۱۰ تا ۲۴ پیکسل.', 'factorchi');
 include $partials . 'card-section.php';
@@ -161,10 +180,34 @@ $description = __('بارکد کنار لوگوی فروشگاه در هدر ف�
 $checked = ($s['show_barcode_top'] ?? 'no') === 'yes';
 include $partials . 'field-toggle.php';
 
+$name = 'show_barcode_top_text';
+$label = __('نمایش اطلاعات بارکد در زیر آن', 'factorchi');
+$description = __('عدد/متن بارکد (barcode-text) زیر بارکد کنار لوگو نمایش داده می‌شود.', 'factorchi');
+$checked = ($s['show_barcode_top_text'] ?? 'yes') === 'yes';
+include $partials . 'field-toggle.php';
+
+$name = 'show_barcode_under_title';
+$label = __('نمایش بارکد زیر عنوان فروشگاه', 'factorchi');
+$description = __('بارکد مستقیماً زیر نام فروشگاه در هدر فاکتور و پیش‌فاکتور نمایش داده می‌شود.', 'factorchi');
+$checked = ($s['show_barcode_under_title'] ?? 'no') === 'yes';
+include $partials . 'field-toggle.php';
+
+$name = 'show_barcode_under_title_text';
+$label = __('نمایش اطلاعات بارکد در زیر آن', 'factorchi');
+$description = __('عدد/متن بارکد (barcode-text) زیر بارکد عنوان فروشگاه نمایش داده می‌شود.', 'factorchi');
+$checked = ($s['show_barcode_under_title_text'] ?? 'no') === 'yes';
+include $partials . 'field-toggle.php';
+
 $name = 'show_barcode_bottom';
 $label = __('نمایش بارکد در پایین فاکتور', 'factorchi');
 $description = __('بارکد در ردیف پایین فاکتور و پیش‌فاکتور (کنار جمع و یادداشت) نمایش داده می‌شود.', 'factorchi');
 $checked = ($s['show_barcode_bottom'] ?? 'yes') === 'yes';
+include $partials . 'field-toggle.php';
+
+$name = 'show_barcode_bottom_text';
+$label = __('نمایش اطلاعات بارکد در زیر آن', 'factorchi');
+$description = __('عدد/متن بارکد (barcode-text) زیر بارکد پایین فاکتور نمایش داده می‌شود.', 'factorchi');
+$checked = ($s['show_barcode_bottom_text'] ?? 'yes') === 'yes';
 include $partials . 'field-toggle.php';
 
 $name = 'filter_product_name_codes';

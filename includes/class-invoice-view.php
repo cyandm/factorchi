@@ -157,6 +157,8 @@ class Factorchi_Invoice_View
         $line_height = max(1.3, min(2.2, round(($font_size / 14) * 1.6, 2)));
         $product_img = max(24, min(200, (int) factorchi_get_setting('product_image_size', 70)));
         $radius      = factorchi_get_setting('enable_border_radius', 'yes') === 'yes' ? '10px' : '0';
+        $print_size  = $this->get_print_size();
+        $section_gap = max(0, min(60, (int) factorchi_get_setting('section_gap_' . $print_size, 12)));
 
         return '<style>'
             . ':root{'
@@ -166,6 +168,7 @@ class Factorchi_Invoice_View
             . '--fc-font-size-lg:' . (int) $font_lg . 'px;'
             . '--fc-line-height:' . esc_attr((string) $line_height) . ';'
             . '--fc-product-image-size:' . (int) $product_img . 'px;'
+            . '--fc-section-gap:' . (int) $section_gap . 'px;'
             . '--fc-brand:#5f1b29;'
             . '--fc-brand-light:#bd3854;'
             . '--fc-accent:#ed3819;'

@@ -5,13 +5,23 @@ if (!defined('ABSPATH')) {
 
 include(FCI_VIEW_PATH . 'header.php');
 
-$show_barcode_top    = factorchi_get_setting('show_barcode_top', 'no') === 'yes';
-$show_barcode_bottom = factorchi_get_setting('show_barcode_bottom', 'yes') === 'yes';
-$barcode_top_html    = ($show_barcode_top && !empty($data['shop_barcode_render']))
+$show_barcode_top               = factorchi_get_setting('show_barcode_top', 'no') === 'yes';
+$show_barcode_top_text          = factorchi_get_setting('show_barcode_top_text', 'yes') === 'yes';
+$show_barcode_under_title       = factorchi_get_setting('show_barcode_under_title', 'no') === 'yes';
+$show_barcode_under_title_text  = factorchi_get_setting('show_barcode_under_title_text', 'no') === 'yes';
+$show_barcode_bottom            = factorchi_get_setting('show_barcode_bottom', 'yes') === 'yes';
+$show_barcode_bottom_text       = factorchi_get_setting('show_barcode_bottom_text', 'yes') === 'yes';
+$barcode_top_html               = ($show_barcode_top && !empty($data['shop_barcode_render']))
 	? $data['shop_barcode_render']
 	: (($show_barcode_top && !empty($data['barcode'])) ? $data['barcode'] : '');
-$barcode_bottom_html = ($show_barcode_bottom && !empty($data['barcode'])) ? $data['barcode'] : '';
-$show_logo_cell      = !empty($data['logo']) || $barcode_top_html !== '';
+$barcode_under_title_html       = ($show_barcode_under_title && !empty($data['shop_barcode_render']))
+	? $data['shop_barcode_render']
+	: (($show_barcode_under_title && !empty($data['barcode'])) ? $data['barcode'] : '');
+$barcode_bottom_html            = ($show_barcode_bottom && !empty($data['barcode'])) ? $data['barcode'] : '';
+$barcode_top_html               = Factorchi_Barcode::with_text_option($barcode_top_html, $show_barcode_top_text);
+$barcode_under_title_html       = Factorchi_Barcode::with_text_option($barcode_under_title_html, $show_barcode_under_title_text);
+$barcode_bottom_html            = Factorchi_Barcode::with_text_option($barcode_bottom_html, $show_barcode_bottom_text);
+$show_logo_cell                 = !empty($data['logo']) || $barcode_top_html !== '';
 
 ?>
 <div class="modern container">
@@ -19,7 +29,7 @@ $show_logo_cell      = !empty($data['logo']) || $barcode_top_html !== '';
 		<div class="fc-document-type"><?php echo esc_html($labels->get_label('pre-invoice')); ?></div>
 	<?php endif; ?>
 	<?php if (
-		$data['title'] || $show_logo_cell || $data['print_date'] ||
+		$data['title'] || $show_logo_cell || $barcode_under_title_html !== '' || $data['print_date'] ||
 		$data['transmission_date'] || $data['url'] || $data['email'] || $data['phone'] || $data['order_id_html'] ||
 		$data['sender'] || $data['postcode'] || $data['economical'] || $data['reg']
 	): ?>
@@ -27,9 +37,14 @@ $show_logo_cell      = !empty($data['logo']) || $barcode_top_html !== '';
 			<tbody>
 				<tr>
 					<?php $colspan = 0; ?>
-					<?php if ($data['title'] || $data['email']): ?>
+					<?php if ($data['title'] || $data['email'] || $barcode_under_title_html !== ''): ?>
 						<td>
 							<?php echo $data['title']; ?>
+							<?php if ($barcode_under_title_html !== ''): ?>
+								<div class="fc-shop-barcode-title">
+									<?php echo $barcode_under_title_html; ?>
+								</div>
+							<?php endif; ?>
 							<?php echo $data['email']; ?>
 						</td>
 						<?php $colspan++; ?>

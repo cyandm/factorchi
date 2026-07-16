@@ -8,6 +8,7 @@ if (!defined('ABSPATH')) {
 ?>
 <div class="fc-field fc-logo-field">
     <label for="shop_logo"><?php esc_html_e('لوگوی فروشگاه', 'factorchi'); ?></label>
+    <p class="fc-description"><?php esc_html_e('لوگو در بالای فاکتور نمایش داده می‌شود.', 'factorchi'); ?></p>
     <div class="fc-logo-row">
         <input type="url" id="shop_logo" name="shop_logo" value="<?php echo esc_attr($value); ?>" class="fc-input" placeholder="https://..." />
         <button type="button" class="button" id="fc-pick-logo"><?php esc_html_e('انتخاب از رسانه', 'factorchi'); ?></button>
@@ -17,5 +18,4 @@ if (!defined('ABSPATH')) {
             <img src="<?php echo esc_url($value); ?>" alt="" />
         <?php endif; ?>
     </div>
-    <p class="fc-description"><?php esc_html_e('لوگو در بالای فاکتور نمایش داده می‌شود.', 'factorchi'); ?></p>
 </div>

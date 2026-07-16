@@ -71,7 +71,7 @@ body.factorchi-document .inner {
 body.factorchi-document .fc-document-type {
   display: block;
   width: 100%;
-  margin: 0 0 16px;
+  margin: 0 0 var(--fc-section-gap, 12px);
   padding: 10px 14px;
   background: var(--fc-brand);
   color: #fff;
@@ -88,7 +88,7 @@ body.factorchi-document .shop-detail {
   border: 1px solid var(--fc-border);
   border-radius: var(--fc-radius);
   overflow: hidden;
-  margin-bottom: 16px;
+  margin-bottom: var(--fc-section-gap, 12px);
   background: var(--fc-surface);
   width: 100%;
   table-layout: fixed;
@@ -101,7 +101,7 @@ body.factorchi-document table.shop-detail th,
 body.factorchi-document .shop-detail td,
 body.factorchi-document .shop-detail th {
   border-color: var(--fc-border);
-  padding: 12px 14px;
+  padding: 4px 14px;
   vertical-align: middle;
   line-height: var(--fc-line-height);
 }
@@ -141,12 +141,48 @@ body.factorchi-document .shop-title {
   margin-bottom: 4px;
 }
 
+body.factorchi-document .fc-shop-barcode-title,
+body.factorchi-print .fc-shop-barcode-title {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin: 2px 0 6px;
+  max-width: 100%;
+}
+
+body.factorchi-document .fc-shop-barcode-title .barcode,
+body.factorchi-print .fc-shop-barcode-title .barcode {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin: 0;
+  line-height: 1.1;
+  max-width: 100%;
+}
+
+body.factorchi-document .fc-shop-barcode-title .barcode img,
+body.factorchi-document .fc-shop-barcode-title .barcode svg,
+body.factorchi-print .fc-shop-barcode-title .barcode img,
+body.factorchi-print .fc-shop-barcode-title .barcode svg {
+  display: block;
+  height: 28px;
+  max-height: 28px;
+  max-width: 160px;
+  width: auto;
+}
+
+body.factorchi-document .fc-shop-barcode-title .barcode .barcode-text,
+body.factorchi-print .fc-shop-barcode-title .barcode .barcode-text {
+  font-size: 10px;
+  margin-top: 2px;
+  line-height: 1.2;
+}
+
 /* Address + URL + phone + postcode */
 body.factorchi-document .fc-shop-meta-line {
   display: flex;
   align-items: baseline;
-  gap: 6px 16px;
-  margin: 0 0 6px;
+  gap: 4px 16px;
   max-width: 100%;
 }
 
@@ -414,11 +450,11 @@ body.factorchi-document .customer-detail {
   border: 1px solid var(--fc-border);
   border-radius: var(--fc-radius);
   background: var(--fc-soft);
-  padding: 16px 18px;
-  margin: 16px 0;
+  padding: 8px 12px;
+  margin: var(--fc-section-gap, 12px) 0;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px 20px;
+  gap: 4px 20px;
 }
 
 /* Corner labels: فروشگاه / خریدار */
@@ -479,6 +515,7 @@ body.factorchi-document .customer-detail p {
   margin: 0;
   padding: 0;
   line-height: var(--fc-line-height);
+  font-weight: 500;
 }
 
 body.factorchi-document .customer-detail p strong {
@@ -505,10 +542,14 @@ body.factorchi-print table.factorchi-total-table {
   border-spacing: 0;
   font-size: var(--fc-font-size);
   line-height: var(--fc-line-height);
-  margin: 14px 0;
+  margin: var(--fc-section-gap, 12px) 0;
   border: 1px solid var(--fc-border);
   border-radius: var(--fc-radius);
   overflow: hidden;
+}
+
+body.factorchi-document table.fci-res-table {
+  margin-top: 0;
 }
 
 body.factorchi-document table.fci-fix-table th,
@@ -552,7 +593,7 @@ body.factorchi-print table.factorchi-products-table {
   border-spacing: 0;
   font-size: var(--fc-font-size);
   line-height: var(--fc-line-height);
-  margin: 14px 0;
+  margin: var(--fc-section-gap, 12px) 0;
   border: 1px solid var(--fc-border);
   border-radius: var(--fc-radius);
   overflow: hidden;
@@ -683,10 +724,10 @@ body.factorchi-document.pre-invoice .shop-meta-dates .order-id {
 body.factorchi-document.invoice .fc-invoice-footer-row,
 body.factorchi-document.pre-invoice .fc-invoice-footer-row {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: stretch;
   gap: 12px;
-  margin: 16px 0;
+  margin: var(--fc-section-gap, 12px) 0;
 }
 
 body.factorchi-document.invoice .fc-invoice-footer-total,
@@ -730,7 +771,7 @@ body.factorchi-document.pre-invoice .fc-invoice-footer-barcode {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 14px 16px;
+  padding: 8px 8px;
   box-sizing: border-box;
   overflow: hidden;
   background: none;
@@ -757,7 +798,7 @@ body.factorchi-document.pre-invoice .fc-invoice-footer-barcode .barcode img {
   max-height: 48px;
 }
 
-@media (max-width: 640px) {
+@media screen and (max-width: 640px) {
   body.factorchi-document.invoice .fc-invoice-footer-row,
   body.factorchi-document.pre-invoice .fc-invoice-footer-row {
     flex-direction: column;
@@ -772,7 +813,7 @@ body.factorchi-document.pre-invoice .fc-invoice-footer-barcode .barcode img {
 /* Tear-off strip (cut-here keep for store) */
 body.factorchi-document.invoice .fc-invoice-tearoff,
 body.factorchi-document.pre-invoice .fc-invoice-tearoff {
-  margin: 20px 0 0;
+  margin: 12px 0 0;
   padding: 0;
   page-break-inside: avoid;
 }
@@ -780,7 +821,7 @@ body.factorchi-document.pre-invoice .fc-invoice-tearoff {
 body.factorchi-document.invoice .fc-invoice-tearoff-cut,
 body.factorchi-document.pre-invoice .fc-invoice-tearoff-cut {
   height: 0;
-  margin: 0 0 10px;
+  margin: 0 0 var(--fc-section-gap, 12px);
   border: 0;
   border-top: 1.5px dashed #94a3b8;
   position: relative;
@@ -925,7 +966,7 @@ body.factorchi-document.post-label .fc-post-label-layout {
     "note note"
     "products products"
     "footer footer";
-  gap: 12px;
+  gap: var(--fc-section-gap, 12px);
   align-items: stretch;
 }
 
@@ -1232,7 +1273,7 @@ body.factorchi-document table.fci-sign-table td {
   padding: 16px;
 }
 
-@media (max-width: 640px) {
+@media screen and (max-width: 640px) {
   body.factorchi-document .customer-detail {
     grid-template-columns: 1fr;
   }

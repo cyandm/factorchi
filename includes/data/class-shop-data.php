@@ -165,9 +165,9 @@ class Factorchi_Shop
         return '';
     }
 
-    public function barcode_holder(int $type = 1, int $height = 80): string
+    public function barcode_holder(int $type = 1, int $height = 80, bool $show_text = true): string
     {
-        return Factorchi_Barcode::html((string) $this->order_id, $height);
+        return Factorchi_Barcode::html((string) $this->order_id, $height, $show_text);
     }
 
     public function customer_note_holder(): string
