@@ -732,8 +732,9 @@ body.factorchi-document.pre-invoice .fc-invoice-footer-row {
 
 body.factorchi-document.invoice .fc-invoice-footer-total,
 body.factorchi-document.pre-invoice .fc-invoice-footer-total {
-  flex: 1 1 220px;
-  min-width: 200px;
+  flex: 0 0 calc(50% - (var(--fc-section-gap, 12px) / 2));
+  width: calc(50% - (var(--fc-section-gap, 12px) / 2));
+  min-width: 0;
 }
 
 body.factorchi-document.invoice
@@ -751,8 +752,9 @@ body.factorchi-document.pre-invoice .fc-invoice-footer-total table.total-table {
 
 body.factorchi-document.invoice .fc-invoice-footer-note,
 body.factorchi-document.pre-invoice .fc-invoice-footer-note {
-  flex: 1 1 220px;
-  min-width: 180px;
+  flex: 0 0 calc(50% - (var(--fc-section-gap, 12px) / 2));
+  width: calc(50% - (var(--fc-section-gap, 12px) / 2));
+  min-width: 0;
 }
 
 body.factorchi-document.invoice .fc-invoice-footer-note .customer-note,
@@ -766,8 +768,9 @@ body.factorchi-document.pre-invoice .fc-invoice-footer-note .order-note {
 
 body.factorchi-document.invoice .fc-invoice-footer-barcode,
 body.factorchi-document.pre-invoice .fc-invoice-footer-barcode {
-  flex: 0 1 200px;
-  min-width: 160px;
+  flex: 0 0 calc(50% - (var(--fc-section-gap, 12px) / 2));
+  width: calc(50% - (var(--fc-section-gap, 12px) / 2));
+  min-width: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -777,6 +780,16 @@ body.factorchi-document.pre-invoice .fc-invoice-footer-barcode {
   background: none;
   border: 1px solid var(--fc-border);
   border-radius: var(--fc-radius);
+}
+
+body.factorchi-document.invoice .fc-invoice-footer-row:has(.fc-invoice-footer-total):has(.fc-invoice-footer-note):has(.fc-invoice-footer-barcode) .fc-invoice-footer-total,
+body.factorchi-document.invoice .fc-invoice-footer-row:has(.fc-invoice-footer-total):has(.fc-invoice-footer-note):has(.fc-invoice-footer-barcode) .fc-invoice-footer-note,
+body.factorchi-document.invoice .fc-invoice-footer-row:has(.fc-invoice-footer-total):has(.fc-invoice-footer-note):has(.fc-invoice-footer-barcode) .fc-invoice-footer-barcode,
+body.factorchi-document.pre-invoice .fc-invoice-footer-row:has(.fc-invoice-footer-total):has(.fc-invoice-footer-note):has(.fc-invoice-footer-barcode) .fc-invoice-footer-total,
+body.factorchi-document.pre-invoice .fc-invoice-footer-row:has(.fc-invoice-footer-total):has(.fc-invoice-footer-note):has(.fc-invoice-footer-barcode) .fc-invoice-footer-note,
+body.factorchi-document.pre-invoice .fc-invoice-footer-row:has(.fc-invoice-footer-total):has(.fc-invoice-footer-note):has(.fc-invoice-footer-barcode) .fc-invoice-footer-barcode {
+  flex: 0 0 calc(33.33% - ((var(--fc-section-gap, 12px) * 2) / 3));
+  width: calc(33.33% - ((var(--fc-section-gap, 12px) * 2) / 3));
 }
 
 body.factorchi-document.invoice .fc-invoice-footer-barcode .barcode,
@@ -1128,7 +1141,7 @@ body.factorchi-document table.order-note {
   border-spacing: 0;
   font-size: var(--fc-font-size);
   line-height: var(--fc-line-height);
-  margin: 14px 0;
+  margin: 0;
   border: 1px solid var(--fc-border);
   border-radius: var(--fc-radius);
   overflow: hidden;
@@ -1152,7 +1165,7 @@ body.factorchi-document table.order-note td {
   text-align: center;
   vertical-align: middle;
   border: none;
-  padding: 10px 12px;
+  padding: 4px 4px;
   color: #334155;
   font-size: 12px;
 }

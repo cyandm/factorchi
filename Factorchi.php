@@ -1,8 +1,9 @@
 <?php
+
 /**
  * Plugin Name: Factorchi
  * Description: ساخت، نمایش و ارسال فاکتور و برچسب برای ووکامرس
- * Version: 1.0.0
+ * Version: 1.1.0
  * Author: Amirali Dizabadi
  * Author URI: https://amiralidz.ir
  * Text Domain: factorchi
@@ -20,7 +21,7 @@ if (!function_exists('get_plugin_data')) {
     require_once ABSPATH . 'wp-admin/includes/plugin.php';
 }
 
-define('FACTORCHI_VERSION', '1.0.0');
+define('FACTORCHI_VERSION', '1.1.0');
 define('FACTORCHI_FILE', __FILE__);
 define('FACTORCHI_DIR', plugin_dir_path(__FILE__));
 define('FACTORCHI_URL', plugin_dir_url(__FILE__));
