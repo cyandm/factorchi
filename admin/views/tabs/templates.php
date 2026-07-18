@@ -59,28 +59,41 @@ $title = __('چاپ و نمایش', 'factorchi');
 $description = __('فونت، تاریخ و گزینه‌های نمایش مشترک اسناد.', 'factorchi');
 include $partials . 'card-section.php';
 
-$name = 'font_family'; $label = __('فونت', 'factorchi');
+$name = 'font_family';
+$label = __('فونت', 'factorchi');
 $value = Factorchi_Font_Registry::normalize_key((string) ($s['font_family'] ?? 'peyda'));
 $options = Factorchi_Font_Registry::options();
 include $partials . 'field-select.php';
 
-$name = 'use_persian_number'; $label = __('اعداد فارسی', 'factorchi'); $checked = ($s['use_persian_number'] ?? 'yes') === 'yes';
+$name = 'use_persian_number';
+$label = __('اعداد فارسی', 'factorchi');
+$checked = ($s['use_persian_number'] ?? 'yes') === 'yes';
 include $partials . 'field-toggle.php';
 
-$name = 'use_jalali_date'; $label = __('تاریخ شمسی', 'factorchi'); $checked = ($s['use_jalali_date'] ?? 'yes') === 'yes';
+$name = 'use_jalali_date';
+$label = __('تاریخ شمسی', 'factorchi');
+$checked = ($s['use_jalali_date'] ?? 'yes') === 'yes';
 include $partials . 'field-toggle.php';
 
-$name = 'show_print_date'; $label = __('نمایش تاریخ چاپ', 'factorchi'); $checked = ($s['show_print_date'] ?? 'yes') === 'yes';
+$name = 'show_print_date';
+$label = __('نمایش تاریخ چاپ', 'factorchi');
+$checked = ($s['show_print_date'] ?? 'yes') === 'yes';
 include $partials . 'field-toggle.php';
 
-$name = 'show_order_date'; $label = __('نمایش تاریخ سفارش', 'factorchi'); $checked = ($s['show_order_date'] ?? 'yes') === 'yes';
+$name = 'show_order_date';
+$label = __('نمایش تاریخ سفارش', 'factorchi');
+$checked = ($s['show_order_date'] ?? 'yes') === 'yes';
 include $partials . 'field-toggle.php';
 
-$name = 'show_date_time'; $label = __('نمایش ساعت در تاریخ‌ها', 'factorchi'); $checked = ($s['show_date_time'] ?? 'yes') === 'yes';
+$name = 'show_date_time';
+$label = __('نمایش ساعت در تاریخ‌ها', 'factorchi');
+$checked = ($s['show_date_time'] ?? 'yes') === 'yes';
 $description = __('اگر خاموش باشد، فقط تاریخ (بدون ساعت) نمایش داده می‌شود.', 'factorchi');
 include $partials . 'field-toggle.php';
 
-$name = 'print_page_size'; $label = __('اندازه پیش‌فرض برگه', 'factorchi'); $value = (string) ($s['print_page_size'] ?? 'a4');
+$name = 'print_page_size';
+$label = __('اندازه پیش‌فرض برگه', 'factorchi');
+$value = (string) ($s['print_page_size'] ?? 'a4');
 $options = ['a4' => 'A4', 'a5' => 'A5'];
 $description = '';
 include $partials . 'field-select.php';
@@ -131,8 +144,10 @@ include $partials . 'card-section.php';
 
 foreach (
     [
-        'font_size_invoice'     => __('فاکتور', 'factorchi'),
-        'font_size_pre_invoice' => __('پیش‌فاکتور', 'factorchi'),
+        'font_size_invoice'     => __('فاکتور (عمومی)', 'factorchi'),
+        'font_size_pre_invoice' => __('پیش‌فاکتور (عمومی)', 'factorchi'),
+        'font_size_shop'        => __('قسمت فروشگاه (فاکتور / پیش‌فاکتور)', 'factorchi'),
+        'font_size_buyer'       => __('قسمت خریدار (فاکتور / پیش‌فاکتور)', 'factorchi'),
         'font_size_post_label'  => __('برچسب پستی', 'factorchi'),
         'font_size_label'       => __('برچسب فروشگاه / مشتری / محصول', 'factorchi'),
     ] as $key => $label
@@ -140,6 +155,8 @@ foreach (
     $defaults = [
         'font_size_invoice'     => '14',
         'font_size_pre_invoice' => '14',
+        'font_size_shop'        => '12',
+        'font_size_buyer'       => '14',
         'font_size_post_label'  => '12',
         'font_size_label'       => '12',
     ];
@@ -223,6 +240,12 @@ $description = __('کدهایی مثل G00927 را از انتهای نام مح
 $checked = ($s['filter_product_name_codes'] ?? 'no') === 'yes';
 include $partials . 'field-toggle.php';
 
+$name = 'compact_party_texts';
+$label = __('استفاده متون از فضای کمتر', 'factorchi');
+$description = __('برای فروشگاه و خریدار: متون نزدیک هم در یک خط؛ اگر آدرس از عنوان فروشگاه طولانی‌تر باشد به خط بعد می‌رود. خاموش = چیدمان شبکه‌ای فعلی خریدار.', 'factorchi');
+$checked = ($s['compact_party_texts'] ?? 'no') === 'yes';
+include $partials . 'field-toggle.php';
+
 include $partials . 'card-section-end.php';
 
 $title = __('اطلاعات خریدار', 'factorchi');
@@ -245,6 +268,18 @@ $name = 'show_transaction_id';
 $label = __('شماره تراکنش', 'factorchi');
 $description = __('نمایش شماره تراکنش در بخش اطلاعات خریدار.', 'factorchi');
 $checked = ($s['show_transaction_id'] ?? 'yes') === 'yes';
+include $partials . 'field-toggle.php';
+
+$name = 'show_customer_note_buyer';
+$label = __('نمایش یادداشت در اطلاعات خریدار', 'factorchi');
+$description = __('نمایش یادداشت مشتری به‌صورت «یادداشت: …» در بخش اطلاعات خریدار.', 'factorchi');
+$checked = ($s['show_customer_note_buyer'] ?? 'yes') === 'yes';
+include $partials . 'field-toggle.php';
+
+$name = 'show_customer_note_footer';
+$label = __('نمایش یادداشت در پایین فاکتور', 'factorchi');
+$description = __('نمایش یادداشت مشتری در ردیف پایین فاکتور (کنار جمع و بارکد).', 'factorchi');
+$checked = ($s['show_customer_note_footer'] ?? 'yes') === 'yes';
 include $partials . 'field-toggle.php';
 
 include $partials . 'card-section-end.php';

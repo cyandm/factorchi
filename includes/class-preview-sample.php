@@ -97,10 +97,15 @@ class Factorchi_Preview_Sample
             'shipping'            => factorchi_get_setting('show_shipping_method', 'yes') === 'yes'
                 ? $p('shipping-method', __('روش ارسال:', 'factorchi'), __('پست پیشتاز', 'factorchi'))
                 : '',
+            'customer_note_line'  => factorchi_get_setting('show_customer_note_buyer', 'yes') === 'yes'
+                ? $p('customer-note-line', __('یادداشت:', 'factorchi'), __('لطفاً قبل از ظهر ارسال شود.', 'factorchi'))
+                : '',
             'user_meta'           => '',
             'order_meta'          => '',
             'delivery_date'       => '',
-            'customer_note'       => '<table class="factorchi-note-table fci-form-table customer-note"><thead><tr><th>' . esc_html__('یادداشت', 'factorchi') . '</th></tr></thead><tbody><tr><td>' . esc_html__('لطفاً قبل از ظهر ارسال شود.', 'factorchi') . '</td></tr></tbody></table>',
+            'customer_note'       => factorchi_get_setting('show_customer_note_footer', 'yes') === 'yes'
+                ? '<table class="factorchi-note-table fci-form-table customer-note"><thead><tr><th>' . esc_html__('یادداشت', 'factorchi') . '</th></tr></thead><tbody><tr><td>' . esc_html__('لطفاً قبل از ظهر ارسال شود.', 'factorchi') . '</td></tr></tbody></table>'
+                : '',
             'order_note'          => '',
             'shop_sign'           => '',
             'customer_sign'       => '',

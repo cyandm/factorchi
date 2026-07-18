@@ -94,6 +94,7 @@ body.factorchi-document .shop-detail {
   table-layout: fixed;
   border-collapse: separate;
   border-spacing: 0;
+  font-size: var(--fc-font-size-shop, var(--fc-font-size));
 }
 
 body.factorchi-document table.shop-detail td,
@@ -135,7 +136,7 @@ body.factorchi-document .shop-detail tfoot td {
 }
 
 body.factorchi-document .shop-title {
-  font-size: var(--fc-font-size-lg);
+  font-size: var(--fc-font-size-shop, var(--fc-font-size-lg));
   font-weight: 700;
   color: var(--fc-brand);
   margin-bottom: 4px;
@@ -370,7 +371,7 @@ body.factorchi-document .transmission-date {
   line-height: var(--fc-line-height);
 }
 
-/* Shop meta — 2px smaller than customer-detail */
+/* Shop meta */
 body.factorchi-document .shop-address,
 body.factorchi-document .shop-postcode,
 body.factorchi-document .shop-economical,
@@ -379,7 +380,7 @@ body.factorchi-document table.shop-detail tfoot td p,
 body.factorchi-document .shop-detail tfoot td p,
 body.factorchi-document .sender-info p {
   color: #1e293b;
-  font-size: calc(var(--fc-font-size) - 2px);
+  font-size: var(--fc-font-size-shop, var(--fc-font-size));
   font-weight: 400;
   margin: 0 0 2px;
   padding: 0;
@@ -455,6 +456,7 @@ body.factorchi-document .customer-detail {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 4px 20px;
+  font-size: var(--fc-font-size-buyer, var(--fc-font-size));
 }
 
 /* Corner labels: فروشگاه / خریدار */
@@ -516,6 +518,7 @@ body.factorchi-document .customer-detail p {
   padding: 0;
   line-height: var(--fc-line-height);
   font-weight: 500;
+  font-size: var(--fc-font-size-buyer, var(--fc-font-size));
 }
 
 body.factorchi-document .customer-detail p strong {
@@ -526,6 +529,90 @@ body.factorchi-document .customer-detail p strong {
 
 body.factorchi-document .customer-detail .customer-address {
   grid-column: 1 / -1;
+}
+
+/* Shop meta — spacious grid when compact_party_texts is off */
+body.factorchi-document .fc-shop-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px 20px;
+}
+
+body.factorchi-document .fc-shop-meta-grid .shop-address {
+  grid-column: 1 / -1;
+  display: block;
+  width: 100%;
+  margin-bottom: 2px;
+}
+
+body.factorchi-document .fc-shop-meta-grid > p {
+  margin: 0;
+  padding: 0;
+}
+
+/* Customer compact — same idea as shop meta-line */
+body.factorchi-document .customer-detail.fc-party-compact {
+  display: block;
+}
+
+body.factorchi-document .fc-customer-meta-line {
+  display: flex;
+  align-items: baseline;
+  gap: 4px 16px;
+  max-width: 100%;
+}
+
+body.factorchi-document .fc-customer-meta-line.is-short {
+  flex-wrap: nowrap;
+}
+
+body.factorchi-document .fc-customer-meta-line.is-long {
+  flex-wrap: wrap;
+}
+
+body.factorchi-document .fc-customer-meta-line .customer-address {
+  display: block;
+  width: auto;
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  grid-column: auto;
+}
+
+body.factorchi-document .fc-customer-meta-line.is-long .customer-address {
+  flex: 1 1 100%;
+  width: 100%;
+  margin-bottom: 2px;
+}
+
+body.factorchi-document .fc-customer-contacts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 14px;
+  row-gap: 2px;
+  flex: 0 1 auto;
+  margin: 0;
+  max-width: 100%;
+}
+
+body.factorchi-document .fc-customer-meta-line.is-long .fc-customer-contacts {
+  flex: 1 1 100%;
+}
+
+body.factorchi-document .customer-detail.fc-party-compact p {
+  display: inline;
+  margin: 0;
+  padding: 0;
+  white-space: nowrap;
+}
+
+body.factorchi-document .customer-detail.fc-party-compact .customer-address {
+  white-space: normal;
+}
+
+body.factorchi-document .customer-detail.fc-party-compact .customer-note-line {
+  white-space: normal;
 }
 
 /* ── Tables ── */
@@ -782,12 +869,36 @@ body.factorchi-document.pre-invoice .fc-invoice-footer-barcode {
   border-radius: var(--fc-radius);
 }
 
-body.factorchi-document.invoice .fc-invoice-footer-row:has(.fc-invoice-footer-total):has(.fc-invoice-footer-note):has(.fc-invoice-footer-barcode) .fc-invoice-footer-total,
-body.factorchi-document.invoice .fc-invoice-footer-row:has(.fc-invoice-footer-total):has(.fc-invoice-footer-note):has(.fc-invoice-footer-barcode) .fc-invoice-footer-note,
-body.factorchi-document.invoice .fc-invoice-footer-row:has(.fc-invoice-footer-total):has(.fc-invoice-footer-note):has(.fc-invoice-footer-barcode) .fc-invoice-footer-barcode,
-body.factorchi-document.pre-invoice .fc-invoice-footer-row:has(.fc-invoice-footer-total):has(.fc-invoice-footer-note):has(.fc-invoice-footer-barcode) .fc-invoice-footer-total,
-body.factorchi-document.pre-invoice .fc-invoice-footer-row:has(.fc-invoice-footer-total):has(.fc-invoice-footer-note):has(.fc-invoice-footer-barcode) .fc-invoice-footer-note,
-body.factorchi-document.pre-invoice .fc-invoice-footer-row:has(.fc-invoice-footer-total):has(.fc-invoice-footer-note):has(.fc-invoice-footer-barcode) .fc-invoice-footer-barcode {
+body.factorchi-document.invoice
+  .fc-invoice-footer-row:has(.fc-invoice-footer-total):has(
+    .fc-invoice-footer-note
+  ):has(.fc-invoice-footer-barcode)
+  .fc-invoice-footer-total,
+body.factorchi-document.invoice
+  .fc-invoice-footer-row:has(.fc-invoice-footer-total):has(
+    .fc-invoice-footer-note
+  ):has(.fc-invoice-footer-barcode)
+  .fc-invoice-footer-note,
+body.factorchi-document.invoice
+  .fc-invoice-footer-row:has(.fc-invoice-footer-total):has(
+    .fc-invoice-footer-note
+  ):has(.fc-invoice-footer-barcode)
+  .fc-invoice-footer-barcode,
+body.factorchi-document.pre-invoice
+  .fc-invoice-footer-row:has(.fc-invoice-footer-total):has(
+    .fc-invoice-footer-note
+  ):has(.fc-invoice-footer-barcode)
+  .fc-invoice-footer-total,
+body.factorchi-document.pre-invoice
+  .fc-invoice-footer-row:has(.fc-invoice-footer-total):has(
+    .fc-invoice-footer-note
+  ):has(.fc-invoice-footer-barcode)
+  .fc-invoice-footer-note,
+body.factorchi-document.pre-invoice
+  .fc-invoice-footer-row:has(.fc-invoice-footer-total):has(
+    .fc-invoice-footer-note
+  ):has(.fc-invoice-footer-barcode)
+  .fc-invoice-footer-barcode {
   flex: 0 0 calc(33.33% - ((var(--fc-section-gap, 12px) * 2) / 3));
   width: calc(33.33% - ((var(--fc-section-gap, 12px) * 2) / 3));
 }
@@ -805,10 +916,10 @@ body.factorchi-document.invoice .fc-invoice-footer-barcode .barcode img,
 body.factorchi-document.pre-invoice .fc-invoice-footer-barcode .barcode svg,
 body.factorchi-document.pre-invoice .fc-invoice-footer-barcode .barcode img {
   display: block;
-  max-width: 100%;
+  height: 28px;
+  max-height: 28px;
+  max-width: 160px;
   width: auto;
-  height: auto;
-  max-height: 48px;
 }
 
 @media screen and (max-width: 640px) {
@@ -844,7 +955,7 @@ body.factorchi-document.invoice .fc-invoice-tearoff-cut::before,
 body.factorchi-document.pre-invoice .fc-invoice-tearoff-cut::before {
   content: "✂";
   position: absolute;
-  top: -0.75em;
+  top: -0.5em;
   right: 0;
   font-size: 10px;
   color: #64748b;

@@ -17,11 +17,14 @@ $barcode_top_html               = ($show_barcode_top && !empty($data['shop_barco
 $barcode_under_title_html       = ($show_barcode_under_title && !empty($data['shop_barcode_render']))
 	? $data['shop_barcode_render']
 	: (($show_barcode_under_title && !empty($data['barcode'])) ? $data['barcode'] : '');
-$barcode_bottom_html            = ($show_barcode_bottom && !empty($data['barcode'])) ? $data['barcode'] : '';
+$barcode_bottom_html            = ($show_barcode_bottom && !empty($data['shop_barcode_render']))
+	? $data['shop_barcode_render']
+	: (($show_barcode_bottom && !empty($data['barcode'])) ? $data['barcode'] : '');
 $barcode_top_html               = Factorchi_Barcode::with_text_option($barcode_top_html, $show_barcode_top_text);
 $barcode_under_title_html       = Factorchi_Barcode::with_text_option($barcode_under_title_html, $show_barcode_under_title_text);
 $barcode_bottom_html            = Factorchi_Barcode::with_text_option($barcode_bottom_html, $show_barcode_bottom_text);
 $show_logo_cell                 = !empty($data['logo']) || $barcode_top_html !== '';
+$compact_party_texts            = factorchi_get_setting('compact_party_texts', 'no') === 'yes';
 
 ?>
 <div class="modern container">
@@ -74,57 +77,10 @@ $show_logo_cell                 = !empty($data['logo']) || $barcode_top_html !==
 					<?php endif; ?>
 				</tr>
 			</tbody>
-			<?php
-			$shop_addr_len = function_exists('mb_strlen')
-				? mb_strlen(trim(wp_strip_all_tags((string) ($data['sender'] ?? ''))), 'UTF-8')
-				: strlen(trim(wp_strip_all_tags((string) ($data['sender'] ?? ''))));
-			$shop_meta_long = $shop_addr_len > 55;
-			?>
-			<?php if ($data['sender'] || $data['url'] || $data['phone'] || $data['postcode'] || $data['economical'] || $data['reg']): ?>
-				<tfoot>
-					<tr>
-						<td colspan="<?php echo $colspan; ?>">
-							<?php if ($data['sender'] || $data['url'] || $data['phone'] || $data['postcode']): ?>
-								<div class="fc-shop-meta-line<?php echo $shop_meta_long ? ' is-long' : ' is-short'; ?>">
-									<?php echo $data['sender']; ?>
-									<?php if ($data['url'] || $data['phone'] || $data['postcode']): ?>
-										<div class="fc-shop-contacts">
-											<?php echo $data['url']; ?>
-											<?php echo $data['phone']; ?>
-											<?php echo $data['postcode']; ?>
-										</div>
-									<?php endif; ?>
-								</div>
-							<?php endif; ?>
-							<?php echo $data['economical']; ?>
-							<?php echo $data['reg']; ?>
-						</td>
-					</tr>
-				</tfoot>
-			<?php endif; ?>
+			<?php include FCI_VIEW_PATH . 'front/invoice/partials/shop-meta.php'; ?>
 		</table>
 	<?php endif; ?>
-	<?php if (
-		$data['recipient'] || $data['full_name'] || $data['r_postcode'] || $data['r_phone'] ||
-		$data['r_email'] || $data['order_date'] || $data['pay_method'] ||
-		$data['trans_id'] || $data['national_id'] || $data['shipping'] || $data['user_meta'] ||
-		$data['order_meta']
-	): ?>
-		<div class="customer-detail">
-			<?php echo $data['recipient']; ?>
-			<?php echo $data['full_name']; ?>
-			<?php echo $data['r_postcode']; ?>
-			<?php echo $data['r_phone']; ?>
-			<?php echo $data['r_email']; ?>
-			<?php echo $data['order_date']; ?>
-			<?php echo $data['pay_method']; ?>
-			<?php echo $data['trans_id']; ?>
-			<?php echo $data['national_id']; ?>
-			<?php echo $data['shipping']; ?>
-			<?php echo $data['user_meta']; ?>
-			<?php echo $data['order_meta']; ?>
-		</div>
-	<?php endif; ?>
+	<?php include FCI_VIEW_PATH . 'front/invoice/partials/customer-detail.php'; ?>
 	<?php if ($data['products_table']): ?>
 		<?php echo $data['products_table']; ?>
 	<?php endif; ?>

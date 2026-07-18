@@ -692,6 +692,24 @@ class Factorchi_Customer_Data
         return $this->field_line(__('روش ارسال:', 'factorchi'), $this->get_shipping_method(), $html, 'shipping-method');
     }
 
+    public function customer_note_line_holder(bool $html = false): string
+    {
+        if (factorchi_get_setting('show_customer_note_buyer', 'yes') !== 'yes') {
+            return '';
+        }
+
+        return $this->field_line(__('یادداشت:', 'factorchi'), $this->get_customer_note(), $html, 'customer-note-line');
+    }
+
+    public function get_customer_note(): string
+    {
+        if (!$this->order) {
+            return '';
+        }
+
+        return trim((string) $this->order->get_customer_note());
+    }
+
     public function get_shipping_method(): string
     {
         if (!$this->order) {

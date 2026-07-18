@@ -172,6 +172,13 @@ class Factorchi_Shop
 
     public function customer_note_holder(): string
     {
+        if (
+            in_array($this->type, ['invoice', 'pre-invoice'], true)
+            && factorchi_get_setting('show_customer_note_footer', 'yes') !== 'yes'
+        ) {
+            return '';
+        }
+
         if (!$this->order) {
             return '';
         }

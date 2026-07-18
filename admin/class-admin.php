@@ -40,7 +40,10 @@ class Factorchi_Admin
                 'show_payment_method',
                 'show_shipping_method',
                 'show_transaction_id',
+                'show_customer_note_buyer',
+                'show_customer_note_footer',
                 'filter_product_name_codes',
+                'compact_party_texts',
                 'show_tearoff',
                 'show_tearoff_payment',
                 'show_tearoff_tracking',
@@ -223,6 +226,8 @@ class Factorchi_Admin
             'font_size_pre_invoice',
             'font_size_post_label',
             'font_size_label',
+            'font_size_shop',
+            'font_size_buyer',
             'product_image_size',
             'shop_logo_size',
             'print_page_size',
@@ -292,6 +297,8 @@ class Factorchi_Admin
             'font_size_pre_invoice',
             'font_size_post_label',
             'font_size_label',
+            'font_size_shop',
+            'font_size_buyer',
         ];
         foreach ($font_size_keys as $font_key) {
             if (isset($data[$font_key])) {

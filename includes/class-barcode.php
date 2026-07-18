@@ -128,7 +128,7 @@ class Factorchi_Barcode
     /**
      * Render a Code128 barcode as inline SVG HTML.
      */
-    public static function svg(string $data, int $height = 80, int $module_width = 2): string
+    public static function svg(string $data, int $height = 60, int $module_width = 2): string
     {
         $data = trim($data);
         if ($data === '') {
@@ -200,7 +200,7 @@ class Factorchi_Barcode
     /**
      * Wrapped barcode HTML matching existing template markup.
      */
-    public static function html(string $data, int $height = 80, bool $show_text = true): string
+    public static function html(string $data, int $height = 60, bool $show_text = true): string
     {
         $svg = self::svg($data, $height);
         if ($svg === '') {

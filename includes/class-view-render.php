@@ -213,6 +213,7 @@ class Factorchi_View_Render
             'trans_id'            => $customer->transaction_id_holder(true),
             'national_id'         => $customer->national_id_holder(true),
             'shipping'            => $customer->shipping_method_holder(true),
+            'customer_note_line'  => $customer->customer_note_line_holder(true),
             'user_meta'           => $customer->user_meta_holder(),
             'order_meta'          => $customer->order_meta_holder(),
             'delivery_date'       => $customer->delivery_date_holder(),

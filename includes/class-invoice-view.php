@@ -154,6 +154,8 @@ class Factorchi_Invoice_View
         $font_size   = $this->get_font_size();
         $font_sm     = max(8, (int) round($font_size * 0.85));
         $font_lg     = min(28, (int) round($font_size * 1));
+        $font_shop   = max(10, min(24, (int) factorchi_get_setting('font_size_shop', 12)));
+        $font_buyer  = max(10, min(24, (int) factorchi_get_setting('font_size_buyer', 14)));
         $line_height = max(1.3, min(2.2, round(($font_size / 14) * 1.6, 2)));
         $product_img = max(24, min(200, (int) factorchi_get_setting('product_image_size', 70)));
         $radius      = factorchi_get_setting('enable_border_radius', 'yes') === 'yes' ? '10px' : '0';
@@ -167,6 +169,8 @@ class Factorchi_Invoice_View
             . '--fc-font-size:' . (int) $font_size . 'px;'
             . '--fc-font-size-sm:' . (int) $font_sm . 'px;'
             . '--fc-font-size-lg:' . (int) $font_lg . 'px;'
+            . '--fc-font-size-shop:' . (int) $font_shop . 'px;'
+            . '--fc-font-size-buyer:' . (int) $font_buyer . 'px;'
             . '--fc-line-height:' . esc_attr((string) $line_height) . ';'
             . '--fc-product-image-size:' . (int) $product_img . 'px;'
             . '--fc-section-gap:' . (int) $section_gap . 'px;'
@@ -247,6 +251,13 @@ class Factorchi_Invoice_View
             $classes[] = 'invoice';
         }
 
+        if (
+            in_array($this->type, ['invoice', 'pre-invoice'], true)
+            && factorchi_get_setting('compact_party_texts', 'no') === 'yes'
+        ) {
+            $classes[] = 'fc-compact-texts';
+        }
+
         return implode(' ', $classes);
     }
 
@@ -293,7 +304,15 @@ class Factorchi_Invoice_View
             $print = ' ' . esc_attr($this->get_view_style());
         }
 
-        return $type . $extra . ' rtl ' . $view . ' factorchi-document' . $print . $size;
+        $compact = '';
+        if (
+            in_array($this->type, ['invoice', 'pre-invoice'], true)
+            && factorchi_get_setting('compact_party_texts', 'no') === 'yes'
+        ) {
+            $compact = ' fc-compact-texts';
+        }
+
+        return $type . $extra . ' rtl ' . $view . ' factorchi-document' . $print . $size . $compact;
     }
 
     public function render(): void
