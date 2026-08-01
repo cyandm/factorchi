@@ -248,6 +248,51 @@ include $partials . 'field-toggle.php';
 
 include $partials . 'card-section-end.php';
 
+$title = __('متغیرها و ویژگی‌های محصول', 'factorchi');
+$description = __('نحوه نمایش متغیرها (مثل سایز و رنگ) کنار نام محصول در جدول اقلام فاکتور و پیش‌فاکتور. ترتیب نمایش: نام محصول، سپس ویژگی‌ها.', 'factorchi');
+include $partials . 'card-section.php';
+
+$name = 'product_attrs_mode';
+$label = __('نمایش متغیرها در جدول اقلام', 'factorchi');
+$value = (string) ($s['product_attrs_mode'] ?? 'all');
+$options = [
+    'all'      => __('نمایش همه متغیرها و ویژگی‌ها', 'factorchi'),
+    'selected' => __('فقط موارد انتخاب‌شده در لیست زیر', 'factorchi'),
+    'none'     => __('نمایش ندادن', 'factorchi'),
+];
+$description = '';
+include $partials . 'field-select.php';
+
+$name = 'product_attrs_show_label';
+$label = __('نمایش نام ویژگی قبل از مقدار', 'factorchi');
+$description = __('روشن: «سایز: XL» — خاموش: XL».', 'factorchi');
+$checked = ($s['product_attrs_show_label'] ?? 'yes') === 'yes';
+include $partials . 'field-toggle.php';
+
+$attr_options = [];
+if (function_exists('wc_get_attribute_taxonomies')) {
+    foreach (wc_get_attribute_taxonomies() as $attribute_tax) {
+        $attr_key = 'pa_' . $attribute_tax->attribute_name;
+        $attr_options[$attr_key] = $attribute_tax->attribute_label !== ''
+            ? $attribute_tax->attribute_label
+            : $attribute_tax->attribute_name;
+    }
+}
+
+if ($attr_options !== []) {
+    $name = 'product_attrs_selected';
+    $label = __('ویژگی‌های انتخابی', 'factorchi');
+    $options = $attr_options;
+    $selected = array_map('strval', (array) ($s['product_attrs_selected'] ?? []));
+    $description = __('فقط در حالت «فقط موارد انتخاب شده» اعمال میشود. ویژگی‌ها به ترتیب همین لیست بعد از نام محصول نمایش داده میشوند.', 'factorchi');
+    include $partials . 'field-checkbox-group.php';
+    unset($selected, $options);
+} else {
+    echo '<p class="fc-description">' . esc_html__('هیچ ویژگی سراسری (Attribute) در ووکامرس تعریف نشده است.', 'factorchi') . '</p>';
+}
+
+include $partials . 'card-section-end.php';
+
 $title = __('اطلاعات خریدار', 'factorchi');
 $description = __('نمایش یا مخفی‌کردن فیلدهای بلوک خریدار در فاکتور و پیش‌فاکتور.', 'factorchi');
 include $partials . 'card-section.php';

@@ -43,6 +43,7 @@ class Factorchi_Admin
                 'show_customer_note_buyer',
                 'show_customer_note_footer',
                 'filter_product_name_codes',
+                'product_attrs_show_label',
                 'compact_party_texts',
                 'show_tearoff',
                 'show_tearoff_payment',
@@ -253,6 +254,7 @@ class Factorchi_Admin
             'line_items_delete',
             'survey_status',
             'default_invoice_type',
+            'product_attrs_mode',
         ];
 
         foreach ($text_fields as $key) {
@@ -290,6 +292,20 @@ class Factorchi_Admin
 
         if (isset($data['print_page_size']) && !in_array($data['print_page_size'], ['a4', 'a5'], true)) {
             $data['print_page_size'] = 'a4';
+        }
+
+        if (isset($data['product_attrs_mode']) && !in_array($data['product_attrs_mode'], ['all', 'selected', 'none'], true)) {
+            $data['product_attrs_mode'] = 'all';
+        }
+
+        // sanitize_title (not sanitize_key) keeps percent-encoded Persian attribute slugs intact.
+        if (isset($_POST['product_attrs_selected']) && is_array($_POST['product_attrs_selected'])) {
+            $data['product_attrs_selected'] = array_values(array_filter(array_map(
+                static fn($key) => sanitize_title(sanitize_text_field((string) $key)),
+                wp_unslash($_POST['product_attrs_selected'])
+            )));
+        } elseif ($tab === 'templates') {
+            $data['product_attrs_selected'] = [];
         }
 
         $font_size_keys = [

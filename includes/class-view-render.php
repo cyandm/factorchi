@@ -115,53 +115,146 @@ class Factorchi_View_Render
     }
 
     /**
-     * Format: "Product name, variation - SKU"
+     * Normalize attribute/meta keys so stored settings and runtime keys match
+     * (Persian attribute slugs are percent-encoded by WooCommerce).
      */
-    public static function build_product_label(string $item_name, ?WC_Product $product, ?WC_Order_Item_Product $item = null): string
+    private static function normalize_attr_key(string $key): string
     {
-        $base      = trim($item_name);
-        $variation = '';
-        $sku       = $product ? trim((string) $product->get_sku()) : '';
+        return sanitize_title(urldecode(strtolower(trim($key))));
+    }
+
+    /**
+     * Collect attribute label/value pairs from an order item or a variation product.
+     *
+     * @return list<array{key:string, label:string, value:string}>
+     */
+    private static function collect_attribute_pairs(?WC_Product $product, ?WC_Order_Item_Product $item = null): array
+    {
+        $pairs = [];
+
+        if ($item instanceof WC_Order_Item_Product) {
+            foreach ($item->get_formatted_meta_data('_', true) as $meta) {
+                $value = trim(wp_strip_all_tags((string) $meta->display_value));
+                if ($value === '') {
+                    continue;
+                }
+                $pairs[] = [
+                    'key'   => self::normalize_attr_key((string) $meta->key),
+                    'label' => trim(wp_strip_all_tags((string) $meta->display_key)),
+                    'value' => $value,
+                ];
+            }
+            if ($pairs !== []) {
+                return $pairs;
+            }
+        }
+
+        if ($product && $product->is_type('variation')) {
+            foreach ($product->get_attributes() as $taxonomy => $value) {
+                if (!is_string($value) || $value === '') {
+                    continue;
+                }
+                $display = $value;
+                if (taxonomy_exists($taxonomy)) {
+                    $term = get_term_by('slug', $value, $taxonomy);
+                    if ($term && !is_wp_error($term)) {
+                        $display = $term->name;
+                    }
+                }
+                $pairs[] = [
+                    'key'   => self::normalize_attr_key($taxonomy),
+                    'label' => wc_attribute_label($taxonomy, $product),
+                    'value' => trim($display),
+                ];
+            }
+        }
+
+        return $pairs;
+    }
+
+    /**
+     * Apply the "product_attrs_mode" setting: all / selected (in admin list order) / none.
+     *
+     * @param list<array{key:string, label:string, value:string}> $pairs
+     * @return list<array{key:string, label:string, value:string}>
+     */
+    private static function filter_attribute_pairs(array $pairs): array
+    {
+        $mode = (string) factorchi_get_setting('product_attrs_mode', 'all');
+
+        if ($mode === 'none') {
+            return [];
+        }
+
+        if ($mode !== 'selected') {
+            return $pairs;
+        }
+
+        $selected = factorchi_get_setting('product_attrs_selected', []);
+        if (!is_array($selected) || $selected === []) {
+            return [];
+        }
+
+        $ordered = [];
+        foreach ($selected as $selected_key) {
+            $selected_key = self::normalize_attr_key((string) $selected_key);
+            foreach ($pairs as $pair) {
+                if ($pair['key'] === $selected_key) {
+                    $ordered[] = $pair;
+                    break;
+                }
+            }
+        }
+
+        return $ordered;
+    }
+
+    /**
+     * Build the label segments: product name, attribute strings, SKU.
+     *
+     * @return array{name:string, attrs:list<string>, sku:string}
+     */
+    public static function build_product_label_parts(string $item_name, ?WC_Product $product, ?WC_Order_Item_Product $item = null): array
+    {
+        $base = trim($item_name);
+        $sku  = $product ? trim((string) $product->get_sku()) : '';
 
         if ($product && $product->is_type('variation')) {
             $parent = wc_get_product($product->get_parent_id());
             if ($parent) {
                 $base = trim($parent->get_name());
             }
-
-            $formatted = wc_get_formatted_variation($product, true, false, true);
-            $variation = is_string($formatted) ? trim(wp_strip_all_tags($formatted)) : '';
-            $variation = trim(preg_replace('/\s*,\s*/u', '، ', $variation) ?? $variation);
-
-            if ($variation === '' && $item instanceof WC_Order_Item_Product) {
-                $attrs = [];
-                foreach ($item->get_formatted_meta_data('_', true) as $meta) {
-                    $val = trim(wp_strip_all_tags((string) $meta->display_value));
-                    if ($val !== '') {
-                        $attrs[] = $val;
-                    }
-                }
-                $variation = implode('، ', $attrs);
-            }
-        } elseif ($item instanceof WC_Order_Item_Product) {
-            $attrs = [];
-            foreach ($item->get_formatted_meta_data('_', true) as $meta) {
-                $val = trim(wp_strip_all_tags((string) $meta->display_value));
-                if ($val !== '') {
-                    $attrs[] = $val;
-                }
-            }
-            $variation = implode('، ', $attrs);
         }
 
-        $base = self::filter_product_name_codes($base, $sku);
+        $pairs      = self::filter_attribute_pairs(self::collect_attribute_pairs($product, $item));
+        $show_label = factorchi_get_setting('product_attrs_show_label', 'yes') === 'yes';
 
-        $label = $base;
-        if ($variation !== '') {
-            $label .= '، ' . $variation;
+        $attrs = [];
+        foreach ($pairs as $pair) {
+            $attrs[] = ($show_label && $pair['label'] !== '')
+                ? $pair['label'] . ': ' . $pair['value']
+                : $pair['value'];
         }
-        if ($sku !== '') {
-            $label .= ' - ' . $sku;
+
+        return [
+            'name'  => self::filter_product_name_codes($base, $sku),
+            'attrs' => $attrs,
+            'sku'   => $sku,
+        ];
+    }
+
+    /**
+     * Plain-text label: "Product name، attr: value، attr: value - SKU".
+     * RLM marks keep mixed LTR/RTL segments in visual order.
+     */
+    public static function build_product_label(string $item_name, ?WC_Product $product, ?WC_Order_Item_Product $item = null): string
+    {
+        $parts = self::build_product_label_parts($item_name, $product, $item);
+        $rlm   = "\u{200F}";
+
+        $label = implode($rlm . '، ', array_merge([$parts['name']], $parts['attrs']));
+        if ($parts['sku'] !== '') {
+            $label .= $rlm . ' - ' . $parts['sku'];
         }
 
         return $label;
@@ -176,6 +269,34 @@ class Factorchi_View_Render
             $html .= $thumb;
         }
         $html .= '<span class="fc-product-text">' . esc_html($label) . '</span>';
+        $html .= '</div></td>';
+
+        return $html;
+    }
+
+    /**
+     * Product cell rendered from label parts. Each segment is bidi-isolated
+     * with <bdi> so Latin names/codes never reorder in the RTL layout.
+     *
+     * @param array{name:string, attrs:list<string>, sku:string} $parts
+     */
+    public static function format_product_name_cell_parts(array $parts, ?WC_Product $product, bool $with_image): string
+    {
+        $thumb = $with_image ? self::get_product_thumbnail_html($product) : '';
+
+        $text = '<bdi>' . esc_html($parts['name']) . '</bdi>';
+        foreach ($parts['attrs'] as $attr) {
+            $text .= '، <bdi>' . esc_html($attr) . '</bdi>';
+        }
+        if ($parts['sku'] !== '') {
+            $text .= ' - <bdi>' . esc_html($parts['sku']) . '</bdi>';
+        }
+
+        $html  = '<td class="fc-product-cell"><div class="fc-product-row">';
+        if ($thumb !== '') {
+            $html .= $thumb;
+        }
+        $html .= '<span class="fc-product-text" dir="rtl">' . $text . '</span>';
         $html .= '</div></td>';
 
         return $html;
@@ -426,9 +547,9 @@ class Factorchi_View_Render
                 continue;
             }
             $product = $item->get_product();
-            $label   = self::build_product_label($item->get_name(), $product instanceof WC_Product ? $product : null, $item);
+            $parts   = self::build_product_label_parts($item->get_name(), $product instanceof WC_Product ? $product : null, $item);
             $rows   .= '<tr>';
-            $rows   .= self::format_product_name_cell($label, $product instanceof WC_Product ? $product : null, $show_image);
+            $rows   .= self::format_product_name_cell_parts($parts, $product instanceof WC_Product ? $product : null, $show_image);
             $rows   .= '<td class="fc-cell-qty">' . esc_html((string) $item->get_quantity()) . '</td>';
             $rows   .= '<td class="fc-cell-price">' . Factorchi_Helper::format_price($item->get_total()) . '</td>';
             $rows   .= '</tr>';

@@ -84,9 +84,9 @@ class Factorchi_Products_Table
             }
             $qty   = (int) ($cart_item['quantity'] ?? 1);
             $price = (float) $product->get_price() * $qty;
-            $label = Factorchi_View_Render::build_product_label($product->get_name(), $product);
+            $parts = Factorchi_View_Render::build_product_label_parts($product->get_name(), $product);
             $rows .= '<tr>';
-            $rows .= Factorchi_View_Render::format_product_name_cell($label, $product, $show_image);
+            $rows .= Factorchi_View_Render::format_product_name_cell_parts($parts, $product, $show_image);
             $rows .= '<td class="fc-cell-qty">' . esc_html((string) $qty) . '</td>';
             $rows .= '<td class="fc-cell-price">' . Factorchi_Helper::format_price($price) . '</td>';
             $rows .= '</tr>';
