@@ -64,6 +64,7 @@ class Factorchi_Settings
             'product_attrs_selected'    => [],
             'compact_party_texts'       => 'no',
             'show_tearoff'              => 'yes',
+            'show_tearoff_recipient'    => 'no',
             'show_tearoff_payment'      => 'yes',
             'show_tearoff_tracking'     => 'yes',
             'use_payzito_gateway_tracking' => 'no',

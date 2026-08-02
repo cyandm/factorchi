@@ -992,6 +992,16 @@ body.factorchi-document.pre-invoice
 
 body.factorchi-document.invoice
   .fc-invoice-tearoff-fields
+  .fc-tearoff-recipient-address,
+body.factorchi-document.pre-invoice
+  .fc-invoice-tearoff-fields
+  .fc-tearoff-recipient-address {
+  white-space: normal;
+  flex: 1 1 100%;
+}
+
+body.factorchi-document.invoice
+  .fc-invoice-tearoff-fields
   .fc-tearoff-item
   strong,
 body.factorchi-document.pre-invoice

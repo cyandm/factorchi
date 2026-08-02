@@ -339,6 +339,12 @@ $description = __('کل نوار برش پایین فاکتور و پیش‌فا
 $checked = ($s['show_tearoff'] ?? 'yes') === 'yes';
 include $partials . 'field-toggle.php';
 
+$name = 'show_tearoff_recipient';
+$label = __('نمایش اطلاعات گیرنده در قسمت برش برگه', 'factorchi');
+$description = __('نام، تلفن، آدرس و کدپستی گیرنده در نوار پایین فاکتور چاپ می‌شود.', 'factorchi');
+$checked = ($s['show_tearoff_recipient'] ?? 'no') === 'yes';
+include $partials . 'field-toggle.php';
+
 $name = 'show_tearoff_payment';
 $label = __('روش پرداخت', 'factorchi');
 $description = '';

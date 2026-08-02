@@ -46,6 +46,7 @@ class Factorchi_Admin
                 'product_attrs_show_label',
                 'compact_party_texts',
                 'show_tearoff',
+                'show_tearoff_recipient',
                 'show_tearoff_payment',
                 'show_tearoff_tracking',
                 'use_payzito_gateway_tracking',

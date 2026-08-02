@@ -373,6 +373,28 @@ class Factorchi_View_Render
 
         $fields = [];
 
+        if (factorchi_get_setting('show_tearoff_recipient', 'no') === 'yes') {
+            $name = $customer->get_full_name();
+            if ($name !== '') {
+                $fields[] = '<p class="fc-tearoff-item fc-tearoff-recipient-name"><strong>' . esc_html__('نام:', 'factorchi') . '</strong> ' . esc_html($name) . '</p>';
+            }
+
+            $phone = $customer->get_phone();
+            if ($phone !== '') {
+                $fields[] = '<p class="fc-tearoff-item fc-tearoff-recipient-phone"><strong>' . esc_html__('تلفن:', 'factorchi') . '</strong> ' . esc_html($phone) . '</p>';
+            }
+
+            $address = $customer->get_address();
+            if ($address !== '') {
+                $fields[] = '<p class="fc-tearoff-item fc-tearoff-recipient-address"><strong>' . esc_html__('آدرس:', 'factorchi') . '</strong> ' . esc_html($address) . '</p>';
+            }
+
+            $postcode = $customer->get_postal_code();
+            if ($postcode !== '') {
+                $fields[] = '<p class="fc-tearoff-item fc-tearoff-recipient-postcode"><strong>' . esc_html__('کدپستی:', 'factorchi') . '</strong> ' . esc_html($postcode) . '</p>';
+            }
+        }
+
         if (factorchi_get_setting('show_tearoff_payment', 'yes') === 'yes') {
             $value = $customer->get_payment_method();
             if ($value !== '') {
@@ -414,7 +436,16 @@ class Factorchi_View_Render
     /**
      * Preview helper with sample tear-off values.
      *
-     * @param array{payment?:string,tracking?:string,order_date?:string,order_id?:string} $sample
+     * @param array{
+     *     payment?:string,
+     *     tracking?:string,
+     *     order_date?:string,
+     *     order_id?:string,
+     *     recipient_name?:string,
+     *     recipient_phone?:string,
+     *     recipient_address?:string,
+     *     recipient_postcode?:string
+     * } $sample
      */
     public static function build_tearoff_html_from_values(array $sample): string
     {
@@ -423,6 +454,21 @@ class Factorchi_View_Render
         }
 
         $fields = [];
+
+        if (factorchi_get_setting('show_tearoff_recipient', 'no') === 'yes') {
+            if (!empty($sample['recipient_name'])) {
+                $fields[] = '<p class="fc-tearoff-item fc-tearoff-recipient-name"><strong>' . esc_html__('نام:', 'factorchi') . '</strong> ' . esc_html((string) $sample['recipient_name']) . '</p>';
+            }
+            if (!empty($sample['recipient_phone'])) {
+                $fields[] = '<p class="fc-tearoff-item fc-tearoff-recipient-phone"><strong>' . esc_html__('تلفن:', 'factorchi') . '</strong> ' . esc_html((string) $sample['recipient_phone']) . '</p>';
+            }
+            if (!empty($sample['recipient_address'])) {
+                $fields[] = '<p class="fc-tearoff-item fc-tearoff-recipient-address"><strong>' . esc_html__('آدرس:', 'factorchi') . '</strong> ' . esc_html((string) $sample['recipient_address']) . '</p>';
+            }
+            if (!empty($sample['recipient_postcode'])) {
+                $fields[] = '<p class="fc-tearoff-item fc-tearoff-recipient-postcode"><strong>' . esc_html__('کدپستی:', 'factorchi') . '</strong> ' . esc_html((string) $sample['recipient_postcode']) . '</p>';
+            }
+        }
 
         if (factorchi_get_setting('show_tearoff_payment', 'yes') === 'yes' && !empty($sample['payment'])) {
             $fields[] = '<p class="fc-tearoff-item fc-tearoff-payment"><strong>' . esc_html__('روش پرداخت:', 'factorchi') . '</strong> ' . esc_html((string) $sample['payment']) . '</p>';

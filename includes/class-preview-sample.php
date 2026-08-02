@@ -119,10 +119,14 @@ class Factorchi_Preview_Sample
             'shop_order_id'       => $sample_id,
             'shop_barcode_render' => Factorchi_Barcode::html((string) $sample_id, 60),
             'tearoff'             => Factorchi_View_Render::build_tearoff_html_from_values([
-                'payment'    => __('پرداخت آنلاین', 'factorchi'),
-                'tracking'   => '111111111',
-                'order_date' => $date,
-                'order_id'   => (string) $sample_id,
+                'payment'             => __('پرداخت آنلاین', 'factorchi'),
+                'tracking'            => '111111111',
+                'order_date'          => $date,
+                'order_id'            => (string) $sample_id,
+                'recipient_name'      => __('علی رضایی', 'factorchi'),
+                'recipient_phone'     => '09121234567',
+                'recipient_address'   => __('تهران، خیابان نمونه، پلاک ۱۲', 'factorchi'),
+                'recipient_postcode'  => '1234567890',
             ]),
         ];
 

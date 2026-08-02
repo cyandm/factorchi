@@ -28,22 +28,31 @@ class Factorchi_Customer_Data
     }
 
     /**
-     * Remove customer name from address text (name is shown separately).
+     * Remove customer name and postal code from address text
+     * (both are shown in their own fields).
      */
     private function strip_name_from_address(string $formatted_html): string
     {
-        $name = $this->get_full_name();
-        if ($name === '' || $formatted_html === '') {
-            return $this->format_plain_address($formatted_html);
+        if ($formatted_html === '') {
+            return '';
         }
+
+        $name = $this->get_full_name();
+        $code = trim($this->get_postal_code());
 
         $lines = preg_split('/<br\s*\/?>/i', $formatted_html) ?: [$formatted_html];
         $lines = array_values(array_filter(array_map(static function ($line) {
             return trim(wp_strip_all_tags($line));
         }, $lines)));
 
-        if (isset($lines[0]) && $lines[0] === $name) {
+        if ($name !== '' && isset($lines[0]) && $lines[0] === $name) {
             array_shift($lines);
+        }
+
+        if ($code !== '') {
+            $lines = array_values(array_filter($lines, static function ($line) use ($code) {
+                return $line !== $code;
+            }));
         }
 
         $plain = implode(' - ', $lines);
@@ -51,11 +60,34 @@ class Factorchi_Customer_Data
         $plain = trim(preg_replace('/\s+/', ' ', $plain) ?? $plain);
 
         // Fallback if WC joins name without a line break.
-        $quoted = preg_quote($name, '/');
-        $plain  = preg_replace('/^' . $quoted . '\s*[-–,]\s*/u', '', $plain) ?? $plain;
-        $plain  = preg_replace('/^' . $quoted . '\s+/u', '', $plain) ?? $plain;
+        if ($name !== '') {
+            $quoted = preg_quote($name, '/');
+            $plain  = preg_replace('/^' . $quoted . '\s*[-–,]\s*/u', '', $plain) ?? $plain;
+            $plain  = preg_replace('/^' . $quoted . '\s+/u', '', $plain) ?? $plain;
+        }
 
-        return trim($plain);
+        return $this->strip_postal_code_from_address(trim($plain));
+    }
+
+    /**
+     * Ensure postal code never remains glued into the address string.
+     */
+    private function strip_postal_code_from_address(string $address): string
+    {
+        $code = trim($this->get_postal_code());
+        if ($code === '' || $address === '') {
+            return $address;
+        }
+
+        $quoted = preg_quote($code, '/');
+
+        // Standalone segment: "… - CODE" / "CODE - …" / trailing CODE.
+        $address = preg_replace('/(?:^|\s*[-–—,]\s*)' . $quoted . '(?=\s*[-–—,]|$)/u', '', $address) ?? $address;
+        $address = preg_replace('/\s*-\s*-\s*/', ' - ', $address) ?? $address;
+        $address = trim(preg_replace('/\s+/', ' ', $address) ?? $address);
+        $address = trim($address, " \t\n\r\0\x0B-–—,");
+
+        return $address;
     }
 
     private function append_plaque_unit_if_missing(string $address, string $prefix): string
