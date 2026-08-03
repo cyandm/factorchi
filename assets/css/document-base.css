@@ -1012,6 +1012,19 @@ body.factorchi-document.pre-invoice
   font-weight: 600;
 }
 
+body.factorchi-document .fc-col-row-num,
+body.factorchi-document .fc-cell-row-num,
+body.factorchi-print .fc-col-row-num,
+body.factorchi-print .fc-cell-row-num {
+  width: 2.5em;
+  max-width: 3em;
+  padding-inline: 4px;
+  text-align: center;
+  white-space: nowrap;
+  font-weight: 600;
+  vertical-align: middle;
+}
+
 body.factorchi-document .fc-cell-qty {
   text-align: center;
   font-weight: 600;

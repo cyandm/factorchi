@@ -41,17 +41,19 @@ class Factorchi_Preview_Sample
             return '<p class="' . esc_attr($class) . '"><strong>' . esc_html($label) . '</strong> ' . esc_html($value) . '</p>';
         };
 
-        $products = '<table class="factorchi-products-table fci-fix-table products-table fci-border-table">'
-            . '<thead><tr>'
-            . '<th>' . esc_html__('محصول', 'factorchi') . '</th>'
-            . '<th>' . esc_html__('تعداد', 'factorchi') . '</th>'
-            . '<th>' . esc_html__('مبلغ', 'factorchi') . '</th>'
-            . '</tr></thead><tbody>'
-            . '<tr><td>' . esc_html__('محصول نمونه ۱، قرمز - PRD-1001', 'factorchi') . '</td><td class="fc-cell-qty">۲</td><td class="fc-cell-price">' . Factorchi_Helper::format_price(250000) . '</td></tr>'
-            . '<tr><td>' . esc_html__('محصول نمونه ۲ - PRD-1002', 'factorchi') . '</td><td class="fc-cell-qty">۱</td><td class="fc-cell-price">' . Factorchi_Helper::format_price(180000) . '</td></tr>'
+        $show_row = Factorchi_View_Render::should_show_product_row_number();
+        $products = '<table class="factorchi-products-table fci-form-table products-table fci-border-table">'
+            . Factorchi_View_Render::products_table_thead_html(__('مبلغ', 'factorchi'))
+            . '<tbody>'
+            . '<tr>'
+            . ($show_row ? Factorchi_View_Render::format_product_row_number_cell(1) : '')
+            . '<td>' . esc_html__('محصول نمونه ۱، قرمز - PRD-1001', 'factorchi') . '</td><td class="fc-cell-qty">۲</td><td class="fc-cell-price">' . Factorchi_Helper::format_price(250000) . '</td></tr>'
+            . '<tr>'
+            . ($show_row ? Factorchi_View_Render::format_product_row_number_cell(2) : '')
+            . '<td>' . esc_html__('محصول نمونه ۲ - PRD-1002', 'factorchi') . '</td><td class="fc-cell-qty">۱</td><td class="fc-cell-price">' . Factorchi_Helper::format_price(180000) . '</td></tr>'
             . '</tbody></table>';
 
-        $total = '<table class="factorchi-total-table fci-fix-table total-table">'
+        $total = '<table class="factorchi-total-table fci-form-table total-table">'
             . '<tr><th>' . esc_html__('جمع جزء', 'factorchi') . '</th><td>' . Factorchi_Helper::format_price(680000) . '</td></tr>'
             . '<tr><th>' . esc_html__('هزینه ارسال', 'factorchi') . '</th><td>' . Factorchi_Helper::format_price(45000) . '</td></tr>'
             . '<tr><th class="final">' . esc_html__('جمع کل', 'factorchi') . '</th><td class="final">' . Factorchi_Helper::format_price(725000) . '</td></tr>'

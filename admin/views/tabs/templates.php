@@ -191,6 +191,12 @@ $description = __('تصویر مربع محصول کنار نام در جدول 
 $checked = ($s['show_product_image'] ?? 'no') === 'yes';
 include $partials . 'field-toggle.php';
 
+$name = 'show_product_row_number';
+$label = __('نمایش تعداد اقلام در جدول محصولات', 'factorchi');
+$description = __('ستون باریک «ردیف» سمت راست قبل از نام محصول، شماره ترتیبی هر قلم را نشان می‌دهد.', 'factorchi');
+$checked = ($s['show_product_row_number'] ?? 'no') === 'yes';
+include $partials . 'field-toggle.php';
+
 $name = 'product_image_size';
 $label = __('اندازه تصویر محصول (پیکسل - مربع)', 'factorchi');
 $value = (string) ($s['product_image_size'] ?? '70');

@@ -77,15 +77,21 @@ class Factorchi_Products_Table
 
         $rows = '';
         $show_image = Factorchi_View_Render::should_show_product_image('pre-invoice');
+        $show_row   = Factorchi_View_Render::should_show_product_row_number();
+        $index      = 0;
         foreach (WC()->cart->get_cart() as $cart_item) {
             $product = $cart_item['data'] ?? null;
             if (!$product instanceof WC_Product) {
                 continue;
             }
+            $index++;
             $qty   = (int) ($cart_item['quantity'] ?? 1);
             $price = (float) $product->get_price() * $qty;
             $parts = Factorchi_View_Render::build_product_label_parts($product->get_name(), $product);
             $rows .= '<tr>';
+            if ($show_row) {
+                $rows .= Factorchi_View_Render::format_product_row_number_cell($index);
+            }
             $rows .= Factorchi_View_Render::format_product_name_cell_parts($parts, $product, $show_image);
             $rows .= '<td class="fc-cell-qty">' . esc_html((string) $qty) . '</td>';
             $rows .= '<td class="fc-cell-price">' . Factorchi_Helper::format_price($price) . '</td>';
@@ -101,12 +107,9 @@ class Factorchi_Products_Table
 
     public static function wrap_table(string $rows): string
     {
-        $html  = '<table class="factorchi-products-table fci-fix-table products-table">';
-        $html .= '<thead><tr>';
-        $html .= '<th>' . esc_html__('محصول', 'factorchi') . '</th>';
-        $html .= '<th>' . esc_html__('تعداد', 'factorchi') . '</th>';
-        $html .= '<th>' . esc_html__('قیمت', 'factorchi') . '</th>';
-        $html .= '</tr></thead><tbody>' . $rows . '</tbody></table>';
+        $html  = '<table class="factorchi-products-table fci-form-table products-table">';
+        $html .= Factorchi_View_Render::products_table_thead_html(__('قیمت', 'factorchi'));
+        $html .= '<tbody>' . $rows . '</tbody></table>';
         return $html;
     }
 }

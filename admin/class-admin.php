@@ -31,6 +31,7 @@ class Factorchi_Admin
                 'show_date_time',
                 'enable_border_radius',
                 'show_product_image',
+                'show_product_row_number',
                 'show_barcode_top',
                 'show_barcode_top_text',
                 'show_barcode_under_title',

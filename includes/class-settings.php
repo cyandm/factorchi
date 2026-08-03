@@ -46,6 +46,7 @@ class Factorchi_Settings
             'font_size_shop'         => '12',
             'font_size_buyer'        => '14',
             'show_product_image'     => 'no',
+            'show_product_row_number'=> 'no',
             'shop_logo_size'         => '80',
             'show_barcode_top'       => 'no',
             'show_barcode_top_text'  => 'yes',

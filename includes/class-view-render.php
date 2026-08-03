@@ -15,6 +15,37 @@ class Factorchi_View_Render
         return factorchi_get_setting('show_product_image', 'no') === 'yes';
     }
 
+    public static function should_show_product_row_number(): bool
+    {
+        return factorchi_get_setting('show_product_row_number', 'no') === 'yes';
+    }
+
+    public static function format_product_row_number_cell(int $index): string
+    {
+        return '<td class="fc-cell-row-num">' . esc_html((string) $index) . '</td>';
+    }
+
+    /**
+     * Products table header cells (optional row-number + product + qty + price).
+     */
+    public static function products_table_thead_html(string $price_label = ''): string
+    {
+        if ($price_label === '') {
+            $price_label = __('مبلغ', 'factorchi');
+        }
+
+        $html = '<thead><tr>';
+        if (self::should_show_product_row_number()) {
+            $html .= '<th class="fc-col-row-num">' . esc_html__('ردیف', 'factorchi') . '</th>';
+        }
+        $html .= '<th>' . esc_html__('محصول', 'factorchi') . '</th>';
+        $html .= '<th>' . esc_html__('تعداد', 'factorchi') . '</th>';
+        $html .= '<th>' . esc_html($price_label) . '</th>';
+        $html .= '</tr></thead>';
+
+        return $html;
+    }
+
     public static function get_product_image_size(): int
     {
         return max(24, min(200, (int) factorchi_get_setting('product_image_size', 70)));
@@ -588,13 +619,19 @@ class Factorchi_View_Render
 
         $rows      = '';
         $show_image = self::should_show_product_image($type);
+        $show_row   = self::should_show_product_row_number();
+        $index      = 0;
         foreach ($order->get_items() as $item) {
             if (!$item instanceof WC_Order_Item_Product) {
                 continue;
             }
+            $index++;
             $product = $item->get_product();
             $parts   = self::build_product_label_parts($item->get_name(), $product instanceof WC_Product ? $product : null, $item);
             $rows   .= '<tr>';
+            if ($show_row) {
+                $rows .= self::format_product_row_number_cell($index);
+            }
             $rows   .= self::format_product_name_cell_parts($parts, $product instanceof WC_Product ? $product : null, $show_image);
             $rows   .= '<td class="fc-cell-qty">' . esc_html((string) $item->get_quantity()) . '</td>';
             $rows   .= '<td class="fc-cell-price">' . Factorchi_Helper::format_price($item->get_total()) . '</td>';
@@ -605,15 +642,13 @@ class Factorchi_View_Render
             return '';
         }
 
-        $html  = '<table class="factorchi-products-table fci-fix-table products-table">';
-        $html .= '<thead><tr>';
-        $html .= '<th>' . esc_html__('محصول', 'factorchi') . '</th>';
-        $html .= '<th>' . esc_html__('تعداد', 'factorchi') . '</th>';
-        $html .= '<th>' . esc_html__('مبلغ', 'factorchi') . '</th>';
-        $html .= '</tr></thead><tbody>' . $rows . '</tbody></table>';
+        $html  = '<table class="factorchi-products-table fci-form-table products-table">';
+        $html .= self::products_table_thead_html(__('مبلغ', 'factorchi'));
+        $html .= '<tbody>' . $rows . '</tbody></table>';
 
         return $html;
     }
+
 
     /**
      * @return array<string, mixed>
