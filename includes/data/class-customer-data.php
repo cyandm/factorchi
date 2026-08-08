@@ -132,7 +132,13 @@ class Factorchi_Customer_Data
 
     public function address_holder(bool $html = false): string
     {
-        return $this->field_line(__('آدرس:', 'factorchi'), $this->get_address(), $html, 'customer-address');
+        $line = $this->field_line(__('آدرس:', 'factorchi'), $this->get_address(), $html, 'customer-address');
+
+        if ($html && $line !== '') {
+            $line .= factorchi_address_enter_spacing_html();
+        }
+
+        return $line;
     }
 
     public function get_address(): string

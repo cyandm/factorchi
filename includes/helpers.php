@@ -15,6 +15,18 @@ function factorchi_get_setting(string $key, $default = '')
 }
 
 /**
+ * One blank line (Enter) below recipient address when the setting is enabled.
+ */
+function factorchi_address_enter_spacing_html(): string
+{
+    if (factorchi_get_setting('address_enter_spacing_below', 'no') !== 'yes') {
+        return '';
+    }
+
+    return '<p class="fc-address-enter-spacer" aria-hidden="true"></p>';
+}
+
+/**
  * @param WC_Order|int $order
  * @param string       $type
  * @param string       $view

@@ -43,6 +43,7 @@ class Factorchi_Admin
                 'show_transaction_id',
                 'show_customer_note_buyer',
                 'show_customer_note_footer',
+                'address_enter_spacing_below',
                 'filter_product_name_codes',
                 'product_attrs_show_label',
                 'compact_party_texts',
@@ -53,6 +54,7 @@ class Factorchi_Admin
                 'use_payzito_gateway_tracking',
                 'show_tearoff_order_date',
                 'show_tearoff_order_id',
+                'show_tearoff_customer_note',
             ],
             'access'    => [
                 'guest_access',

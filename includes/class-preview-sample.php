@@ -81,7 +81,7 @@ class Factorchi_Preview_Sample
             'postcode'            => $p('shop-postcode', __('کدپستی:', 'factorchi'), $shop_post !== '' ? $shop_post : '1234567890'),
             'economical'          => $p('shop-economical', __('شماره اقتصادی:', 'factorchi'), '123456789012'),
             'reg'                 => $p('shop-reg', __('شماره ثبت:', 'factorchi'), '12345'),
-            'recipient'           => $p('customer-address', __('آدرس:', 'factorchi'), __('تهران، خیابان آزادی، کوچه نمونه، پلاک ۱۲', 'factorchi')),
+            'recipient'           => $p('customer-address', __('آدرس:', 'factorchi'), __('تهران، خیابان آزادی، کوچه نمونه، پلاک ۱۲', 'factorchi')) . factorchi_address_enter_spacing_html(),
             'full_name'           => $p('customer-name', __('نام:', 'factorchi'), __('علی رضایی', 'factorchi')),
             'r_postcode'          => $p('customer-postcode', __('کدپستی:', 'factorchi'), '9876543210'),
             'r_phone'             => $p('customer-phone', __('تلفن:', 'factorchi'), '09121234567'),
@@ -129,6 +129,7 @@ class Factorchi_Preview_Sample
                 'recipient_phone'     => '09121234567',
                 'recipient_address'   => __('تهران، خیابان نمونه، پلاک ۱۲', 'factorchi'),
                 'recipient_postcode'  => '1234567890',
+                'customer_note'       => __('لطفاً قبل از ظهر ارسال شود.', 'factorchi'),
             ]),
         ];
 

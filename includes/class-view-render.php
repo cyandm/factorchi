@@ -418,6 +418,7 @@ class Factorchi_View_Render
             $address = $customer->get_address();
             if ($address !== '') {
                 $fields[] = '<p class="fc-tearoff-item fc-tearoff-recipient-address"><strong>' . esc_html__('آدرس:', 'factorchi') . '</strong> ' . esc_html($address) . '</p>';
+                $fields[] = factorchi_address_enter_spacing_html();
             }
 
             $postcode = $customer->get_postal_code();
@@ -454,6 +455,13 @@ class Factorchi_View_Render
             }
         }
 
+        if (factorchi_get_setting('show_tearoff_customer_note', 'no') === 'yes') {
+            $value = $customer->get_customer_note();
+            if ($value !== '') {
+                $fields[] = '<p class="fc-tearoff-item fc-tearoff-customer-note"><strong>' . esc_html__('یادداشت:', 'factorchi') . '</strong> ' . esc_html($value) . '</p>';
+            }
+        }
+
         if ($fields === []) {
             return '';
         }
@@ -475,7 +483,8 @@ class Factorchi_View_Render
      *     recipient_name?:string,
      *     recipient_phone?:string,
      *     recipient_address?:string,
-     *     recipient_postcode?:string
+     *     recipient_postcode?:string,
+     *     customer_note?:string
      * } $sample
      */
     public static function build_tearoff_html_from_values(array $sample): string
@@ -495,6 +504,7 @@ class Factorchi_View_Render
             }
             if (!empty($sample['recipient_address'])) {
                 $fields[] = '<p class="fc-tearoff-item fc-tearoff-recipient-address"><strong>' . esc_html__('آدرس:', 'factorchi') . '</strong> ' . esc_html((string) $sample['recipient_address']) . '</p>';
+                $fields[] = factorchi_address_enter_spacing_html();
             }
             if (!empty($sample['recipient_postcode'])) {
                 $fields[] = '<p class="fc-tearoff-item fc-tearoff-recipient-postcode"><strong>' . esc_html__('کدپستی:', 'factorchi') . '</strong> ' . esc_html((string) $sample['recipient_postcode']) . '</p>';
@@ -515,6 +525,10 @@ class Factorchi_View_Render
 
         if (factorchi_get_setting('show_tearoff_order_id', 'yes') === 'yes' && !empty($sample['order_id'])) {
             $fields[] = '<p class="fc-tearoff-item fc-tearoff-order-id"><strong>' . esc_html__('شناسه سفارش:', 'factorchi') . '</strong> ' . esc_html((string) $sample['order_id']) . '</p>';
+        }
+
+        if (factorchi_get_setting('show_tearoff_customer_note', 'no') === 'yes' && !empty($sample['customer_note'])) {
+            $fields[] = '<p class="fc-tearoff-item fc-tearoff-customer-note"><strong>' . esc_html__('یادداشت:', 'factorchi') . '</strong> ' . esc_html((string) $sample['customer_note']) . '</p>';
         }
 
         if ($fields === []) {

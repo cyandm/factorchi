@@ -531,6 +531,19 @@ body.factorchi-document .customer-detail .customer-address {
   grid-column: 1 / -1;
 }
 
+body.factorchi-document .fc-address-enter-spacer {
+  margin: 0;
+  padding: 0;
+  height: var(--fc-line-height);
+  line-height: var(--fc-line-height);
+  font-size: 0;
+}
+
+body.factorchi-document.invoice .fc-invoice-tearoff-fields .fc-address-enter-spacer,
+body.factorchi-document.pre-invoice .fc-invoice-tearoff-fields .fc-address-enter-spacer {
+  flex: 1 1 100%;
+}
+
 /* Shop meta — spacious grid when compact_party_texts is off */
 body.factorchi-document .fc-shop-meta-grid {
   display: grid;

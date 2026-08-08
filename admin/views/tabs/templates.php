@@ -333,6 +333,12 @@ $description = __('نمایش یادداشت مشتری در ردیف پایین
 $checked = ($s['show_customer_note_footer'] ?? 'yes') === 'yes';
 include $partials . 'field-toggle.php';
 
+$name = 'address_enter_spacing_below';
+$label = __('اعمال یک enter (فاصله) در زیر آدرس', 'factorchi');
+$description = __('یک خط خالی زیر آدرس گیرنده در بخش خریدار و نوار برش پایین فاکتور اضافه می‌شود.', 'factorchi');
+$checked = ($s['address_enter_spacing_below'] ?? 'no') === 'yes';
+include $partials . 'field-toggle.php';
+
 include $partials . 'card-section-end.php';
 
 $title = __('برگه جداشدنی (برش پایین)', 'factorchi');
@@ -379,6 +385,12 @@ $name = 'show_tearoff_order_id';
 $label = __('شناسه سفارش', 'factorchi');
 $description = '';
 $checked = ($s['show_tearoff_order_id'] ?? 'yes') === 'yes';
+include $partials . 'field-toggle.php';
+
+$name = 'show_tearoff_customer_note';
+$label = __('نمایش یادداشت مشتری در قسمت برش', 'factorchi');
+$description = __('یادداشت سفارش مشتری در انتهای نوار برش پایین فاکتور چاپ می‌شود.', 'factorchi');
+$checked = ($s['show_tearoff_customer_note'] ?? 'no') === 'yes';
 include $partials . 'field-toggle.php';
 
 include $partials . 'card-section-end.php';
