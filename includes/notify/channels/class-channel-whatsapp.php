@@ -24,13 +24,8 @@ class Factorchi_Channel_Whatsapp extends Factorchi_Notify_Channel_Base
         }
 
         $api_url = (string) factorchi_get_setting('whatsapp_api_url', '');
-        if ($api_url === '') {
-            $phone   = preg_replace('/\D+/', '', $order->get_billing_phone());
-            $message = rawurlencode($this->render_template((string) factorchi_get_setting('whatsapp_message', ''), $context));
-            if ($phone === '') {
-                return false;
-            }
-            return true;
+        if ($api_url === '' || !factorchi_is_safe_remote_url($api_url)) {
+            return false;
         }
 
         $message = $this->render_template((string) factorchi_get_setting('whatsapp_message', ''), $context);

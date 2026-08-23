@@ -128,12 +128,18 @@ jQuery(document).ready(function ($) {
         window.open(url);
     }
 
-    $('.post-type-shop_order .bulkactions #doaction, .post-type-shop_order .bulkactions #doaction2').click(function (e) {
+    $('.post-type-shop_order .bulkactions #doaction').on('click', function (e) {
         handleBulkPrint(e, '#bulk-action-selector-top', "#posts-filter [name='post[]']");
     });
+    $('.post-type-shop_order .bulkactions #doaction2').on('click', function (e) {
+        handleBulkPrint(e, '#bulk-action-selector-bottom', "#posts-filter [name='post[]']");
+    });
 
-    $('.woocommerce_page_wc-orders .bulkactions #doaction, .woocommerce_page_wc-orders .bulkactions #doaction2').click(function (e) {
+    $('.woocommerce_page_wc-orders .bulkactions #doaction').on('click', function (e) {
         handleBulkPrint(e, 'select[name="action"]', '.woocommerce_page_wc-orders input[name="id[]"]');
+    });
+    $('.woocommerce_page_wc-orders .bulkactions #doaction2').on('click', function (e) {
+        handleBulkPrint(e, 'select[name="action2"]', '.woocommerce_page_wc-orders input[name="id[]"]');
     });
 
 

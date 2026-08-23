@@ -34,7 +34,7 @@ include $partials . 'field-checkbox-group.php';
 $label = __('کانال‌های ارسال خودکار', 'factorchi');
 $name = 'auto_send_channels';
 $options = $channel_options;
-$selected = (array) ($s['auto_send_channels'] ?? ['email']);
+$selected = (array) ($s['auto_send_channels'] ?? []);
 include $partials . 'field-checkbox-group.php';
 
 include $partials . 'card-section-end.php';

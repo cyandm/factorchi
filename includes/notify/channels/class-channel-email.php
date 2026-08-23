@@ -28,7 +28,7 @@ class Factorchi_Channel_Email extends Factorchi_Notify_Channel_Base
             return false;
         }
 
-        $subject = $this->render_template((string) factorchi_get_setting('email_subject', ''), $context);
+        $subject = sanitize_text_field($this->render_template((string) factorchi_get_setting('email_subject', ''), $context));
         $body    = $this->render_template((string) factorchi_get_setting('email_body', ''), $context);
         $headers = ['Content-Type: text/html; charset=UTF-8'];
 

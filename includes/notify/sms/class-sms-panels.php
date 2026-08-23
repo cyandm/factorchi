@@ -35,7 +35,9 @@ class Factorchi_SMS_Panels
             CURLOPT_URL            => 'https://api.sms.ir/v1/send/verify',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_CUSTOMREQUEST  => 'POST',
-            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_SSL_VERIFYHOST => 2,
+            CURLOPT_TIMEOUT        => 30,
             CURLOPT_POSTFIELDS     => json_encode([
                 'mobile'     => $to,
                 'templateId' => (int) $this->pattern_id,

@@ -141,18 +141,54 @@ class Factorchi_Customer_Data
         return $line;
     }
 
+    /**
+     * Preferred customer address type for documents: shipping|billing.
+     * Honours Factorchi setting + WooCommerce "Shipping destination".
+     */
+    private function resolve_address_type(): string
+    {
+        if (!$this->order) {
+            return 'billing';
+        }
+
+        $mode = (string) factorchi_get_setting('customer_address_source', 'woocommerce');
+
+        if ($mode === 'billing') {
+            $preferred = 'billing';
+        } elseif ($mode === 'shipping') {
+            $preferred = 'shipping';
+        } else {
+            // Match WooCommerce → Settings → Shipping → Shipping destination.
+            $wc_dest = (string) get_option('woocommerce_ship_to_destination', 'shipping');
+            $preferred = ($wc_dest === 'billing_only' || $wc_dest === 'billing')
+                ? 'billing'
+                : 'shipping';
+        }
+
+        $shipping = (string) $this->order->get_formatted_shipping_address();
+        $billing  = (string) $this->order->get_formatted_billing_address();
+
+        if ($preferred === 'billing') {
+            return $billing !== '' ? 'billing' : ($shipping !== '' ? 'shipping' : 'billing');
+        }
+
+        return $shipping !== '' ? 'shipping' : ($billing !== '' ? 'billing' : 'shipping');
+    }
+
     public function get_address(): string
     {
         if (!$this->order) {
             return '';
         }
 
-        $formatted = $this->order->get_formatted_shipping_address();
-        $prefix    = '_shipping_';
+        $type = $this->resolve_address_type();
 
-        if ($formatted === '') {
-            $formatted = $this->order->get_formatted_billing_address();
+        if ($type === 'billing') {
+            $formatted = (string) $this->order->get_formatted_billing_address();
             $prefix    = '_billing_';
+        } else {
+            $formatted = (string) $this->order->get_formatted_shipping_address();
+            $prefix    = '_shipping_';
         }
 
         $plain = $this->strip_name_from_address($formatted);
@@ -171,9 +207,16 @@ class Factorchi_Customer_Data
             return '';
         }
 
-        $name = trim($this->order->get_formatted_shipping_full_name());
-        if ($name === '') {
+        if ($this->resolve_address_type() === 'billing') {
             $name = trim($this->order->get_formatted_billing_full_name());
+            if ($name === '') {
+                $name = trim($this->order->get_formatted_shipping_full_name());
+            }
+        } else {
+            $name = trim($this->order->get_formatted_shipping_full_name());
+            if ($name === '') {
+                $name = trim($this->order->get_formatted_billing_full_name());
+            }
         }
 
         return $name;
@@ -190,7 +233,19 @@ class Factorchi_Customer_Data
             return '';
         }
 
-        return (string) ($this->order->get_shipping_postcode() ?: $this->order->get_billing_postcode());
+        if ($this->resolve_address_type() === 'billing') {
+            $code = trim((string) $this->order->get_billing_postcode());
+            if ($code === '') {
+                $code = trim((string) $this->order->get_shipping_postcode());
+            }
+        } else {
+            $code = trim((string) $this->order->get_shipping_postcode());
+            if ($code === '') {
+                $code = trim((string) $this->order->get_billing_postcode());
+            }
+        }
+
+        return $code;
     }
 
     public function phone_holder(bool $html = false): string
@@ -468,23 +523,34 @@ class Factorchi_Customer_Data
             return $table;
         }
 
-        foreach (
-            [
-                $wpdb->prefix . 'payzito_transactions',
-                $wpdb->prefix . 'payzito_transctions',
-            ] as $candidate
-        ) {
-            if ($wpdb->get_var($wpdb->prepare('SHOW TABLES LIKE %s', $candidate)) === $candidate) {
+        // Only known PayZito table names — never wildcard discovery.
+        $candidates = [
+            $wpdb->prefix . 'payzito_transactions',
+            $wpdb->prefix . 'payzito_transctions', // legacy typo in some installs
+        ];
+
+        foreach ($candidates as $candidate) {
+            $suffix = substr($candidate, strlen($wpdb->prefix));
+            if (!$this->is_safe_sql_ident($suffix)) {
+                continue;
+            }
+
+            $found = $wpdb->get_var($wpdb->prepare('SHOW TABLES LIKE %s', $candidate));
+            if ($found === $candidate) {
                 $table = $candidate;
 
                 return $table;
             }
         }
 
-        $found = $wpdb->get_col("SHOW TABLES LIKE '%payzito%trans%'");
-        $table = !empty($found[0]) ? (string) $found[0] : '';
+        $table = '';
 
         return $table;
+    }
+
+    private function is_safe_sql_ident(string $ident): bool
+    {
+        return (bool) preg_match('/^[A-Za-z0-9_]+$/', $ident);
     }
 
     /**
@@ -494,62 +560,36 @@ class Factorchi_Customer_Data
     {
         global $wpdb;
 
+        $suffix = substr($table, strlen($wpdb->prefix));
+        if (
+            $table === ''
+            || !str_starts_with($table, $wpdb->prefix)
+            || !$this->is_safe_sql_ident($suffix)
+        ) {
+            return null;
+        }
+
         $columns = $wpdb->get_col("SHOW COLUMNS FROM `{$table}`");
         if (!is_array($columns) || $columns === []) {
             return null;
         }
 
-        $columns = array_map('strval', $columns);
-        $like    = '%' . $wpdb->esc_like($order_id) . '%';
+        $columns = array_values(array_filter(
+            array_map('strval', $columns),
+            [$this, 'is_safe_sql_ident']
+        ));
 
-        $exact_candidates = [
+        // Exact match only on known order-id columns (no LIKE / no scan-all-columns).
+        $order_columns = [
             'order_id',
             'app_order_id',
-            'extension_id',
             'extension_order_id',
             'wc_order_id',
             'woocommerce_order_id',
-            'factor_id',
-            'ref_id',
         ];
 
-        foreach ($exact_candidates as $column) {
+        foreach ($order_columns as $column) {
             if (!in_array($column, $columns, true)) {
-                continue;
-            }
-
-            $row = $wpdb->get_row(
-                $wpdb->prepare(
-                    "SELECT * FROM `{$table}` WHERE `{$column}` = %s ORDER BY id DESC LIMIT 1",
-                    $order_id
-                ),
-                ARRAY_A
-            );
-            if (is_array($row)) {
-                return $row;
-            }
-        }
-
-        foreach (['extension_data', 'params', 'data', 'logs', 'log', 'meta'] as $column) {
-            if (!in_array($column, $columns, true)) {
-                continue;
-            }
-
-            $row = $wpdb->get_row(
-                $wpdb->prepare(
-                    "SELECT * FROM `{$table}` WHERE `{$column}` LIKE %s ORDER BY id DESC LIMIT 1",
-                    $like
-                ),
-                ARRAY_A
-            );
-            if (is_array($row)) {
-                return $row;
-            }
-        }
-
-        // Last resort: any column equals order id.
-        foreach ($columns as $column) {
-            if (in_array($column, ['id', 'amount', 'price', 'paid', 'total'], true)) {
                 continue;
             }
 

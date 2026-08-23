@@ -11,7 +11,8 @@ class Factorchi_WooCommerce
         add_filter('woocommerce_admin_order_actions', [$this, 'order_actions'], 20, 2);
         add_filter('bulk_actions-edit-shop_order', [$this, 'bulk_actions']);
         add_filter('bulk_actions-woocommerce_page_wc-orders', [$this, 'bulk_actions']);
-        add_filter('manage_shop_order_posts_custom_column', [$this, 'order_column_links'], 20, 2);
+        add_action('manage_shop_order_posts_custom_column', [$this, 'order_column_links'], 20, 2);
+        add_action('woocommerce_shop_order_list_table_custom_column', [$this, 'order_column_links_hpos'], 20, 2);
         add_filter('post_class', [$this, 'dashboard_class']);
         add_shortcode('factorchi-pre-invoice', [$this, 'pre_invoice_shortcode']);
 
@@ -48,17 +49,41 @@ class Factorchi_WooCommerce
         return $actions;
     }
 
-    public function order_column_links(string $column, int $post_id): void
+    public function order_column_links(string $column, $post_id): void
     {
         if ($column !== 'order_number') {
             return;
         }
 
+        $this->render_order_column_links((int) $post_id);
+    }
+
+    public function order_column_links_hpos(string $column, $order): void
+    {
+        if ($column !== 'order_number') {
+            return;
+        }
+
+        $order_id = $order instanceof WC_Order ? (int) $order->get_id() : (int) $order;
+        $this->render_order_column_links($order_id);
+    }
+
+    private function render_order_column_links(int $order_id): void
+    {
+        if ($order_id <= 0) {
+            return;
+        }
+
+        $labels = [
+            'invoice'    => __('فاکتور', 'factorchi'),
+            'post-label' => __('برچسب پستی', 'factorchi'),
+        ];
+
         $links = [];
-        foreach (['invoice', 'post-label'] as $type) {
-            $url = factorchi_get_invoice_url($post_id, $type);
+        foreach ($labels as $type => $label) {
+            $url = factorchi_get_invoice_url($order_id, $type);
             if ($url !== '') {
-                $links[] = '<a class="factorchi-' . esc_attr(str_replace('-', '_', $type)) . '" href="' . esc_url($url) . '" target="_blank">' . esc_html($type) . '</a>';
+                $links[] = '<a class="factorchi-' . esc_attr(str_replace('-', '_', $type)) . '" href="' . esc_url($url) . '" target="_blank">' . esc_html($label) . '</a>';
             }
         }
 

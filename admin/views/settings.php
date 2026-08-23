@@ -22,9 +22,9 @@ $nav_groups = [
         'sms'    => ['label' => __('SMS', 'factorchi'), 'icon' => 'dashicons-smartphone'],
         'bots'   => ['label' => __('تلگرام / بله', 'factorchi'), 'icon' => 'dashicons-format-chat'],
         'auto'   => ['label' => __('خودکار', 'factorchi'), 'icon' => 'dashicons-update'],
+        'survey' => ['label' => __('اطلاع رسانی (ارسال فاکتور)', 'factorchi'), 'icon' => 'dashicons-megaphone'],
     ],
     __('سایر', 'factorchi') => [
-        'survey' => ['label' => __('نظرسنجی', 'factorchi'), 'icon' => 'dashicons-star-filled'],
         'tapin'  => ['label' => __('تاپین', 'factorchi'), 'icon' => 'dashicons-tag'],
     ],
 ];
@@ -37,7 +37,7 @@ $tab_titles = [
     'sms'       => __('تنظیمات SMS', 'factorchi'),
     'bots'      => __('ربات تلگرام و بله', 'factorchi'),
     'auto'      => __('ارسال خودکار', 'factorchi'),
-    'survey'    => __('نظرسنجی پس از خرید', 'factorchi'),
+    'survey'    => __('اطلاع رسانی (ارسال فاکتور)', 'factorchi'),
     'tapin'     => __('یکپارچگی تاپین', 'factorchi'),
 ];
 

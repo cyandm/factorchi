@@ -19,7 +19,7 @@ class Factorchi_Channel_Socials extends Factorchi_Notify_Channel_Base
     public function send(int $order_id, array $context): bool
     {
         $api_url = (string) factorchi_get_setting('socials_api_url', '');
-        if ($api_url === '') {
+        if ($api_url === '' || !factorchi_is_safe_remote_url($api_url)) {
             return false;
         }
 

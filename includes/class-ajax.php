@@ -46,8 +46,7 @@ class Factorchi_Ajax
             $only = null;
         }
 
-        $dispatcher = new Factorchi_Notify_Dispatcher();
-        $results    = $dispatcher->send_invoice($order_id, $payment, $only);
+        $results = Factorchi_Notify_Dispatcher::instance()->send_invoice($order_id, $payment, $only);
         $success = $results === [] ? false : in_array(true, $results, true);
 
         wp_send_json(['result' => $success, 'channels' => $results]);

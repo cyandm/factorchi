@@ -303,6 +303,17 @@ $title = __('اطلاعات خریدار', 'factorchi');
 $description = __('نمایش یا مخفی‌کردن فیلدهای بلوک خریدار در فاکتور و پیش‌فاکتور.', 'factorchi');
 include $partials . 'card-section.php';
 
+$name = 'customer_address_source';
+$label = __('منبع آدرس مشتری', 'factorchi');
+$value = (string) ($s['customer_address_source'] ?? 'woocommerce');
+$options = [
+    'woocommerce' => __('پیروی از تنظیمات ووکامرس (مقصد ارسال)', 'factorchi'),
+    'shipping'    => __('همیشه آدرس حمل و نقل (در صورت خالی بودن، صورت‌حساب)', 'factorchi'),
+    'billing'     => __('همیشه آدرس صورت‌حساب (در صورت خالی بودن، حمل و نقل)', 'factorchi'),
+];
+$description = __('با گزینه اول، همان سه حالت «مقصد ارسال» در ووکامرس → تنظیمات → ارسال اعمال می‌شود. در صورت خالی بودن آدرس ترجیحی، آدرس دیگر استفاده می‌شود.', 'factorchi');
+include $partials . 'field-select.php';
+
 $name = 'show_payment_method';
 $label = __('روش پرداخت', 'factorchi');
 $description = __('نمایش روش پرداخت در بخش اطلاعات خریدار.', 'factorchi');

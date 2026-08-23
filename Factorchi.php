@@ -3,13 +3,13 @@
 /**
  * Plugin Name: Factorchi
  * Description: ساخت، نمایش و ارسال فاکتور و برچسب برای ووکامرس
- * Version: 1.1.0
+ * Version: 1.2.0
  * Author: Amirali Dizabadi
  * Author URI: https://amiralidz.ir
  * Text Domain: factorchi
  * Domain Path: /languages
  * Requires at least: 6.0
- * Requires PHP: 7.4
+ * Requires PHP: 8.0
  * WC requires at least: 7.0
  */
 
@@ -17,11 +17,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-if (!function_exists('get_plugin_data')) {
-    require_once ABSPATH . 'wp-admin/includes/plugin.php';
-}
-
-define('FACTORCHI_VERSION', '1.1.0');
+define('FACTORCHI_VERSION', '1.2.0');
 define('FACTORCHI_FILE', __FILE__);
 define('FACTORCHI_DIR', plugin_dir_path(__FILE__));
 define('FACTORCHI_URL', plugin_dir_url(__FILE__));

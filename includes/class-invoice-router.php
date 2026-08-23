@@ -18,10 +18,17 @@ class Factorchi_Invoice_Router
             return;
         }
 
-        $type     = isset($_GET['type']) ? sanitize_key(wp_unslash($_GET['type'])) : 'invoice';
-        $order_id = isset($_GET['order-id']) ? wp_unslash($_GET['order-id']) : '';
-        $view     = isset($_GET['view']) ? sanitize_file_name(wp_unslash($_GET['view'])) : '';
+        $type       = isset($_GET['type']) ? sanitize_key(wp_unslash($_GET['type'])) : 'invoice';
+        $order_id   = isset($_GET['order-id']) ? wp_unslash($_GET['order-id']) : '';
+        $view       = isset($_GET['view']) ? sanitize_file_name(wp_unslash($_GET['view'])) : '';
         $is_preview = $this->is_preview_request();
+
+        if (!in_array($type, factorchi_allowed_document_types(), true)
+            && $type !== 'orders'
+            && $type !== 'order-label'
+        ) {
+            wp_die(esc_html__('نوع سند نامعتبر است.', 'factorchi'), '', ['response' => 400]);
+        }
 
         if ($is_preview) {
             $this->render_admin_preview($type, $view);
@@ -42,9 +49,24 @@ class Factorchi_Invoice_Router
             wp_die(esc_html__('شناسه سفارش نامعتبر است.', 'factorchi'));
         }
 
+        $max = factorchi_max_batch_orders();
+        if (count($order_ids) > $max) {
+            wp_die(
+                esc_html(
+                    sprintf(
+                        /* translators: %d: max number of orders */
+                        __('حداکثر %d سفارش در هر چاپ گروهی مجاز است.', 'factorchi'),
+                        $max
+                    )
+                ),
+                '',
+                ['response' => 400]
+            );
+        }
+
         foreach ($order_ids as $id) {
             if (!$this->user_can_view_order($id)) {
-                wp_die(esc_html__('دسترسی مجاز نیست.', 'factorchi'));
+                wp_die(esc_html__('دسترسی مجاز نیست.', 'factorchi'), '', ['response' => 403]);
             }
         }
 
@@ -84,6 +106,10 @@ class Factorchi_Invoice_Router
             wp_die(esc_html__('این نوع سند حذف شده است.', 'factorchi'), '', ['response' => 404]);
         }
 
+        if (!in_array($type, factorchi_allowed_document_types(), true)) {
+            wp_die(esc_html__('نوع سند نامعتبر است.', 'factorchi'), '', ['response' => 400]);
+        }
+
         Factorchi_Preview_Sample::render($type, $view);
         exit;
     }
@@ -110,11 +136,24 @@ class Factorchi_Invoice_Router
     private function parse_order_ids($raw): array
     {
         if (is_array($raw)) {
-            return array_values(array_filter(array_map('intval', $raw)));
+            $ids = array_values(array_filter(array_map('intval', $raw)));
+        } else {
+            $parts = array_map('trim', explode(',', (string) $raw));
+            $ids   = array_values(array_filter(array_map('intval', $parts)));
         }
 
-        $parts = array_map('trim', explode(',', (string) $raw));
-        return array_values(array_filter(array_map('intval', $parts)));
+        // Deduplicate while preserving order.
+        $seen = [];
+        $out  = [];
+        foreach ($ids as $id) {
+            if ($id <= 0 || isset($seen[$id])) {
+                continue;
+            }
+            $seen[$id] = true;
+            $out[]     = $id;
+        }
+
+        return $out;
     }
 
     public function user_can_view_order(int $order_id): bool

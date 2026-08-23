@@ -177,6 +177,20 @@ class Factorchi_Admin
     {
         $settings = array_merge(Factorchi_Settings::defaults(), get_option(Factorchi_Settings::OPTION_KEY, []));
         $tab      = isset($_GET['tab']) ? sanitize_key(wp_unslash($_GET['tab'])) : 'general';
+        $allowed  = [
+            'general',
+            'templates',
+            'access',
+            'notify',
+            'sms',
+            'bots',
+            'auto',
+            'survey',
+            'tapin',
+        ];
+        if (!in_array($tab, $allowed, true)) {
+            $tab = 'general';
+        }
         include FACTORCHI_DIR . 'admin/views/settings.php';
     }
 
@@ -217,7 +231,6 @@ class Factorchi_Admin
             'shop_economical',
             'shop_reg',
             'shop_logo',
-            'shop_note',
             'font_family',
             'invoice_default_view',
             'pre_invoice_view',
@@ -237,34 +250,51 @@ class Factorchi_Admin
             'shop_logo_size',
             'print_page_size',
             'email_subject',
-            'email_body',
             'sms_panel',
             'sms_username',
             'sms_password',
             'sms_sender',
             'sms_pattern_id',
-            'sms_message',
             'whatsapp_api_url',
-            'whatsapp_message',
             'socials_api_url',
-            'socials_message',
             'telegram_bot_token',
             'telegram_chat_id',
-            'telegram_message',
             'bale_bot_token',
             'bale_chat_id',
-            'bale_message',
             'tapin_barcode_meta',
             'line_items_delete',
             'survey_status',
             'default_invoice_type',
             'product_attrs_mode',
+            'customer_address_source',
         ];
 
         foreach ($text_fields as $key) {
             if (isset($_POST[$key])) {
                 $data[$key] = sanitize_text_field(wp_unslash($_POST[$key]));
             }
+        }
+
+        $textarea_fields = [
+            'shop_note',
+            'email_body',
+            'sms_message',
+            'whatsapp_message',
+            'socials_message',
+            'telegram_message',
+            'bale_message',
+        ];
+
+        foreach ($textarea_fields as $key) {
+            if (isset($_POST[$key])) {
+                $data[$key] = sanitize_textarea_field(wp_unslash($_POST[$key]));
+            }
+        }
+
+        if (isset($data['customer_address_source'])
+            && !in_array($data['customer_address_source'], ['woocommerce', 'shipping', 'billing'], true)
+        ) {
+            $data['customer_address_source'] = 'woocommerce';
         }
 
         if (isset($data['font_family'])) {
@@ -290,8 +320,7 @@ class Factorchi_Admin
         }
 
         if ($tab === 'survey') {
-            $data['survey_sms_delay_days']   = max(0, (int) ($_POST['survey_sms_delay_days'] ?? 3));
-            $data['survey_email_delay_days'] = max(0, (int) ($_POST['survey_email_delay_days'] ?? 3));
+            $data['survey_sms_delay_days'] = max(0, (int) ($_POST['survey_sms_delay_days'] ?? 3));
         }
 
         if (isset($data['print_page_size']) && !in_array($data['print_page_size'], ['a4', 'a5'], true)) {
@@ -339,6 +368,13 @@ class Factorchi_Admin
             if (isset($data[$gap_key])) {
                 $data[$gap_key] = (string) max(0, min(60, (int) $data[$gap_key]));
             }
+        }
+
+        if (isset($data['whatsapp_api_url']) && $data['whatsapp_api_url'] !== '' && !factorchi_is_safe_remote_url($data['whatsapp_api_url'])) {
+            $data['whatsapp_api_url'] = '';
+        }
+        if (isset($data['socials_api_url']) && $data['socials_api_url'] !== '' && !factorchi_is_safe_remote_url($data['socials_api_url'])) {
+            $data['socials_api_url'] = '';
         }
 
         Factorchi_Settings::update($data);

@@ -6,10 +6,23 @@ if (!defined('ABSPATH')) {
 
 class Factorchi_Notify_Dispatcher
 {
+    private static ?Factorchi_Notify_Dispatcher $instance = null;
+
     /** @var array<int, Factorchi_Notify_Channel> */
     private array $channels = [];
 
-    public function __construct()
+    private bool $hooks_registered = false;
+
+    public static function instance(): Factorchi_Notify_Dispatcher
+    {
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
+
+        return self::$instance;
+    }
+
+    private function __construct()
     {
         $this->channels = [
             new Factorchi_Channel_Email(),
@@ -20,7 +33,17 @@ class Factorchi_Notify_Dispatcher
             new Factorchi_Channel_Bale(),
         ];
 
+        $this->register_hooks();
+    }
+
+    private function register_hooks(): void
+    {
+        if ($this->hooks_registered) {
+            return;
+        }
+
         add_action('woocommerce_order_status_changed', [$this, 'maybe_auto_send'], 20, 4);
+        $this->hooks_registered = true;
     }
 
     /**
@@ -80,7 +103,10 @@ class Factorchi_Notify_Dispatcher
             return;
         }
 
-        $channels = (array) factorchi_get_setting('auto_send_channels', ['email']);
+        $channels = (array) factorchi_get_setting('auto_send_channels', []);
+        if ($channels === []) {
+            return;
+        }
         $this->send_invoice($order_id, false, $channels);
     }
 }

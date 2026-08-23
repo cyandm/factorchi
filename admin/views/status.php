@@ -34,11 +34,11 @@ $cron_next    = wp_next_scheduled(Factorchi_Survey::CRON_HOOK);
                     <td><?php echo $hpos ? esc_html__('فعال', 'factorchi') : esc_html__('غیرفعال', 'factorchi'); ?></td>
                 </tr>
                 <tr>
-                    <th><?php esc_html_e('جدول نظرسنجی', 'factorchi'); ?></th>
+                    <th><?php esc_html_e('جدول اطلاع رسانی', 'factorchi'); ?></th>
                     <td><?php echo $table_exists ? esc_html__('موجود', 'factorchi') : esc_html__('ناموجود', 'factorchi'); ?></td>
                 </tr>
                 <tr>
-                    <th><?php esc_html_e('Cron نظرسنجی', 'factorchi'); ?></th>
+                    <th><?php esc_html_e('Cron اطلاع رسانی', 'factorchi'); ?></th>
                     <td><?php echo $cron_next ? esc_html(date_i18n('Y-m-d H:i', $cron_next)) : esc_html__('زمان‌بندی نشده', 'factorchi'); ?></td>
                 </tr>
                 <tr>

@@ -59,6 +59,7 @@ class Factorchi_Settings
             'show_transaction_id'    => 'yes',
             'show_customer_note_buyer'  => 'yes',
             'show_customer_note_footer' => 'yes',
+            'customer_address_source'   => 'woocommerce',
             'address_enter_spacing_below' => 'no',
             'filter_product_name_codes' => 'no',
             'product_attrs_mode'        => 'all',
@@ -76,9 +77,8 @@ class Factorchi_Settings
             'product_image_size'     => '70',
             'enable_border_radius'   => 'yes',
             'allowed_statuses'       => ['processing', 'completed'],
-            'allowed_roles'          => ['customer', 'administrator', 'shop_manager'],
             'guest_access'           => 'yes',
-            'channel_email'          => 'yes',
+            'channel_email'          => 'no',
             'channel_sms'            => 'no',
             'channel_whatsapp'       => 'no',
             'channel_socials'        => 'no',
@@ -103,7 +103,7 @@ class Factorchi_Settings
             'bale_chat_id'           => '',
             'bale_message'           => 'فاکتور سفارش {order_id}: {invoice_url}',
             'auto_send_statuses'     => [],
-            'auto_send_channels'     => ['email'],
+            'auto_send_channels'     => [],
             'show_on_thankyou'       => 'yes',
             'show_on_my_account'     => 'yes',
             'replace_view_order_url' => 'yes',
@@ -127,7 +127,7 @@ class Factorchi_Settings
         }
 
         Factorchi_Survey::install_table();
-        Factorchi_Survey::schedule_cron();
+        // Cron is scheduled only when اطلاع‌رسانی is enabled (see Factorchi_Survey).
     }
 
     /**

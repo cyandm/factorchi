@@ -4,21 +4,36 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+/**
+ * Delayed invoice notify queue (SMS).
+ * Settings keys keep the legacy "survey_*" names for backwards compatibility.
+ */
 class Factorchi_Survey
 {
     public const CRON_HOOK = 'factorchi_survey_send_task';
+    public const META_QUEUED = '_factorchi_surveyed';
+
+    /** sms_status: 0=pending, 1=success, 2=failed, 3=processing */
+    public const STATUS_PENDING    = 0;
+    public const STATUS_SUCCESS    = 1;
+    public const STATUS_FAILED     = 2;
+    public const STATUS_PROCESSING = 3;
 
     public function __construct()
     {
+        // Custom schedule must stay registered even when the feature is off,
+        // otherwise WP cannot resolve events scheduled on activation.
+        add_filter('cron_schedules', [$this, 'cron_schedules']);
+
         if (factorchi_get_setting('survey_enabled', 'no') !== 'yes') {
             return;
         }
 
+        self::schedule_cron();
+        self::install_table();
+
         add_action('woocommerce_order_status_changed', [$this, 'register_send'], 30, 4);
         add_action(self::CRON_HOOK, [$this, 'process_queue']);
-        add_filter('cron_schedules', [$this, 'cron_schedules']);
-        add_action('wp_ajax_factorchi_survey_register_comment', [$this, 'ajax_register_comment']);
-        add_action('wp_ajax_nopriv_factorchi_survey_register_comment', [$this, 'ajax_register_comment']);
 
         if (is_admin()) {
             add_action('admin_menu', [$this, 'register_admin_page']);
@@ -50,7 +65,8 @@ class Factorchi_Survey
             sms_status TINYINT NOT NULL DEFAULT 0,
             email_status TINYINT NOT NULL DEFAULT 0,
             PRIMARY KEY (id),
-            KEY order_number (order_number)
+            UNIQUE KEY order_number (order_number),
+            KEY sms_queue (sms_status, sent_date)
         ) {$charset};";
 
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';
@@ -70,8 +86,8 @@ class Factorchi_Survey
     }
 
     /**
-     * @param array<string, int|string> $schedules
-     * @return array<string, int|string>
+     * @param array<string, array<string, int|string>> $schedules
+     * @return array<string, array<string, int|string>>
      */
     public function cron_schedules(array $schedules): array
     {
@@ -85,122 +101,154 @@ class Factorchi_Survey
     public function register_send(int $order_id, string $old_status, string $new_status, WC_Order $order): void
     {
         $target = (string) factorchi_get_setting('survey_status', 'completed');
-        if ($new_status !== $target || $order->get_meta('_factorchi_surveyed') === 'yes') {
+        if ($new_status !== $target || $order->get_meta(self::META_QUEUED) === 'yes') {
             return;
         }
 
         global $wpdb;
-        $sms_delay   = (int) factorchi_get_setting('survey_sms_delay_days', 3);
-        $email_delay = (int) factorchi_get_setting('survey_email_delay_days', 3);
-        $sms_time    = time() + ($sms_delay * DAY_IN_SECONDS);
-        $email_time  = time() + ($email_delay * DAY_IN_SECONDS);
+        $sms_delay = (int) factorchi_get_setting('survey_sms_delay_days', 3);
+        $sms_time  = time() + ($sms_delay * DAY_IN_SECONDS);
 
-        $wpdb->insert(
+        // Mark first to reduce duplicate inserts under concurrent status hooks.
+        $order->update_meta_data(self::META_QUEUED, 'yes');
+        $order->save();
+
+        $inserted = $wpdb->insert(
             self::table_name(),
             [
                 'order_number'    => $order_id,
                 'phone'           => $order->get_billing_phone(),
-                'email'           => $order->get_billing_email(),
+                'email'           => '',
                 'sent_date'       => $sms_time,
                 'sent_time'       => 0,
-                'sent_date_email' => $email_time,
+                'sent_date_email' => 0,
                 'sent_time_email' => 0,
-                'sms_status'      => 0,
-                'email_status'    => 0,
+                'sms_status'      => self::STATUS_PENDING,
+                'email_status'    => 1,
             ],
             ['%d', '%s', '%s', '%d', '%d', '%d', '%d', '%d', '%d']
         );
+
+        if (!$inserted) {
+            // Unique key collision or DB error — leave meta set so we do not retry forever.
+            return;
+        }
     }
 
     public function process_queue(): void
     {
         global $wpdb;
-        $table = self::table_name();
-        $now   = time();
+        $table     = self::table_name();
+        $now       = time();
+        $deadline  = time() + 20;
+        $batch     = (int) apply_filters('factorchi_notify_queue_batch', 40);
 
-        $rows = $wpdb->get_results(
+        // Reclaim stale "processing" rows (crashed workers) after 15 minutes.
+        $wpdb->query(
             $wpdb->prepare(
-                "SELECT * FROM {$table} WHERE (sms_status = 0 AND sent_date <= %d) OR (email_status = 0 AND sent_date_email <= %d) LIMIT 20",
-                $now,
-                $now
+                "UPDATE {$table} SET sms_status = %d WHERE sms_status = %d AND sent_date <= %d",
+                self::STATUS_PENDING,
+                self::STATUS_PROCESSING,
+                $now - (15 * MINUTE_IN_SECONDS)
             )
         );
 
-        if (!is_array($rows)) {
-            return;
-        }
+        while (time() < $deadline) {
+            $rows = $wpdb->get_results(
+                $wpdb->prepare(
+                    "SELECT * FROM {$table} WHERE sms_status = %d AND sent_date <= %d ORDER BY id ASC LIMIT %d",
+                    self::STATUS_PENDING,
+                    $now,
+                    max(1, min(100, $batch))
+                )
+            );
 
-        $dispatcher = new Factorchi_Notify_Dispatcher();
-
-        foreach ($rows as $row) {
-            $order_id = (int) $row->order_number;
-
-            if ((int) $row->sms_status === 0 && (int) $row->sent_date <= $now) {
-                $dispatcher->send_invoice($order_id, false, ['sms']);
-                $wpdb->update(self::table_name(), ['sms_status' => 1], ['id' => (int) $row->id], ['%d'], ['%d']);
+            if (!is_array($rows) || $rows === []) {
+                return;
             }
 
-            if ((int) $row->email_status === 0 && (int) $row->sent_date_email <= $now) {
-                $dispatcher->send_invoice($order_id, false, ['email']);
-                $wpdb->update(self::table_name(), ['email_status' => 1], ['id' => (int) $row->id], ['%d'], ['%d']);
+            $dispatcher = Factorchi_Notify_Dispatcher::instance();
+
+            foreach ($rows as $row) {
+                if (time() >= $deadline) {
+                    return;
+                }
+
+                $id = (int) $row->id;
+
+                // Atomic claim — prevents double SMS under overlapping cron/spawns.
+                $claimed = $wpdb->update(
+                    $table,
+                    [
+                        'sms_status' => self::STATUS_PROCESSING,
+                        'sent_date'  => time(),
+                    ],
+                    [
+                        'id'         => $id,
+                        'sms_status' => self::STATUS_PENDING,
+                    ],
+                    ['%d', '%d'],
+                    ['%d', '%d']
+                );
+
+                if (!$claimed) {
+                    continue;
+                }
+
+                $order_id = (int) $row->order_number;
+                $results  = $dispatcher->send_invoice($order_id, false, ['sms']);
+                $ok       = !empty($results['sms']);
+
+                if ($ok) {
+                    $wpdb->update(
+                        $table,
+                        [
+                            'sms_status' => self::STATUS_SUCCESS,
+                            'sent_time'  => time(),
+                        ],
+                        ['id' => $id],
+                        ['%d', '%d'],
+                        ['%d']
+                    );
+                    continue;
+                }
+
+                $attempts = (int) $row->sent_time + 1;
+                if ($attempts >= 3) {
+                    $wpdb->update(
+                        $table,
+                        [
+                            'sms_status' => self::STATUS_FAILED,
+                            'sent_time'  => $attempts,
+                        ],
+                        ['id' => $id],
+                        ['%d', '%d'],
+                        ['%d']
+                    );
+                    continue;
+                }
+
+                $wpdb->update(
+                    $table,
+                    [
+                        'sms_status' => self::STATUS_PENDING,
+                        'sent_date'  => time() + HOUR_IN_SECONDS,
+                        'sent_time'  => $attempts,
+                    ],
+                    ['id' => $id],
+                    ['%d', '%d', '%d'],
+                    ['%d']
+                );
             }
         }
-    }
-
-    public function ajax_register_comment(): void
-    {
-        check_ajax_referer('factorchi_survey', 'nonce');
-
-        $order_id = isset($_POST['order_id']) ? (int) $_POST['order_id'] : 0;
-        $rating   = isset($_POST['rating']) ? (int) $_POST['rating'] : 0;
-        $comment  = isset($_POST['comment']) ? sanitize_textarea_field(wp_unslash($_POST['comment'])) : '';
-
-        $order = wc_get_order($order_id);
-        if (!$order) {
-            wp_send_json_error(['message' => 'invalid_order']);
-        }
-
-        $product_id = 0;
-        foreach ($order->get_items() as $item) {
-            if ($item instanceof WC_Order_Item_Product) {
-                $product_id = (int) $item->get_product_id();
-                break;
-            }
-        }
-
-        if ($product_id <= 0) {
-            wp_send_json_error(['message' => 'no_product']);
-        }
-
-        $comment_id = wp_insert_comment([
-            'comment_post_ID'      => $product_id,
-            'comment_author'       => $order->get_formatted_billing_full_name(),
-            'comment_author_email' => $order->get_billing_email(),
-            'comment_content'      => $comment,
-            'comment_type'         => 'review',
-            'comment_approved'     => 0,
-            'user_id'              => (int) $order->get_customer_id(),
-        ]);
-
-        if (!$comment_id) {
-            wp_send_json_error(['message' => 'insert_failed']);
-        }
-
-        add_comment_meta($comment_id, 'rating', $rating);
-        add_comment_meta($comment_id, 'fbcommenttype', 'survey');
-        $order->update_meta_data('_psurvey_' . $product_id, 'yes');
-        $order->update_meta_data('_factorchi_surveyed', 'yes');
-        $order->save();
-
-        wp_send_json_success(['comment_id' => $comment_id]);
     }
 
     public function register_admin_page(): void
     {
         add_submenu_page(
             'factorchi',
-            __('نظرسنجی', 'factorchi'),
-            __('نظرسنجی', 'factorchi'),
+            __('اطلاع رسانی (ارسال فاکتور)', 'factorchi'),
+            __('اطلاع رسانی (ارسال فاکتور)', 'factorchi'),
             'manage_woocommerce',
             'factorchi-survey',
             [$this, 'render_admin_page']
@@ -209,8 +257,14 @@ class Factorchi_Survey
 
     public function render_admin_page(): void
     {
+        if (!current_user_can('manage_woocommerce')) {
+            wp_die(esc_html__('Unauthorized', 'factorchi'), '', ['response' => 403]);
+        }
+
         global $wpdb;
-        $rows = $wpdb->get_results('SELECT * FROM ' . self::table_name() . ' ORDER BY id DESC LIMIT 100');
+        $rows = $wpdb->get_results(
+            'SELECT * FROM ' . self::table_name() . ' ORDER BY id DESC LIMIT 100'
+        );
         include FACTORCHI_DIR . 'admin/views/survey-list.php';
     }
 }

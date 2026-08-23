@@ -45,7 +45,7 @@ final class Factorchi_Plugin
 
         new Factorchi_Assets();
         new Factorchi_Invoice_Router();
-        new Factorchi_Notify_Dispatcher();
+        Factorchi_Notify_Dispatcher::instance();
         new Factorchi_WooCommerce();
         new Factorchi_Ajax();
         new Factorchi_Frontend();
