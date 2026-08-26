@@ -23,39 +23,11 @@ class Factorchi_Admin
     {
         return [
             'general'   => [],
-            'templates' => [
-                'use_persian_number',
-                'use_jalali_date',
-                'show_print_date',
-                'show_order_date',
-                'show_date_time',
-                'enable_border_radius',
-                'show_product_image',
-                'show_product_row_number',
-                'show_barcode_top',
-                'show_barcode_top_text',
-                'show_barcode_under_title',
-                'show_barcode_under_title_text',
-                'show_barcode_bottom',
-                'show_barcode_bottom_text',
-                'show_payment_method',
-                'show_shipping_method',
-                'show_transaction_id',
-                'show_customer_note_buyer',
-                'show_customer_note_footer',
-                'address_enter_spacing_below',
-                'filter_product_name_codes',
-                'product_attrs_show_label',
-                'compact_party_texts',
-                'show_tearoff',
-                'show_tearoff_recipient',
-                'show_tearoff_payment',
-                'show_tearoff_tracking',
-                'use_payzito_gateway_tracking',
-                'show_tearoff_order_date',
-                'show_tearoff_order_id',
-                'show_tearoff_customer_note',
-            ],
+            'templates' => array_values(array_unique(array_merge(
+                $this->templates_section_checkboxes('select'),
+                $this->templates_section_checkboxes('style'),
+                $this->templates_section_checkboxes('content')
+            ))),
             'access'    => [
                 'guest_access',
                 'show_on_thankyou',
@@ -78,6 +50,97 @@ class Factorchi_Admin
                 'survey_enabled',
             ],
         ];
+    }
+
+    /**
+     * Checkbox keys for a templates sub-section.
+     *
+     * @return list<string>
+     */
+    private function templates_section_checkboxes(string $section): array
+    {
+        $map = [
+            'select'  => [],
+            'style'   => [
+                'use_persian_number',
+                'use_jalali_date',
+                'enable_border_radius',
+                'compact_party_texts',
+            ],
+            'content' => [
+                'show_print_date',
+                'show_order_date',
+                'show_date_time',
+                'show_product_image',
+                'show_product_row_number',
+                'show_barcode_top',
+                'show_barcode_top_text',
+                'show_barcode_under_title',
+                'show_barcode_under_title_text',
+                'show_barcode_bottom',
+                'show_barcode_bottom_text',
+                'show_payment_method',
+                'show_shipping_method',
+                'show_transaction_id',
+                'show_customer_note_buyer',
+                'show_customer_note_footer',
+                'address_enter_spacing_below',
+                'filter_product_name_codes',
+                'product_attrs_show_label',
+                'show_tearoff',
+                'show_tearoff_recipient',
+                'show_tearoff_payment',
+                'show_tearoff_tracking',
+                'use_payzito_gateway_tracking',
+                'show_tearoff_order_date',
+                'show_tearoff_order_id',
+                'show_tearoff_customer_note',
+            ],
+        ];
+
+        return $map[$section] ?? [];
+    }
+
+    /**
+     * Text field keys allowed for a templates sub-section.
+     *
+     * @return list<string>
+     */
+    private function templates_section_text_fields(string $section): array
+    {
+        $map = [
+            'select' => [
+                'invoice_default_view',
+                'pre_invoice_view',
+                'post_label_view',
+                'mini_label_view',
+            ],
+            'style' => [
+                'font_family',
+                'print_page_size',
+                'invoice_margin',
+                'pre_invoice_margin',
+                'post_label_margin',
+                'mini_label_margin',
+                'section_gap_a4',
+                'section_gap_a5',
+                'font_size_invoice',
+                'font_size_pre_invoice',
+                'font_size_post_label',
+                'font_size_label',
+                'font_size_mini_label',
+                'font_size_shop',
+                'font_size_buyer',
+                'product_image_size',
+                'shop_logo_size',
+            ],
+            'content' => [
+                'product_attrs_mode',
+                'customer_address_source',
+            ],
+        ];
+
+        return $map[$section] ?? [];
     }
 
     /**
@@ -213,11 +276,19 @@ class Factorchi_Admin
         check_admin_referer('factorchi_save_settings');
 
         $tab = sanitize_key(wp_unslash($_POST['factorchi_tab'] ?? 'general'));
+        $section = sanitize_key(wp_unslash($_POST['factorchi_section'] ?? ''));
+        if ($tab === 'templates' && !in_array($section, ['select', 'style', 'content'], true)) {
+            $section = 'select';
+        }
 
-        // Only update toggles belonging to the submitted tab. Missing checkboxes
-        // from other tabs must not be forced to "no".
+        // Only update toggles belonging to the submitted tab (and templates section).
+        // Missing checkboxes from other tabs/sections must not be forced to "no".
         $data = [];
-        foreach ($this->checkboxes_by_tab()[$tab] ?? [] as $key) {
+        $checkbox_keys = $this->checkboxes_by_tab()[$tab] ?? [];
+        if ($tab === 'templates') {
+            $checkbox_keys = $this->templates_section_checkboxes($section);
+        }
+        foreach ($checkbox_keys as $key) {
             $data[$key] = !empty($_POST[$key]) ? 'yes' : 'no';
         }
 
@@ -235,15 +306,18 @@ class Factorchi_Admin
             'invoice_default_view',
             'pre_invoice_view',
             'post_label_view',
+            'mini_label_view',
             'invoice_margin',
             'pre_invoice_margin',
             'post_label_margin',
+            'mini_label_margin',
             'section_gap_a4',
             'section_gap_a5',
             'font_size_invoice',
             'font_size_pre_invoice',
             'font_size_post_label',
             'font_size_label',
+            'font_size_mini_label',
             'font_size_shop',
             'font_size_buyer',
             'product_image_size',
@@ -268,6 +342,11 @@ class Factorchi_Admin
             'product_attrs_mode',
             'customer_address_source',
         ];
+
+        if ($tab === 'templates') {
+            $allowed_text = $this->templates_section_text_fields($section);
+            $text_fields  = array_values(array_intersect($text_fields, $allowed_text));
+        }
 
         foreach ($text_fields as $key) {
             if (isset($_POST[$key])) {
@@ -332,13 +411,15 @@ class Factorchi_Admin
         }
 
         // sanitize_title (not sanitize_key) keeps percent-encoded Persian attribute slugs intact.
-        if (isset($_POST['product_attrs_selected']) && is_array($_POST['product_attrs_selected'])) {
-            $data['product_attrs_selected'] = array_values(array_filter(array_map(
-                static fn($key) => sanitize_title(sanitize_text_field((string) $key)),
-                wp_unslash($_POST['product_attrs_selected'])
-            )));
-        } elseif ($tab === 'templates') {
-            $data['product_attrs_selected'] = [];
+        if ($tab === 'templates' && $section === 'content') {
+            if (isset($_POST['product_attrs_selected']) && is_array($_POST['product_attrs_selected'])) {
+                $data['product_attrs_selected'] = array_values(array_filter(array_map(
+                    static fn($key) => sanitize_title(sanitize_text_field((string) $key)),
+                    wp_unslash($_POST['product_attrs_selected'])
+                )));
+            } else {
+                $data['product_attrs_selected'] = [];
+            }
         }
 
         $font_size_keys = [
@@ -353,6 +434,10 @@ class Factorchi_Admin
             if (isset($data[$font_key])) {
                 $data[$font_key] = (string) max(10, min(24, (int) $data[$font_key]));
             }
+        }
+
+        if (isset($data['font_size_mini_label'])) {
+            $data['font_size_mini_label'] = (string) max(7, min(20, (int) $data['font_size_mini_label']));
         }
 
         if (isset($data['product_image_size'])) {
@@ -379,7 +464,12 @@ class Factorchi_Admin
 
         Factorchi_Settings::update($data);
 
-        wp_safe_redirect(add_query_arg(['page' => 'factorchi', 'tab' => $tab, 'updated' => '1'], admin_url('admin.php')));
+        $redirect_args = ['page' => 'factorchi', 'tab' => $tab, 'updated' => '1'];
+        if ($tab === 'templates') {
+            $redirect_args['section'] = $section;
+        }
+
+        wp_safe_redirect(add_query_arg($redirect_args, admin_url('admin.php')));
         exit;
     }
 

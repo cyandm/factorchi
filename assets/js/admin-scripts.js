@@ -97,7 +97,8 @@ jQuery(document).ready(function ($) {
 
     var bulkPrintTypeMap = {
         invoice: 'invoice',
-        post_label: 'post-label'
+        post_label: 'post-label',
+        mini_label: 'mini-label'
     };
 
     function handleBulkPrint(e, selectorTop, checkboxSelector) {
@@ -122,7 +123,17 @@ jQuery(document).ready(function ($) {
         });
 
         var url = FACTORCHI_JS_DATA.base_url + '?action=factorchi-show&type=' + encodeURIComponent($type) + '&order-id=' + ids;
-        if (FACTORCHI_JS_DATA.print_size) {
+        if ($type === 'mini-label' && FACTORCHI_JS_DATA.mini_label_print_size) {
+            url += '&print-size=' + encodeURIComponent(FACTORCHI_JS_DATA.mini_label_print_size);
+            if (FACTORCHI_JS_DATA.mini_label_view) {
+                url += '&view=' + encodeURIComponent(FACTORCHI_JS_DATA.mini_label_view);
+            }
+        } else if ($type === 'post-label' && FACTORCHI_JS_DATA.post_label_print_size) {
+            url += '&print-size=' + encodeURIComponent(FACTORCHI_JS_DATA.post_label_print_size);
+            if (FACTORCHI_JS_DATA.post_label_view) {
+                url += '&view=' + encodeURIComponent(FACTORCHI_JS_DATA.post_label_view);
+            }
+        } else if (FACTORCHI_JS_DATA.print_size) {
             url += '&print-size=' + encodeURIComponent(FACTORCHI_JS_DATA.print_size);
         }
         window.open(url);
@@ -327,7 +338,7 @@ jQuery(document).ready(function ($) {
         });
     });
 
-    $('.wp-list-table .factorchi-invoice, .wp-list-table .factorchi-packing-slip, .wp-list-table .factorchi-post-label, .wp-list-table .factorchi-shop-label, .wp-list-table .factorchi-customer-label, .wp-list-table .factorchi-product-label').attr('target', '_blank');
+        $('.wp-list-table .factorchi-invoice, .wp-list-table .factorchi-packing-slip, .wp-list-table .factorchi-post-label, .wp-list-table .factorchi-shop-label, .wp-list-table .factorchi-customer-label, .wp-list-table .factorchi-product-label, .wp-list-table .factorchi-mini-label').attr('target', '_blank');
 
 
     $('#factorchi-send-invoice-sms-payment').click(function (e) {

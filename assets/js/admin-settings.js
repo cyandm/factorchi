@@ -83,6 +83,8 @@
             var sizeMatch = String(view).match(/-a([45])$/i);
             if (sizeMatch) {
                 url += '&print-size=a' + sizeMatch[1];
+            } else if (String(view) === '50x80') {
+                url += '&print-size=50x80';
             }
             $link.attr('href', url);
         });

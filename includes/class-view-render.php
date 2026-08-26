@@ -147,11 +147,38 @@ class Factorchi_View_Render
 
     /**
      * Normalize attribute/meta keys so stored settings and runtime keys match
-     * (Persian attribute slugs are percent-encoded by WooCommerce).
+     * (Persian attribute slugs are percent-encoded by WooCommerce;
+     * cart/order meta may use an "attribute_" prefix).
      */
     private static function normalize_attr_key(string $key): string
     {
-        return sanitize_title(urldecode(strtolower(trim($key))));
+        $key = rawurldecode(trim($key));
+        $key = preg_replace('/^attribute_/i', '', $key) ?? $key;
+
+        return sanitize_title(strtolower($key));
+    }
+
+    /**
+     * Whether a selected setting key refers to the same attribute as a pair key.
+     */
+    private static function attr_keys_equal(string $selected_key, string $pair_key): bool
+    {
+        $a = self::normalize_attr_key($selected_key);
+        $b = self::normalize_attr_key($pair_key);
+
+        if ($a === '' || $b === '') {
+            return false;
+        }
+
+        if ($a === $b) {
+            return true;
+        }
+
+        $strip = static function (string $key): string {
+            return preg_replace('/^pa_/', '', $key) ?? $key;
+        };
+
+        return $strip($a) === $strip($b);
     }
 
     /**
@@ -169,8 +196,9 @@ class Factorchi_View_Render
                 if ($value === '') {
                     continue;
                 }
+                $raw_key = (string) ($meta->key ?? '');
                 $pairs[] = [
-                    'key'   => self::normalize_attr_key((string) $meta->key),
+                    'key'   => self::normalize_attr_key($raw_key),
                     'label' => trim(wp_strip_all_tags((string) $meta->display_key)),
                     'value' => $value,
                 ];
@@ -205,6 +233,7 @@ class Factorchi_View_Render
 
     /**
      * Apply the "product_attrs_mode" setting: all / selected (in admin list order) / none.
+     * Applies to every Factorchi document that renders product names (invoice, labels, …).
      *
      * @param list<array{key:string, label:string, value:string}> $pairs
      * @return list<array{key:string, label:string, value:string}>
@@ -228,9 +257,8 @@ class Factorchi_View_Render
 
         $ordered = [];
         foreach ($selected as $selected_key) {
-            $selected_key = self::normalize_attr_key((string) $selected_key);
             foreach ($pairs as $pair) {
-                if ($pair['key'] === $selected_key) {
+                if (self::attr_keys_equal((string) $selected_key, (string) $pair['key'])) {
                     $ordered[] = $pair;
                     break;
                 }

@@ -39,7 +39,7 @@ if (!empty($fc_document_embed)) {
     <?php echo $this->append_styles(); ?>
     <style>
         @page {
-            size: <?php echo $print_size === 'a5' ? 'A5' : 'A4'; ?> portrait;
+            size: <?php echo esc_html(Factorchi_Settings::page_size_css($print_size)); ?>;
             margin: 0;
         }
         @media print {

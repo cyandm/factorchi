@@ -39,15 +39,23 @@ class Factorchi_Assets
         );
 
         wp_localize_script('factorchi-admin', 'FACTORCHI_JS_DATA', [
-            'base_url'           => home_url('/'),
-            'waiting'            => __('در حال ارسال...', 'factorchi'),
-            'send_invoice'       => __('ارسال فاکتور', 'factorchi'),
-            'send_payment_link'  => __('ارسال لینک پرداخت', 'factorchi'),
-            'send_invoice_sms'   => __('ارسال پیامک', 'factorchi'),
-            'invoice_send'       => __('فاکتور ارسال شد.', 'factorchi'),
-            'payment_link_send'  => __('لینک پرداخت ارسال شد.', 'factorchi'),
-            'error_happend'      => __('خطایی رخ داد.', 'factorchi'),
-            'print_size'         => (string) factorchi_get_setting('print_page_size', 'a4'),
+            'base_url'               => home_url('/'),
+            'waiting'                => __('در حال ارسال...', 'factorchi'),
+            'send_invoice'           => __('ارسال فاکتور', 'factorchi'),
+            'send_payment_link'      => __('ارسال لینک پرداخت', 'factorchi'),
+            'send_invoice_sms'       => __('ارسال پیامک', 'factorchi'),
+            'invoice_send'           => __('فاکتور ارسال شد.', 'factorchi'),
+            'payment_link_send'      => __('لینک پرداخت ارسال شد.', 'factorchi'),
+            'error_happend'          => __('خطایی رخ داد.', 'factorchi'),
+            'print_size'             => (string) factorchi_get_setting('print_page_size', 'a4'),
+            'post_label_view'        => (string) factorchi_get_setting('post_label_view', 'modern-a4'),
+            'post_label_print_size'  => Factorchi_Settings::post_label_size_from_view(
+                (string) factorchi_get_setting('post_label_view', 'modern-a4')
+            ),
+            'mini_label_view'        => (string) factorchi_get_setting('mini_label_view', '50x80'),
+            'mini_label_print_size'  => Factorchi_Settings::mini_label_size_from_view(
+                (string) factorchi_get_setting('mini_label_view', '50x80')
+            ),
         ]);
     }
 }

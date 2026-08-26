@@ -26,6 +26,8 @@ class Factorchi_Invoice_View
             $this->view = Factorchi_Settings::normalize_invoice_view($resolved);
         } elseif ($type === 'post-label') {
             $this->view = Factorchi_Settings::normalize_post_label_view($resolved);
+        } elseif ($type === 'mini-label') {
+            $this->view = Factorchi_Settings::normalize_mini_label_view($resolved);
         } else {
             $this->view = $resolved;
         }
@@ -47,10 +49,18 @@ class Factorchi_Invoice_View
             'invoice'        => 'invoice_default_view',
             'pre-invoice'    => 'pre_invoice_view',
             'post-label'     => 'post_label_view',
+            'mini-label'     => 'mini_label_view',
         ];
 
         $key     = $map[$type] ?? 'invoice_default_view';
-        $default = $type === 'post-label' ? 'modern-a4' : (in_array($type, ['invoice', 'pre-invoice'], true) ? 'modern' : 'view-1');
+        $default = 'modern';
+        if ($type === 'post-label') {
+            $default = 'modern-a4';
+        } elseif ($type === 'mini-label') {
+            $default = '50x80';
+        } elseif (!in_array($type, ['invoice', 'pre-invoice'], true)) {
+            $default = 'view-1';
+        }
 
         return (string) factorchi_get_setting($key, $default);
     }
@@ -96,12 +106,16 @@ class Factorchi_Invoice_View
     public function get_print_size(): string
     {
         $size = isset($_GET['print-size']) ? sanitize_key(wp_unslash($_GET['print-size'])) : '';
-        if (in_array($size, ['a4', 'a5'], true)) {
+        if (in_array($size, ['a4', 'a5', '50x80'], true)) {
             return $size;
         }
 
         if ($this->type === 'post-label') {
             return Factorchi_Settings::post_label_size_from_view($this->view);
+        }
+
+        if ($this->type === 'mini-label') {
+            return Factorchi_Settings::mini_label_size_from_view($this->view);
         }
 
         $size = (string) factorchi_get_setting('print_page_size', 'a4');
@@ -132,7 +146,7 @@ class Factorchi_Invoice_View
             'shop-label'     => 'font_size_label',
             'customer-label' => 'font_size_label',
             'product-label'  => 'font_size_label',
-            'mini-label'     => 'font_size_label',
+            'mini-label'     => 'font_size_mini_label',
         ];
 
         $defaults = [
@@ -140,12 +154,18 @@ class Factorchi_Invoice_View
             'font_size_pre_invoice' => 14,
             'font_size_post_label'  => 12,
             'font_size_label'       => 12,
+            'font_size_mini_label'  => 9,
         ];
 
         $key     = $map[$this->type] ?? 'font_size_invoice';
         $default = $defaults[$key] ?? 14;
+        $size    = (int) factorchi_get_setting($key, $default);
 
-        return max(10, min(24, (int) factorchi_get_setting($key, $default)));
+        if ($this->type === 'mini-label') {
+            return max(7, min(20, $size));
+        }
+
+        return max(10, min(24, $size));
     }
 
     public function append_document_variables(): string
@@ -286,7 +306,7 @@ class Factorchi_Invoice_View
             'shop-label'     => 'shop-label-1.css',
             'customer-label' => 'customer-label-1.css',
             'product-label'  => 'product-label-1.css',
-            'mini-label'     => 'shop-label-1.css',
+            'mini-label'     => $this->view === '50x80' ? 'mini-label-50x80.css' : 'shop-label-1.css',
         ];
 
         return $label_map[$this->type] ?? '';
@@ -336,7 +356,7 @@ class Factorchi_Invoice_View
 
     private function should_use_print_batch(): bool
     {
-        if (!in_array($this->type, ['invoice', 'post-label'], true)) {
+        if (!in_array($this->type, ['invoice', 'post-label', 'mini-label'], true)) {
             return false;
         }
 

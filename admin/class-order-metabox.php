@@ -44,6 +44,7 @@ class Factorchi_Order_Metabox
     {
         $invoice_url    = factorchi_get_invoice_url($order);
         $post_label_url = factorchi_get_invoice_url($order, 'post-label');
+        $mini_label_url = factorchi_get_invoice_url($order, 'mini-label');
         ?>
         <div class="factorchi-order-metabox" style="display:flex;flex-direction:column;gap:8px;">
             <?php if ($invoice_url !== '') : ?>
@@ -54,6 +55,11 @@ class Factorchi_Order_Metabox
             <?php if ($post_label_url !== '') : ?>
                 <a class="button" target="_blank" href="<?php echo esc_url($post_label_url); ?>">
                     <?php esc_html_e('چاپ برچسب پستی', 'factorchi'); ?>
+                </a>
+            <?php endif; ?>
+            <?php if ($mini_label_url !== '') : ?>
+                <a class="button" target="_blank" href="<?php echo esc_url($mini_label_url); ?>">
+                    <?php esc_html_e('چاپ برچسب چاپی', 'factorchi'); ?>
                 </a>
             <?php endif; ?>
             <button type="button" class="button" id="factorchi-send-invoice" data-id="<?php echo esc_attr((string) $order_id); ?>">

@@ -126,6 +126,17 @@ function factorchi_get_invoice_url($order, string $type = 'invoice', string $vie
     if ($type === 'post-label') {
         $label_view = $view !== '' ? $view : (string) factorchi_get_setting('post_label_view', 'modern-a4');
         $args['print-size'] = Factorchi_Settings::post_label_size_from_view($label_view);
+        if ($view === '') {
+            $args['view'] = Factorchi_Settings::normalize_post_label_view($label_view);
+        }
+    }
+
+    if ($type === 'mini-label') {
+        $label_view = $view !== '' ? $view : (string) factorchi_get_setting('mini_label_view', '50x80');
+        $args['print-size'] = Factorchi_Settings::mini_label_size_from_view($label_view);
+        if ($view === '') {
+            $args['view'] = Factorchi_Settings::normalize_mini_label_view($label_view);
+        }
     }
 
     $token = Factorchi_Invoice_Router::generate_access_token($order_id);

@@ -18,7 +18,7 @@ class Factorchi_Labels
             'shop-label'    => __('برچسب فروشگاه', 'factorchi'),
             'customer-label'=> __('برچسب مشتری', 'factorchi'),
             'product-label' => __('برچسب محصول', 'factorchi'),
-            'mini-label'    => __('برچسب مینی', 'factorchi'),
+            'mini-label'    => __('برچسب چاپی', 'factorchi'),
             'row'           => __('ردیف', 'factorchi'),
             'order'         => __('سفارش', 'factorchi'),
             'address'       => __('آدرس:', 'factorchi'),

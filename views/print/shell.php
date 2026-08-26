@@ -13,9 +13,14 @@ if (!defined('ABSPATH')) {
  */
 
 $body_classes = $this->get_print_body_classes();
-$type_label   = $this->type === 'post-label' ? __('برچسب پستی', 'factorchi') : __('فاکتور', 'factorchi');
+$type_labels  = [
+    'post-label' => __('برچسب پستی', 'factorchi'),
+    'mini-label' => __('برچسب چاپی', 'factorchi'),
+];
+$type_label   = $type_labels[$this->type] ?? __('فاکتور', 'factorchi');
 $first_id     = $order_ids[0] ?? 0;
 $view_style   = $this->get_view_style();
+$hide_size    = $print_size === '50x80';
 ?>
 <!DOCTYPE html>
 <html <?php language_attributes(); ?>>
@@ -27,7 +32,7 @@ $view_style   = $this->get_view_style();
     <link rel="stylesheet" href="<?php echo esc_url(FACTORCHI_CSS_URL . 'print-layout.css'); ?>?ver=<?php echo esc_attr(FACTORCHI_VERSION); ?>" />
     <style>
         @page {
-            size: <?php echo $print_size === 'a5' ? 'A5' : 'A4'; ?> portrait;
+            size: <?php echo esc_html(Factorchi_Settings::page_size_css($print_size)); ?>;
             margin: 0;
         }
         @media print {
@@ -37,13 +42,15 @@ $view_style   = $this->get_view_style();
 </head>
 <body class="<?php echo esc_attr($body_classes . ' ' . $view_style); ?>">
     <div class="fc-print-toolbar" role="toolbar" aria-label="<?php esc_attr_e('تنظیمات چاپ', 'factorchi'); ?>">
-        <label>
-            <?php esc_html_e('اندازه برگه', 'factorchi'); ?>
-            <select id="fc-print-size" data-fc-print-size>
-                <option value="a4" <?php selected($print_size, 'a4'); ?>><?php esc_html_e('A4', 'factorchi'); ?></option>
-                <option value="a5" <?php selected($print_size, 'a5'); ?>><?php esc_html_e('A5', 'factorchi'); ?></option>
-            </select>
-        </label>
+        <?php if (!$hide_size) : ?>
+            <label>
+                <?php esc_html_e('اندازه برگه', 'factorchi'); ?>
+                <select id="fc-print-size" data-fc-print-size>
+                    <option value="a4" <?php selected($print_size, 'a4'); ?>><?php esc_html_e('A4', 'factorchi'); ?></option>
+                    <option value="a5" <?php selected($print_size, 'a5'); ?>><?php esc_html_e('A5', 'factorchi'); ?></option>
+                </select>
+            </label>
+        <?php endif; ?>
         <button type="button" class="fc-print-btn" id="fc-print-trigger"><?php esc_html_e('چاپ', 'factorchi'); ?></button>
     </div>
 

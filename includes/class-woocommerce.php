@@ -46,6 +46,7 @@ class Factorchi_WooCommerce
     {
         $actions['factorchi_bulk_print_invoice']    = __('چاپ فاکتور', 'factorchi');
         $actions['factorchi_bulk_print_post_label'] = __('چاپ برچسب پستی', 'factorchi');
+        $actions['factorchi_bulk_print_mini_label'] = __('چاپ برچسب چاپی', 'factorchi');
         return $actions;
     }
 
@@ -77,6 +78,7 @@ class Factorchi_WooCommerce
         $labels = [
             'invoice'    => __('فاکتور', 'factorchi'),
             'post-label' => __('برچسب پستی', 'factorchi'),
+            'mini-label' => __('برچسب چاپی', 'factorchi'),
         ];
 
         $links = [];

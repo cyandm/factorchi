@@ -14,8 +14,16 @@ $nav_groups = [
         'general' => ['label' => __('اطلاعات عمومی', 'factorchi'), 'icon' => 'dashicons-store'],
     ],
     __('نمایش', 'factorchi') => [
-        'templates' => ['label' => __('قالب‌ها', 'factorchi'), 'icon' => 'dashicons-layout'],
-        'access'    => ['label' => __('دسترسی', 'factorchi'), 'icon' => 'dashicons-lock'],
+        'templates' => [
+            'label'    => __('قالب‌ها', 'factorchi'),
+            'icon'     => 'dashicons-layout',
+            'children' => [
+                'select'  => __('انتخاب قالب', 'factorchi'),
+                'style'   => __('استایل', 'factorchi'),
+                'content' => __('محتوا', 'factorchi'),
+            ],
+        ],
+        'access' => ['label' => __('دسترسی', 'factorchi'), 'icon' => 'dashicons-lock'],
     ],
     __('ارسال', 'factorchi') => [
         'notify' => ['label' => __('کانال‌ها', 'factorchi'), 'icon' => 'dashicons-email-alt'],
@@ -41,8 +49,23 @@ $tab_titles = [
     'tapin'     => __('یکپارچگی تاپین', 'factorchi'),
 ];
 
+$templates_section = isset($_GET['section']) ? sanitize_key(wp_unslash($_GET['section'])) : 'select';
+if (!in_array($templates_section, ['select', 'style', 'content'], true)) {
+    $templates_section = 'select';
+}
+
+$section_titles = [
+    'select'  => __('انتخاب قالب', 'factorchi'),
+    'style'   => __('استایل', 'factorchi'),
+    'content' => __('محتوا', 'factorchi'),
+];
+
 $active_title = $tab_titles[$tab] ?? $tab_titles['general'];
-$base_url     = admin_url('admin.php?page=factorchi');
+if ($tab === 'templates') {
+    $active_title = ($tab_titles['templates'] ?? '') . ' — ' . ($section_titles[$templates_section] ?? $section_titles['select']);
+}
+
+$base_url = admin_url('admin.php?page=factorchi');
 ?>
 <div class="wrap factorchi-admin">
     <div class="fc-header">
@@ -63,11 +86,41 @@ $base_url     = admin_url('admin.php?page=factorchi');
                 <div class="fc-nav-group">
                     <p class="fc-nav-group-title"><?php echo esc_html($group_title); ?></p>
                     <?php foreach ($items as $slug => $item) : ?>
-                        <a href="<?php echo esc_url(add_query_arg('tab', $slug, $base_url)); ?>"
-                           class="fc-nav-item <?php echo $tab === $slug ? 'is-active' : ''; ?>">
-                            <span class="dashicons <?php echo esc_attr($item['icon']); ?>"></span>
-                            <?php echo esc_html($item['label']); ?>
-                        </a>
+                        <?php
+                        $has_children = !empty($item['children']) && is_array($item['children']);
+                        $is_open      = $has_children && $tab === $slug;
+                        $parent_url   = add_query_arg('tab', $slug, $base_url);
+                        if ($slug === 'templates') {
+                            $parent_url = add_query_arg('section', 'select', $parent_url);
+                        }
+                        ?>
+                        <div class="fc-nav-block <?php echo $is_open ? 'is-open' : ''; ?>">
+                            <a href="<?php echo esc_url($parent_url); ?>"
+                               class="fc-nav-item <?php echo $tab === $slug ? 'is-active' : ''; ?>">
+                                <span class="dashicons <?php echo esc_attr($item['icon']); ?>"></span>
+                                <?php echo esc_html($item['label']); ?>
+                            </a>
+                            <?php if ($has_children) : ?>
+                                <div class="fc-nav-children" <?php echo $is_open ? '' : 'hidden'; ?>>
+                                    <?php foreach ($item['children'] as $child_slug => $child_label) : ?>
+                                        <?php
+                                        $child_url = add_query_arg(
+                                            [
+                                                'tab'     => $slug,
+                                                'section' => $child_slug,
+                                            ],
+                                            $base_url
+                                        );
+                                        $child_active = $tab === $slug && $templates_section === $child_slug;
+                                        ?>
+                                        <a href="<?php echo esc_url($child_url); ?>"
+                                           class="fc-nav-child <?php echo $child_active ? 'is-active' : ''; ?>">
+                                            <?php echo esc_html($child_label); ?>
+                                        </a>
+                                    <?php endforeach; ?>
+                                </div>
+                            <?php endif; ?>
+                        </div>
                     <?php endforeach; ?>
                 </div>
             <?php endforeach; ?>

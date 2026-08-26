@@ -1,0 +1,133 @@
+/* Mini print label — 80mm × 50mm (landscape) */
+
+body.factorchi-document.mini-label.fc-print-50x80,
+body.factorchi-print.mini-label.fc-print-50x80 {
+  margin: 0;
+  padding: 0;
+  background: #fff;
+}
+
+body.factorchi-document.mini-label.fc-print-50x80 .fc-document-frame,
+body.factorchi-print.mini-label.fc-print-50x80 .fc-document-frame {
+  width: 80mm;
+  height: 50mm;
+  max-width: 80mm;
+  max-height: 50mm;
+  margin: 0 auto;
+  overflow: hidden;
+  box-sizing: border-box;
+  padding: var(--fc-doc-pad, 2px);
+  border-radius: var(--fc-radius);
+  background: #fff;
+}
+
+body.factorchi-document.mini-label .fc-mini-label-50x80,
+body.factorchi-print.mini-label .fc-mini-label-50x80 {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  direction: rtl;
+  text-align: right;
+  font-size: var(--fc-font-size);
+  line-height: var(--fc-line-height, 1.35);
+  color: #000;
+  background: #fff;
+  border-radius: var(--fc-radius);
+}
+
+body.factorchi-document.mini-label .fc-mini-label-50x80 .inner,
+body.factorchi-print.mini-label .fc-mini-label-50x80 .inner {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  height: 100%;
+  padding: 0;
+  box-shadow: none;
+  border: none;
+  border-radius: var(--fc-radius);
+}
+
+body.factorchi-document.mini-label .fc-mini-label-50x80 p,
+body.factorchi-print.mini-label .fc-mini-label-50x80 p {
+  margin: 0;
+  padding: 0;
+}
+
+body.factorchi-document.mini-label .fc-mini-label-50x80 strong,
+body.factorchi-print.mini-label .fc-mini-label-50x80 strong {
+  font-weight: 700;
+  margin-left: 3px;
+}
+
+body.factorchi-document.mini-label .fc-mini-label-50x80 .fc-mini-address,
+body.factorchi-print.mini-label .fc-mini-label-50x80 .fc-mini-address {
+  word-break: break-word;
+}
+
+body.factorchi-document.mini-label .fc-mini-label-50x80 .fc-mini-orders,
+body.factorchi-print.mini-label .fc-mini-label-50x80 .fc-mini-orders {
+  margin-top: 2px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+body.factorchi-document.mini-label .fc-mini-label-50x80 .fc-mini-orders-label,
+body.factorchi-print.mini-label .fc-mini-label-50x80 .fc-mini-orders-label {
+  display: block;
+  margin-bottom: 1px;
+}
+
+body.factorchi-document.mini-label .fc-mini-label-50x80 .fc-mini-orders-list,
+body.factorchi-print.mini-label .fc-mini-label-50x80 .fc-mini-orders-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+body.factorchi-document.mini-label .fc-mini-label-50x80 .fc-mini-orders-list li,
+body.factorchi-print.mini-label .fc-mini-label-50x80 .fc-mini-orders-list li {
+  display: block;
+  margin: 0;
+  padding: 0;
+  line-height: 1.3;
+}
+
+body.factorchi-document.mini-label .fc-mini-label-50x80 .fc-mini-note,
+body.factorchi-print.mini-label .fc-mini-label-50x80 .fc-mini-note {
+  margin-top: 2px;
+  min-height: 1.4em;
+  word-break: break-word;
+}
+
+@media screen {
+  body.factorchi-document.mini-label.fc-print-50x80 {
+    background: #e2e8f0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  body.factorchi-document.mini-label.fc-print-50x80 .fc-document-frame {
+    background: #fff;
+    box-shadow: 0 4px 24px rgba(15, 23, 42, 0.12);
+  }
+}
+
+@media print {
+  body.factorchi-document.mini-label.fc-print-50x80 .fc-document-frame,
+  body.factorchi-print.mini-label.fc-print-50x80 .fc-document-frame,
+  body.factorchi-print.mini-label.fc-print-50x80 .fc-print-sheet .fc-document-frame {
+    width: 80mm !important;
+    height: 50mm !important;
+    max-width: 80mm !important;
+    max-height: 50mm !important;
+    box-shadow: none !important;
+    padding: var(--fc-doc-pad, 2px) !important;
+    border-radius: var(--fc-radius) !important;
+  }
+
+  body.factorchi-print.mini-label.fc-print-50x80 .fc-print-root {
+    max-width: 80mm !important;
+  }
+}

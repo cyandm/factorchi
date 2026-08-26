@@ -30,6 +30,10 @@ body.fc-print-a5 .fc-print-root {
   max-width: 148mm;
 }
 
+body.fc-print-50x80 .fc-print-root {
+  max-width: 80mm;
+}
+
 .fc-print-toolbar {
   position: sticky;
   top: 0;

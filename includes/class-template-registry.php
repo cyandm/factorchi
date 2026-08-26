@@ -11,6 +11,7 @@ class Factorchi_Template_Registry
         'invoice_default_view' => 'invoice',
         'pre_invoice_view'       => 'invoice',
         'post_label_view'        => 'post-label',
+        'mini_label_view'        => 'mini-label',
     ];
 
     /**
@@ -31,6 +32,14 @@ class Factorchi_Template_Registry
                 'modern-a5'  => __('مدرن سایز A5', 'factorchi'),
                 'classic-a4' => __('کلاسیک سایز A4', 'factorchi'),
                 'classic-a5' => __('کلاسیک سایز A5', 'factorchi'),
+            ];
+        }
+
+        if ($folder === 'mini-label') {
+            return [
+                '50x80'   => __('برچسب ۵۰×۸۰', 'factorchi'),
+                'modern'  => __('مدرن', 'factorchi'),
+                'classic' => __('کلاسیک', 'factorchi'),
             ];
         }
 
@@ -71,6 +80,7 @@ class Factorchi_Template_Registry
             'modern-a5'  => __('مدرن سایز A5', 'factorchi'),
             'classic-a4' => __('کلاسیک سایز A4', 'factorchi'),
             'classic-a5' => __('کلاسیک سایز A5', 'factorchi'),
+            '50x80'      => __('برچسب ۵۰×۸۰', 'factorchi'),
         ];
 
         return $labels[$slug] ?? $slug;
@@ -86,6 +96,7 @@ class Factorchi_Template_Registry
             'invoice_default_view' => 'invoice',
             'pre_invoice_view'     => 'pre-invoice',
             'post_label_view'      => 'post-label',
+            'mini_label_view'      => 'mini-label',
         ];
 
         $type = $type_map[$setting_key] ?? 'invoice';
@@ -100,6 +111,10 @@ class Factorchi_Template_Registry
 
         if ($type === 'post-label') {
             $args['print-size'] = Factorchi_Settings::post_label_size_from_view($view_slug);
+        }
+
+        if ($type === 'mini-label') {
+            $args['print-size'] = Factorchi_Settings::mini_label_size_from_view($view_slug);
         }
 
         return add_query_arg($args, home_url('/'));
@@ -118,6 +133,7 @@ class Factorchi_Template_Registry
             'invoice_default_view' => 'invoice',
             'pre_invoice_view'     => 'pre-invoice',
             'post_label_view'      => 'post-label',
+            'mini_label_view'      => 'mini-label',
         ];
 
         $type = $type_map[$setting_key] ?? 'invoice';

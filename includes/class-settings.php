@@ -34,15 +34,18 @@ class Factorchi_Settings
             'invoice_default_view'   => 'modern',
             'pre_invoice_view'       => 'modern',
             'post_label_view'        => 'modern-a4',
+            'mini_label_view'        => '50x80',
             'invoice_margin'         => '10',
             'pre_invoice_margin'     => '10',
             'post_label_margin'      => '5',
+            'mini_label_margin'      => '2',
             'section_gap_a4'         => '12',
             'section_gap_a5'         => '12',
             'font_size_invoice'      => '14',
             'font_size_pre_invoice'  => '14',
             'font_size_post_label'   => '12',
             'font_size_label'        => '12',
+            'font_size_mini_label'   => '9',
             'font_size_shop'         => '12',
             'font_size_buyer'        => '14',
             'show_product_image'     => 'no',
@@ -218,6 +221,40 @@ class Factorchi_Settings
     }
 
     /**
+     * Mini (print) label templates.
+     */
+    public static function normalize_mini_label_view(string $view): string
+    {
+        $view = sanitize_file_name($view);
+        $allowed = ['50x80', 'modern', 'classic'];
+
+        if (in_array($view, $allowed, true)) {
+            return $view;
+        }
+
+        return '50x80';
+    }
+
+    public static function mini_label_size_from_view(string $view): string
+    {
+        $view = self::normalize_mini_label_view($view);
+
+        return $view === '50x80' ? '50x80' : 'a4';
+    }
+
+    /**
+     * CSS @page size value for a print-size key.
+     */
+    public static function page_size_css(string $size): string
+    {
+        if ($size === '50x80') {
+            return '80mm 50mm';
+        }
+
+        return $size === 'a5' ? 'A5 portrait' : 'A4 portrait';
+    }
+
+    /**
      * @param array<string, mixed> $settings
      * @return array<string, mixed>
      */
@@ -231,6 +268,10 @@ class Factorchi_Settings
 
         if (isset($settings['post_label_view']) && is_string($settings['post_label_view'])) {
             $settings['post_label_view'] = self::normalize_post_label_view($settings['post_label_view']);
+        }
+
+        if (isset($settings['mini_label_view']) && is_string($settings['mini_label_view'])) {
+            $settings['mini_label_view'] = self::normalize_mini_label_view($settings['mini_label_view']);
         }
 
         return $settings;
@@ -249,6 +290,10 @@ class Factorchi_Settings
 
         if (isset($settings['post_label_view']) && is_string($settings['post_label_view'])) {
             $settings['post_label_view'] = self::normalize_post_label_view($settings['post_label_view']);
+        }
+
+        if (isset($settings['mini_label_view']) && is_string($settings['mini_label_view'])) {
+            $settings['mini_label_view'] = self::normalize_mini_label_view($settings['mini_label_view']);
         }
 
         $merged = array_merge(self::defaults(), get_option(self::OPTION_KEY, []), $settings);
