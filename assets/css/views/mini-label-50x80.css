@@ -99,6 +99,21 @@ body.factorchi-print.mini-label .fc-mini-label-50x80 .fc-mini-note {
   word-break: break-word;
 }
 
+body.factorchi-document.mini-label .fc-mini-label-50x80 .fc-mini-more,
+body.factorchi-print.mini-label .fc-mini-label-50x80 .fc-mini-more {
+  font-weight: 700;
+  margin-top: 1px;
+}
+
+body.factorchi-document.mini-label .fc-mini-label-50x80 .fc-mini-continued-head,
+body.factorchi-print.mini-label .fc-mini-label-50x80 .fc-mini-continued-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+  padding-bottom: 1px;
+  border-bottom: 1px dashed #000;
+}
+
 @media screen {
   body.factorchi-document.mini-label.fc-print-50x80 {
     background: #e2e8f0;
@@ -106,6 +121,11 @@ body.factorchi-print.mini-label .fc-mini-label-50x80 .fc-mini-note {
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+
+  body.factorchi-document.mini-label.fc-print-50x80:not(.factorchi-print) {
+    flex-direction: column;
+    gap: 12px;
   }
 
   body.factorchi-document.mini-label.fc-print-50x80 .fc-document-frame {
@@ -129,5 +149,10 @@ body.factorchi-print.mini-label .fc-mini-label-50x80 .fc-mini-note {
 
   body.factorchi-print.mini-label.fc-print-50x80 .fc-print-root {
     max-width: 80mm !important;
+  }
+
+  body.factorchi-document.mini-label.fc-print-50x80 > .fc-mini-continued-frame {
+    page-break-before: always;
+    break-before: page;
   }
 }

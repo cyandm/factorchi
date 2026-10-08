@@ -26,8 +26,15 @@ if ($is_preview) {
     $note     = $customer->get_customer_note();
     $order_items = $products->get_list();
 }
+
+$fit_order_id = (string) ($data['shop_order_id'] ?? $this->get_order_id());
 ?>
-<div class="fc-mini-label fc-mini-label-50x80 container">
+<div class="fc-mini-label fc-mini-label-50x80 container"
+     data-fc-fit
+     data-order-id="<?php echo esc_attr($fit_order_id); ?>"
+     data-continued-label="<?php esc_attr_e('ادامه سفارش', 'factorchi'); ?>"
+     data-next-label="<?php esc_attr_e('… ادامه در برچسب بعد', 'factorchi'); ?>"
+     data-page-label="<?php /* translators: 1: current label number, 2: total labels */ esc_attr_e('برچسب %1$s از %2$s', 'factorchi'); ?>">
     <div class="inner">
         <?php if ($name !== '') : ?>
             <p class="fc-mini-name">
@@ -83,5 +90,9 @@ if ($is_preview) {
         </p>
     </div>
 </div>
+<?php if (!defined('FACTORCHI_MINI_LABEL_FIT_LOADED')) : ?>
+    <?php define('FACTORCHI_MINI_LABEL_FIT_LOADED', true); ?>
+    <script src="<?php echo esc_url(FACTORCHI_JS_URL . 'mini-label-fit.js?ver=' . FACTORCHI_VERSION); ?>"></script>
+<?php endif; ?>
 <?php
 include FCI_VIEW_PATH . 'footer.php';
